@@ -6,6 +6,9 @@ Open source ssh manager
 
 1. Clone the repository
 2. Run `npm install`
+
+   Note: You might need to run `npm install --force` if you encounter any errors.
+
 3. Run `npm start`
 
 # Package
