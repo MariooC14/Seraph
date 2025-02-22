@@ -1,8 +1,6 @@
-"use client";
-
 import { useEffect, useRef } from "react";
-import { Terminal } from "xterm";
-import { FitAddon } from "xterm-addon-fit";
+import { Terminal, } from "@xterm/xterm";
+import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "xterm-addon-web-links";
 import "xterm/css/xterm.css";
 
@@ -26,7 +24,7 @@ function TerminalWindow({ connection }: TerminalWindowProps) {
         background: "#1a1b1e",
         foreground: "#f8f9fa",
         cursor: "#f8f9fa",
-        selection: "rgba(248, 249, 250, 0.3)",
+        selectionForeground: "rgba(248, 249, 250, 0.3)",
         black: "#1a1b1e",
         red: "#e03131",
         green: "#2f9e44",

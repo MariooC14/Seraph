@@ -36,7 +36,7 @@
     "@typescript-eslint/parser": "^5.62.0",
     "autoprefixer": "^10.4.20",
     "electron": "34.2.0",
-    "eslint": "^8.57.1",
+    "eslint": "^9.21.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.37.4",
     "globals": "^16.0.0",
@@ -59,6 +59,8 @@
     "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "^2.48.1",
     "@tailwindcss/vite": "^4.0.8",
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/xterm": "^5.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "electron-squirrel-startup": "^1.0.1",
@@ -73,8 +75,6 @@
     "tailwind-merge": "^3.0.1",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
-    "xterm": "^4.19.0",
-    "xterm-addon-web-links": "^0.9.0",
     "zod": "^3.24.2"
   }
 }
