@@ -32,9 +32,11 @@ function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <NavLink to="/settings">Settings</NavLink>
-        </DropdownMenuItem>
+        <NavLink to="/settings">
+          <DropdownMenuItem>
+            Settings
+          </DropdownMenuItem>
+        </NavLink>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-red-600">
           Logout
