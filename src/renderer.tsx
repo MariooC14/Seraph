@@ -30,10 +30,26 @@ import { StrictMode } from "react";
 import App from "./App";
 import "./index.css";
 import { createRoot } from "react-dom/client";
+import { HashRouter, Route, Routes } from "react-router";
+import Dashboard from "./pages/dashboard";
+import Servers from "./pages/servers";
+import Containers from "./pages/containers";
+import Terminals from "./pages/terminals";
+import Settings from "./pages/settings";
 
 const root = createRoot(document.body);
 root.render(
   <StrictMode>
-    <App />
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<App />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/servers" element={<Servers />} />
+          <Route path="/containers" element={<Containers />} />
+          <Route path="/terminals" element={<Terminals />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+      </Routes>
+    </HashRouter>
   </StrictMode>
 );
