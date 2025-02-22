@@ -1,6 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "./components/theme-provider";
-import { toast } from "sonner";
 import { ModeToggle } from "./components/mode-toggle";
 import UserNav from "./components/user-nav";
 import { Outlet } from "react-router";
