@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { serverSchema, type ServerFormData } from "@/lib/validations/server";
-// import { addServer } from "@/lib/server";
+import { addServer } from "@/lib/server";
 
 export function AddServerDialog() {
   const [open, setOpen] = useState(false);
@@ -36,16 +36,15 @@ export function AddServerDialog() {
     },
   });
 
-  const onSubmit = async (/*data: ServerFormData*/) => {
-    toast.error("Add server not implemented yet.");
-    // try {
-    //   await addServer(data);
-    //   setOpen(false);
-    //   reset();
-    //   toast.success("Server added successfully.");
-    // } catch (error) {
-    //   toast.error("Failed to add server.");
-    // }
+  const onSubmit = async (data: ServerFormData) => {
+    try {
+      await addServer(data);
+      toast.success("Server added successfully");
+      setOpen(false);
+      reset();
+    } catch (error) {
+      toast.error("Failed to add server");
+    }
   };
 
   return (
