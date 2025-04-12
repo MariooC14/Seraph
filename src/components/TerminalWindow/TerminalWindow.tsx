@@ -35,12 +35,6 @@ function TerminalWindow() {
       fitAddon.fit(); // todo? could debounce this
     }
 
-    term.onResize(() => {
-        const dimensions = fitAddon.proposeDimensions();
-        console.log(dimensions);
-        term.resize(dimensions.cols, dimensions.rows);
-    })
-
     window.addEventListener('resize', handleResize)
 
     return () => {
