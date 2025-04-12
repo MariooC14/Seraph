@@ -5,11 +5,14 @@ Open source ssh manager
 # Set up
 
 1. Clone the repository
-2. Run `npm install`
+2. For windows:
+   - Install the Visual C++ Build Environment by either installing the Visual Studio Build Tools or the Visual Studio Community Edition. The minimum workload to install is Desktop Development with C++. But there are additional components from "Individual components":
+      - MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs (Latest) (use ARM64 for Windows on ARM, but the x64/x86 may still be needed)
+4. Run `npm install`
 
    Note: You might need to run `npm install --force` if you encounter any errors.
 
-3. Run `npm start`
+5. Run `npm start`
 
 # Package
 
