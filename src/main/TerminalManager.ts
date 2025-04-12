@@ -25,7 +25,7 @@ export class TerminalManager {
   }
 
   sendData(_: IpcMainInvokeEvent, data: string) {
-    if (!this?.terminal) return;
+    if (!this.terminal) return;
 
     this.terminal.write(data);
   }
