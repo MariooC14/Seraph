@@ -1,6 +1,6 @@
 {
-  "name": "serverer",
-  "productName": "serverer",
+  "name": "seraph",
+  "productName": "Seraph",
   "version": "1.0.0",
   "description": "Open source ssh manager",
   "main": ".vite/build/main.js",
