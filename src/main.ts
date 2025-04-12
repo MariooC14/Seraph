@@ -26,7 +26,6 @@ const createWindow = () => {
     );
   }
 
-  // Open the DevTools if in development mode.
   if (process.env.NODE_ENV === "development")
     mainWindow.webContents.openDevTools();
 };
