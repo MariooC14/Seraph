@@ -1,4 +1,4 @@
-# Serverer
+# Seraph
 
 Open source ssh manager
 
