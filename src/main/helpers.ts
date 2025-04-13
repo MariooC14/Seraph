@@ -8,7 +8,6 @@ const commonWindowShells = [
   { name: "Command Prompt", path: "cmd.exe" },
   { name: "Git Bash", path: "C:\\Program Files\\Git\\bin\\bash.exe" },
   { name: "Windows Subsystem for Linux (WSL)", path: "wsl.exe" },
-  { name: "PowerShell ISE", path: "powershell_ise.exe" },
 ];
 
 export async function getAvailableShells(platform: NodeJS.Platform) {
