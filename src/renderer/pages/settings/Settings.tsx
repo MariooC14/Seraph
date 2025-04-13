@@ -1,8 +1,8 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Shield, Globe } from "lucide-react";
 import NotificationsTab from "./tabs/NotificationsTab";
 import SecurityTab from "./tabs/SecurityTab";
 import GeneralTab from "./tabs/GeneralTab";
+import TerminalTab from "./tabs/TerminalTab";
 
 function Settings() {
 
@@ -10,22 +10,26 @@ function Settings() {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Settings</h1>
 
-      <Tabs defaultValue="notifications" className="space-y-4">
-        <TabsList>
+      <Tabs defaultValue="terminal" className="space-y-4">
+        <TabsList className="">
+          <TabsTrigger value="terminal">
+            Terminal
+          </TabsTrigger>
           <TabsTrigger value="notifications">
-            <Bell /> Notifications
+            Notifications
           </TabsTrigger>
           <TabsTrigger value="security">
-            <Shield /> Security
+            Security
           </TabsTrigger>
           <TabsTrigger value="general">
-            <Globe />General
+            General
           </TabsTrigger>
         </TabsList>
 
         <NotificationsTab />
         <SecurityTab />
         <GeneralTab />
+        <TerminalTab />
       </Tabs>
     </div>
   );

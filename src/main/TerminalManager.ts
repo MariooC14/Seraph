@@ -5,7 +5,10 @@
 
 import os from "node:os";
 import * as pty from "node-pty";
-import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
+import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
+import fs from "node:fs";
+import { join } from "node:path";
+import { getAvailableShells } from "./helpers";
 
 export class TerminalManager {
   shell: string;
@@ -18,9 +21,21 @@ export class TerminalManager {
   }
 
   public startListening() {
-    ipcMain.handle("terminal:spawn", () => this.spawnTerminal());
+    ipcMain.handle("terminal:spawn", (_, shellPath: string) =>
+      this.spawnTerminal(shellPath)
+    );
+    ipcMain.handle("terminal:kill", () => this.killTerminal());
     ipcMain.handle("terminal:write", (_, data: string) =>
       this.sendData(_, data)
+    );
+    ipcMain.handle("terminal:getUserPreferredShell", () =>
+      this.getUserPreferredShell()
+    );
+    ipcMain.handle("terminal:getAvailableShells", () =>
+      this.getAvailableShells()
+    );
+    ipcMain.handle("terminal:saveDefaultShell", (_, newShellPath: string) =>
+      this.saveDefaultShell(newShellPath)
     );
   }
 
@@ -35,14 +50,48 @@ export class TerminalManager {
     return "bash";
   }
 
+  public getUserPreferredShell() {
+    const configPath = join(app.getPath("userData"), "config.json");
+    if (!fs.existsSync(configPath)) {
+      fs.writeFileSync(configPath, JSON.stringify({ shell: this.shell }));
+      return this.shell;
+    } else {
+      const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+      console.log("main", config);
+      return (config.shell as string) || this.shell;
+    }
+  }
+
+  public saveDefaultShell(newShellPath: string) {
+    const configPath = join(app.getPath("userData"), "config.json");
+
+    try {
+      if (!fs.existsSync(configPath)) {
+        fs.writeFileSync(configPath, JSON.stringify({ shell: newShellPath }));
+      } else {
+        const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+        config.shell = newShellPath;
+        fs.writeFileSync(configPath, JSON.stringify(config));
+      }
+      return true;
+    } catch (error) {
+      console.error("Failed to save default shell:", error);
+      return false;
+    }
+  }
+
+  public async getAvailableShells() {
+    return await getAvailableShells(os.platform());
+  }
+
   sendData(_: IpcMainInvokeEvent, data: string) {
     if (!this.terminal) return;
 
     this.terminal.write(data);
   }
 
-  spawnTerminal() {
-    this.terminal = pty.spawn(this.shell, [], {
+  spawnTerminal(shellPath?: string) {
+    this.terminal = pty.spawn(shellPath || this.shell, [], {
       name: "xterm-color",
       cols: 80,
       rows: 30,

@@ -3,8 +3,15 @@
 import { contextBridge, ipcRenderer } from "electron/renderer";
 
 contextBridge.exposeInMainWorld("terminal", {
-  spawnTerminal: () => ipcRenderer.invoke("terminal:spawn"),
+  spawnTerminal: (shellPath: string) =>
+    ipcRenderer.invoke("terminal:spawn", shellPath),
+  killTerminal: () => ipcRenderer.invoke("terminal:kill"),
   sendData: (data: string) => ipcRenderer.invoke("terminal:write", data),
   onData: (callback: (data: string) => void) =>
     ipcRenderer.on("terminal:updateData", (_event, value) => callback(value)),
+  getUserPreferredShell: () =>
+    ipcRenderer.invoke("terminal:getUserPreferredShell"),
+  getAvailableShells: () => ipcRenderer.invoke("terminal:getAvailableShells"),
+  saveDefaultShell: (newShellPath: string) =>
+    ipcRenderer.invoke("terminal:saveDefaultShell", newShellPath),
 });
