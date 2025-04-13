@@ -14,7 +14,7 @@ export class TerminalManager {
 
   public constructor(window: BrowserWindow) {
     this.window = window;
-    this.shell = os.platform() === "win32" ? "powershell.exe" : "bash";
+    this.shell = this.getShell();
   }
 
   public startListening() {
@@ -22,6 +22,17 @@ export class TerminalManager {
     ipcMain.handle("terminal:write", (_, data: string) =>
       this.sendData(_, data)
     );
+  }
+
+  getShell() {
+    return process.env.SHELL || this.getDefaultShell();
+  }
+
+  getDefaultShell(): string {
+    if (os.platform() === "win32") {
+      return "powershell.exe";
+    }
+    return "bash";
   }
 
   sendData(_: IpcMainInvokeEvent, data: string) {
