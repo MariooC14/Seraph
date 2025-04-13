@@ -4,7 +4,7 @@
  */
 
 import os from "node:os";
-import pty from "node-pty";
+import * as pty from "node-pty";
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
 
 export class TerminalManager {

@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Server, Activity, HardDrive, Network, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { AddServerDialog } from "@/components/add-server-dialog";
+// import { AddServerDialog } from "@/components/add-server-dialog";
 
 type Server = {
   id: string;
@@ -58,7 +58,7 @@ function Servers() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Servers</h1>
-        <AddServerDialog />
+        {/* <AddServerDialog /> */}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

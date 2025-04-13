@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
-import { TerminalManager } from "./main/TerminalManager";
+import { TerminalManager } from "./TerminalManager";
 
 let terminalManager: TerminalManager;
 let mainWindow: BrowserWindow;
