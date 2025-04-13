@@ -4,12 +4,14 @@ import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import "@xterm/xterm/css/xterm.css";
 import { defaultTerminalOptions } from "./terminalConfig";
+import { useConfig } from "@/context/ConfigProvider";
 
 function TerminalWindow() {
+  const { defaultShellPath } = useConfig();
   const terminalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    window.terminal.spawnTerminal();
+    window.terminal.spawnTerminal(defaultShellPath);
     const term = new Terminal(defaultTerminalOptions);
 
     const fitAddon = new FitAddon();
@@ -38,6 +40,7 @@ function TerminalWindow() {
     window.addEventListener('resize', handleResize)
 
     return () => {
+      window.terminal.killTerminal();
       term.dispose();
       window.removeEventListener('resize', handleResize);
     };
