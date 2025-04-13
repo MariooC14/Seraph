@@ -12,7 +12,6 @@ function App() {
           <div className="w-64 border-r bg-muted/10 min-h-[calc(100vh-4rem)] p-4">
             <MainNav />
           </div>
-
           <div className="flex-1 p-8">
             <Outlet />
           </div>
