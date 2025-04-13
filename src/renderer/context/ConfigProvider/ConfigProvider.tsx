@@ -44,7 +44,9 @@ export default function ConfigProvider({ children }: { children: React.ReactNode
 };
 
 export function useConfig() {
-  if (!ConfigContext)
+  const context = useContext(ConfigContext);
+  if (!context) {
     console.warn("useConfig must be used within a ConfigProvider");
-  return useContext(ConfigContext);
+  }
+  return context;
 }
