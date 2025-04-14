@@ -13,7 +13,9 @@ const titleBarThemes = {
 };
 
 export class WindowManager {
-  constructor(public mainWindow: Electron.BrowserWindow) {}
+  platform: NodeJS.Platform = process.platform;
+
+  constructor(private mainWindow: Electron.BrowserWindow) {}
 
   startListening() {
     ipcMain.handle("windows:applyTheme", (_, theme: Theme) => {
@@ -29,6 +31,8 @@ export class WindowManager {
 
   applyTheme(theme: Theme) {
     console.log("windowManager: applying theme", theme);
+    if (this.platform === "darwin") return; // macos has no notion of titlebar
+
     if (theme === "system") {
       const nativeTheme = electron.nativeTheme.shouldUseDarkColors
         ? "dark"
