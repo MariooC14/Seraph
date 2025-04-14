@@ -13,8 +13,14 @@ if (started) {
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    minWidth: 800,
+    minHeight: 600,
+    titleBarStyle: "hidden",
+    // expose window controlls in Windows/Linux
+    ...(process.platform !== "darwin"
+      ? { titleBarOverlay: { color: "#0a0a0a", symbolColor: "#636363" } }
+      : {}),
+    frame: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -29,8 +35,8 @@ const createWindow = () => {
     );
   }
 
-  if (process.env.NODE_ENV === "development")
-    mainWindow.webContents.openDevTools();
+  // if (process.env.NODE_ENV === "development")
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

@@ -1,0 +1,27 @@
+:root {
+  --fallback-title-bar-height: 40px;
+}
+
+#titleBarContainer {
+  position: absolute;
+  top: env(titlebar-area-y, 0);
+  height: env(titlebar-area-height, var(--fallback-title-bar-height));
+  width: 100%;
+}
+
+.draggable {
+  app-region: drag;
+  /* Pre-fix app-region during standardization process */
+  -webkit-app-region: drag;
+}
+
+.nonDraggable {
+  app-region: no-drag;
+  /* Pre-fix app-region during standardization process */
+  -webkit-app-region: no-drag;
+}
+
+#titleBar {
+  left: env(titlebar-area-x, 0);
+  width: env(titlebar-area-width, 100%);
+}

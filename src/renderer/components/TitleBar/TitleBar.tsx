@@ -1,0 +1,12 @@
+import { TypographyP } from "@/components/ui/TypographyP";
+import "./TitleBar.css";
+
+export default function TitleBar() {
+  return (
+    <div id="titleBarContainer">
+      <div id="titleBar" className="draggable absolute flex top-0 px-2 select-none h-full">
+        <TypographyP className="draggable">Seraph</TypographyP>
+      </div>
+    </div>
+  )
+};
