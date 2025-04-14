@@ -1,37 +1,58 @@
-import { Moon, Sun } from "lucide-react"
+import { Check, ChevronsUpDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { useTheme } from "@/components/theme-provider"
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
+import { useState } from "react"
+import { cn } from "@/lib/utils"
+import { Command, CommandGroup, CommandItem, CommandList } from "./ui/command"
+
+const themeOptions: Theme[] = ["light", "dark", "system"];
 
 export function ModeToggle() {
-  const { setTheme } = useTheme()
+  const [open, setOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-[200px] justify-between capitalize"
+          >
+          {theme}
+          <ChevronsUpDown className="opacity-50" />
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-[200px]">
+        <Command>
+          <CommandList>
+            <CommandGroup>
+              {themeOptions.map((themeOption) => (
+                <CommandItem
+                key={themeOption}
+                value={themeOption}
+                className="capitalize"
+                onSelect={(themeOption: Theme) => {
+                  setTheme(themeOption)
+                  setOpen(false)
+                }}
+                >
+                  {themeOption}
+                  <Check
+                    className={cn(
+                      "ml-auto",
+                      themeOption === theme ? "opacity-100" : "opacity-0"
+                    )}
+                    />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

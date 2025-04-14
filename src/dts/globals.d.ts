@@ -9,7 +9,14 @@ declare global {
       getAvailableShells: () => Promise<string[]>;
       saveDefaultShell: (newShellPath: string) => Promise<boolean>;
     };
+
+    windows: {
+      applyTheme: (theme: Theme) => Promise<void>;
+      onNativeThemeChanged: (callback: (theme: Theme) => void) => void;
+    };
   }
+
+  type Theme = "system" | "light" | "dark";
 }
 
 export {};

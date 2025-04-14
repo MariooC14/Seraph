@@ -2,8 +2,10 @@ import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { TerminalManager } from "./TerminalManager";
+import { WindowManager } from "./windowManager";
 
 let terminalManager: TerminalManager;
+let windowManager: WindowManager;
 let mainWindow: BrowserWindow;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -44,7 +46,10 @@ const createWindow = () => {
 app.whenReady().then(() => {
   createWindow();
   terminalManager = new TerminalManager(mainWindow);
+  windowManager = new WindowManager(mainWindow);
+
   terminalManager.startListening();
+  windowManager.startListening();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
