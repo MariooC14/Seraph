@@ -1,26 +1,27 @@
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "./components/theme-provider";
-import { ModeToggle } from "./components/mode-toggle";
 import { Outlet } from "react-router";
 import MainNav from "./components/main-nav";
 import ConfigProvider from "./context/ConfigProvider";
+import TitleBar from "./components/TitleBar/TitleBar";
+import { ScrollArea } from "./components/ui/scroll-area";
 
 function App() {
   return (
     <ThemeProvider defaultTheme="system">
       <ConfigProvider>
-        <div className="min-h-screen">
-          <div className="flex">
-            <div className="w-64 border-r bg-muted/10 min-h-[calc(100vh-4rem)] p-4">
+        <div className="h-screen w-screen">
+          <TitleBar />
+          <div id="mainContent" className="flex overflow-hidden">
+            <div className="min-w-44 border-r bg-muted/10 p-3">
               <MainNav />
             </div>
-            <div className="flex-1 p-8">
+            <ScrollArea className="flex-1 p-8 h-full">
               <Outlet />
-            </div>
+            </ScrollArea>
           </div>
         </div>
         <Toaster />
-        <ModeToggle />
       </ConfigProvider>
     </ThemeProvider>
   );

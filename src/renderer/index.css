@@ -121,3 +121,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+#mainContent {
+  position: absolute;
+  top: env(titlebar-area-height, var(--fallback-title-bar-height));
+  right: 0;
+  bottom: 0;
+  left: 0;
+  user-select: none;
+}

@@ -30,6 +30,12 @@ export function ThemeProvider({
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   )
 
+  function updateTheme(theme: Theme) {
+      localStorage.setItem(storageKey, theme)
+      window.windows.applyTheme(theme);
+      setTheme(theme);
+  }
+
   useEffect(() => {
     const root = window.document.documentElement
 
@@ -48,12 +54,17 @@ export function ThemeProvider({
     root.classList.add(theme)
   }, [theme])
 
+  useEffect(() => {
+    // Handle case where user changes system theme from OS settings
+    window.windows.onNativeThemeChanged((newTheme: Theme) => {
+      localStorage.setItem(storageKey, newTheme);
+      setTheme(newTheme);
+    });
+  });
+
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
-      setTheme(theme)
-    },
+    setTheme: updateTheme,
   }
 
   return (

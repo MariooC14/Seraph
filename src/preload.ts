@@ -15,3 +15,11 @@ contextBridge.exposeInMainWorld("terminal", {
   saveDefaultShell: (newShellPath: string) =>
     ipcRenderer.invoke("terminal:saveDefaultShell", newShellPath),
 });
+
+contextBridge.exposeInMainWorld("windows", {
+  applyTheme: (theme: Theme) => ipcRenderer.invoke("windows:applyTheme", theme),
+  onNativeThemeChanged: (callback: (theme: Theme) => void) =>
+    ipcRenderer.on("windows:nativeThemeChanged", (_event, value) =>
+      callback(value)
+    ),
+});

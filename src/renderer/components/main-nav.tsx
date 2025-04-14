@@ -18,7 +18,7 @@ function MainNav() {
       {navigation.map((item) => {
         const Icon = item.icon;
         return (
-          <NavLink
+          <NavLink draggable={false}
             key={item.name}
             to={item.href}
             className={cn(

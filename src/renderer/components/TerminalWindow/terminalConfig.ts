@@ -30,4 +30,5 @@ export const defaultTerminalOptions: ITerminalOptions &
   allowTransparency: true,
   scrollback: 10000,
   rows: 25,
+  cols: 50,
 };

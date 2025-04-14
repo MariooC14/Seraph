@@ -2,8 +2,10 @@ import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { TerminalManager } from "./TerminalManager";
+import { WindowManager } from "./windowManager";
 
 let terminalManager: TerminalManager;
+let windowManager: WindowManager;
 let mainWindow: BrowserWindow;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -13,8 +15,13 @@ if (started) {
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    minWidth: 800,
+    minHeight: 600,
+    titleBarStyle: "hidden",
+    // expose window controlls in Windows/Linux
+    ...(process.platform !== "darwin"
+      ? { titleBarOverlay: { color: "#0a0a0a", symbolColor: "#636363" } }
+      : {}),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -29,8 +36,8 @@ const createWindow = () => {
     );
   }
 
-  if (process.env.NODE_ENV === "development")
-    mainWindow.webContents.openDevTools();
+  // if (process.env.NODE_ENV === "development")
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -39,7 +46,10 @@ const createWindow = () => {
 app.whenReady().then(() => {
   createWindow();
   terminalManager = new TerminalManager(mainWindow);
+  windowManager = new WindowManager(mainWindow);
+
   terminalManager.startListening();
+  windowManager.startListening();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
