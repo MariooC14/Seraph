@@ -20,7 +20,6 @@ const createWindow = () => {
     ...(process.platform !== "darwin"
       ? { titleBarOverlay: { color: "#0a0a0a", symbolColor: "#636363" } }
       : {}),
-    frame: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
