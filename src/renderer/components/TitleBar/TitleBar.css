@@ -1,3 +1,5 @@
+/* These styles are unique to electron and cannot be applied with tailwind or inline */
+
 :root {
   --fallback-title-bar-height: 40px;
 }
