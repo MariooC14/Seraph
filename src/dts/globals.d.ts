@@ -10,8 +10,12 @@ declare global {
       saveDefaultShell: (newShellPath: string) => Promise<boolean>;
     };
 
-    windows: {
-      applyTheme: (theme: Theme) => Promise<void>;
+    app: {
+      exit(): () => void;
+      maximize: () => void;
+      unmaximize: () => void;
+      minimize: () => void;
+      onMaximized: (callback: (maximized: boolean) => void) => void;
       onNativeThemeChanged: (callback: (theme: Theme) => void) => void;
     };
   }

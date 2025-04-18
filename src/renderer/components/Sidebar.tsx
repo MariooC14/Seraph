@@ -10,11 +10,11 @@ const navigation = [
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
-function MainNav() {
+function Sidebar() {
   const { pathname } = useLocation();
 
   return (
-    <nav className="flex flex-col space-y-1">
+    <nav className="min-w-44 border-r bg-muted/10 p-3 flex flex-col space-y-1">
       {navigation.map((item) => {
         const Icon = item.icon;
         return (
@@ -37,4 +37,4 @@ function MainNav() {
   );
 }
 
-export default MainNav;
+export default Sidebar;
