@@ -16,10 +16,15 @@ contextBridge.exposeInMainWorld("terminal", {
     ipcRenderer.invoke("terminal:saveDefaultShell", newShellPath),
 });
 
-contextBridge.exposeInMainWorld("windows", {
-  applyTheme: (theme: Theme) => ipcRenderer.invoke("windows:applyTheme", theme),
+contextBridge.exposeInMainWorld("app", {
+  exit: () => ipcRenderer.invoke("app:exit"),
+  maximize: () => ipcRenderer.invoke("app:maximize"),
+  unmaximize: () => ipcRenderer.invoke("app:unmaximize"),
+  minimize: () => ipcRenderer.invoke("app:minimize"),
+  onMaximized: (callback: (maximized: boolean) => void) =>
+    ipcRenderer.on("app:maximized", (_event, maximized) => callback(maximized)),
   onNativeThemeChanged: (callback: (theme: Theme) => void) =>
-    ipcRenderer.on("windows:nativeThemeChanged", (_event, value) =>
+    ipcRenderer.on("app:nativeThemeChanged", (_event, value) =>
       callback(value)
     ),
 });

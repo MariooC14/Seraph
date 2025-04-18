@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { TerminalManager } from "./TerminalManager";
@@ -18,10 +18,6 @@ const createWindow = () => {
     minWidth: 800,
     minHeight: 600,
     titleBarStyle: "hidden",
-    // expose window controlls in Windows/Linux
-    ...(process.platform !== "darwin"
-      ? { titleBarOverlay: { color: "#0a0a0a", symbolColor: "#636363" } }
-      : {}),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -50,6 +46,24 @@ app.whenReady().then(() => {
 
   terminalManager.startListening();
   windowManager.startListening();
+
+  ipcMain.handle("app:exit", () => {
+    if (process.platform !== "darwin") {
+      app.quit();
+    } else {
+      mainWindow.close();
+    }
+  });
+  ipcMain.handle("app:minimize", () => mainWindow.minimize());
+  ipcMain.handle("app:maximize", () => mainWindow.maximize());
+  ipcMain.handle("app:unmaximize", () => mainWindow.unmaximize());
+
+  mainWindow.on("maximize", () => {
+    mainWindow.webContents.send("app:maximized", true);
+  });
+  mainWindow.on("unmaximize", () => {
+    mainWindow.webContents.send("app:maximized", false);
+  });
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

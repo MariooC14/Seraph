@@ -1,12 +1,14 @@
-import { TypographyP } from "@/components/ui/TypographyP";
-import "./TitleBar.css";
+import { Button } from "../ui/button";
+import { Home } from "lucide-react";
+import WindowControlBar from "../WindowControlBar";
 
 export default function TitleBar() {
   return (
-    <div id="titleBarContainer">
-      <div id="titleBar" className="draggable absolute flex top-0 px-2 select-none h-full text-muted-foreground">
-        <TypographyP className="draggable">Seraph</TypographyP>
-      </div>
-    </div>
-  )
-};
+      <nav className="draggable flex justify-between select-none text-muted-foreground h-10">
+        <div className="flex items-center space-x-2">
+        <Button className="cursor-pointer nonDraggable" variant="ghost" size="icon"><Home /></Button>
+        </div>
+        <WindowControlBar />
+      </nav>
+  );
+}

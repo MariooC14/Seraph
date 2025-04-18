@@ -122,11 +122,16 @@
   }
 }
 
-#mainContent {
-  position: absolute;
-  top: env(titlebar-area-height, var(--fallback-title-bar-height));
-  right: 0;
-  bottom: 0;
-  left: 0;
-  user-select: none;
+/* These styles are unique to electron and cannot be applied with tailwind or inline */
+
+.draggable {
+  app-region: drag;
+  /* Pre-fix app-region during standardization process */
+  -webkit-app-region: drag;
+}
+
+.nonDraggable {
+  app-region: no-drag;
+  /* Pre-fix app-region during standardization process */
+  -webkit-app-region: no-drag;
 }

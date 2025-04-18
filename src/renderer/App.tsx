@@ -10,16 +10,14 @@ function App() {
   return (
     <ThemeProvider defaultTheme="system">
       <ConfigProvider>
-        <div className="h-screen w-screen">
+        <div className="flex flex-col h-screen w-screen">
           <TitleBar />
-          <div id="mainContent" className="flex overflow-hidden">
-            <div className="min-w-44 border-r bg-muted/10 p-3">
-              <Sidebar />
-            </div>
-            <ScrollArea className="flex-1 p-8 h-full">
+          <main className="flex flex-1 overflow-hidden">
+            <Sidebar />
+            <ScrollArea className="p-8 h-full flex-1">
               <Outlet />
             </ScrollArea>
-          </div>
+          </main>
         </div>
         <Toaster />
       </ConfigProvider>

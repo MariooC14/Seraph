@@ -32,7 +32,6 @@ export function ThemeProvider({
 
   function updateTheme(theme: Theme) {
       localStorage.setItem(storageKey, theme)
-      window.windows.applyTheme(theme);
       setTheme(theme);
   }
 
@@ -56,11 +55,11 @@ export function ThemeProvider({
 
   useEffect(() => {
     // Handle case where user changes system theme from OS settings
-    window.windows.onNativeThemeChanged((newTheme: Theme) => {
+    window.app.onNativeThemeChanged((newTheme: Theme) => {
       localStorage.setItem(storageKey, newTheme);
       setTheme(newTheme);
     });
-  });
+  }, []);
 
   const value = {
     theme,
