@@ -10,7 +10,7 @@ const navigation = [
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
-function MainNav() {
+function Sidebar() {
   const { pathname } = useLocation();
 
   return (
@@ -37,4 +37,4 @@ function MainNav() {
   );
 }
 
-export default MainNav;
+export default Sidebar;
