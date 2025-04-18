@@ -7,8 +7,12 @@ export default function WindowControlBar() {
 
   useEffect(() => {
     // User can maximize by e.g. double clicking the title bar
-    window.app.onMaximized(maximized => setMaximized(maximized));
-  });
+    const handleMaximized = (maximized: boolean) => setMaximized(maximized);
+    window.app.onMaximized(handleMaximized);
+    return () => {
+      window.app.offMaximized(handleMaximized);
+    };
+  }, []);
 
   const handleMinimize = () => {
     window.app.minimize();
