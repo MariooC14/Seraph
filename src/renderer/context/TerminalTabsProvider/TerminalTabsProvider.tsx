@@ -1,18 +1,24 @@
 import { Terminal } from "@xterm/xterm";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react"
-import { v4 as uuidv4 } from "uuid";
 import HostSelectionDialog from "./HostSelectionDialog";
+import { TerminalService } from "@/service/TerminalService/TerminalService";
+import { useConfig } from "../ConfigProvider";
+
+export type TerminalSession = {
+  id: string;
+  terminal: Terminal;
+}
 
 type TerminalTab = {
   id: string;
   name: string;
-  terminal?: Terminal;
+  session: TerminalSession;
   isActive: boolean;
 }
 
 type TerminalTabsContextValue = {
   tabs: TerminalTab[];
-  createTab: () => void;
+  createTab: (name: string) => Promise<TerminalTab>;
   closeTab: (id: string) => void;
   showHostSelectionDialog: () => void;
 }
@@ -20,6 +26,7 @@ type TerminalTabsContextValue = {
 const TerminalTabsContext = createContext<TerminalTabsContextValue>({} as TerminalTabsContextValue);
 
 export default function TerminalTabsProvider({ children }: { children: ReactNode }) {
+  const { defaultShellPath } = useConfig();
   const [tabs, setTabs] = useState<TerminalTab[]>([]);
   const [hostSelectionDialogVisible, setHostSelectionDialogVisible] = useState(false);
 
@@ -41,20 +48,27 @@ export default function TerminalTabsProvider({ children }: { children: ReactNode
   const value: TerminalTabsContextValue = {
     tabs,
     showHostSelectionDialog: () => setHostSelectionDialogVisible(true),
-    createTab: () => {
-      setHostSelectionDialogVisible(true);
-      const id = uuidv4();
+    createTab: async (name: string) => {
+      console.log("Creating new terminal tab");
+      const numExistingTabNames = tabs.filter((tab) => tab.name === name).length;
+      if (numExistingTabNames > 0) {
+        name = `${name} (${numExistingTabNames})`;
+      }
+      const session = await TerminalService.createTerminalSession(defaultShellPath);
       const newTab: TerminalTab = {
-        id,
-        name: `New Tab`,
-        isActive: true,
+        id: session.id,
+        isActive: false,
+        name, session,
       };
-      setTabs((prev) => ({ ...prev, [id]: newTab })); 
+      setTabs((prev) => ([...prev, newTab ]));
+      return newTab;
     },
     closeTab: (id: string) => {
       const tabToClose = tabs.find((tab) => tab.id === id);
-      // cleanup terminal 
-      tabToClose.terminal?.dispose();
+      if (!tabToClose) return;
+      
+      window.terminal.killTerminal(tabToClose.session.id);
+      tabToClose.session.terminal.dispose();
       setTabs((prev) => prev.filter((tab) => tab.id !== id));
     }
   }

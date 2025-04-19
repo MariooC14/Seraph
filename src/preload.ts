@@ -5,9 +5,16 @@ import { contextBridge, ipcRenderer } from "electron/renderer";
 contextBridge.exposeInMainWorld("terminal", {
   spawnTerminal: (shellPath: string) =>
     ipcRenderer.invoke("terminal:spawn", shellPath),
-  killTerminal: () => ipcRenderer.invoke("terminal:kill"),
-  sendData: (data: string) => ipcRenderer.invoke("terminal:write", data),
-  onData: (callback: (data: string) => void) =>
+  onNewTerminalSession: (callback: (sessionId: string) => void) =>
+    ipcRenderer.on("terminal:newSession", (_event, sessionId) =>
+      callback(sessionId)
+    ),
+  killTerminal: (sessionId: string) =>
+    ipcRenderer.invoke("terminal:kill", sessionId),
+  killAllTerminals: () => ipcRenderer.invoke("terminal:killAll"),
+  sendData: (event: ClientWriteEvent) =>
+    ipcRenderer.invoke("terminal:write", event),
+  onData: (callback: (event: TerminalDataEvent) => void) =>
     ipcRenderer.on("terminal:updateData", (_event, value) => callback(value)),
   getUserPreferredShell: () =>
     ipcRenderer.invoke("terminal:getUserPreferredShell"),

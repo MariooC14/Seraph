@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Plus} from "lucide-react";
-import TerminalWindow from "@/components/TerminalWindow/TerminalWindow";
+import TerminalPanel from "@/components/TerminalWindow/TerminalPanel";
 
 function Terminals() {
   return (
@@ -29,7 +29,7 @@ function Terminals() {
         </CardHeader>
         <CardContent>
           <div className="bg-black rounded-lg overflow-hidden">
-            <TerminalWindow />
+            <TerminalPanel />
           </div>
         </CardContent>
       </Card>

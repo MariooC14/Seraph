@@ -26,7 +26,6 @@
  * ```
  */
 
-import { StrictMode } from "react";
 import App from "./App";
 import "./index.css";
 import { createRoot } from "react-dom/client";
@@ -34,27 +33,23 @@ import { HashRouter, Route, Routes } from "react-router";
 import Dashboard from "./pages/Home/pages/dashboard";
 import Servers from "./pages/Home/pages/servers";
 import Containers from "./pages/Home/pages/containers";
-import Terminals from "./pages/Home/pages/terminals";
 import Settings from "./pages/Home/pages/settings";
 import Home from "./pages/Home/Home";
 
 const root = createRoot(document.body);
 root.render(
-  <StrictMode>
-    <HashRouter>
-      <Routes>
-        <Route element={<App />}>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Dashboard />} />
-            <Route path="servers" element={<Servers />} />
-            <Route path="containers" element={<Containers />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-          <Route path="/terminals">
-            <Route index element={<Terminals />} />
-          </Route>
+  <HashRouter>
+    <Routes>
+      <Route element={<App />}>
+        <Route path="/" element={<Home />}>
+          <Route index element={<Dashboard />} />
+          <Route path="servers" element={<Servers />} />
+          <Route path="containers" element={<Containers />} />
+          <Route path="settings" element={<Settings />} />
+          {/* The path below is rendered by App. We need to keep the terminals rendered but invisible */}
+          <Route path="terminals/:terminalId" />
         </Route>
-      </Routes>
-    </HashRouter>
-  </StrictMode>
+      </Route>
+    </Routes>
+  </HashRouter>
 );

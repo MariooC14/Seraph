@@ -6,7 +6,7 @@ export const defaultTerminalOptions: ITerminalOptions &
   fontSize: 14,
   fontFamily: 'Menlo, Monaco, "Courier New", monospace',
   theme: {
-    background: "#1a1b1e",
+    background: "#0a0a0a",
     foreground: "#f8f9fa",
     cursor: "#f8f9fa",
     selectionForeground: "rgba(248, 249, 250, 0.3)",
