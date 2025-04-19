@@ -1,24 +1,22 @@
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "./components/theme-provider";
 import { Outlet } from "react-router";
-import Sidebar from "./components/Sidebar";
 import ConfigProvider from "./context/ConfigProvider";
 import TitleBar from "./components/TitleBar/TitleBar";
-import { ScrollArea } from "./components/ui/scroll-area";
+import TerminalTabsProvider from "./context/TerminalTabsProvider";
 
 function App() {
   return (
     <ThemeProvider defaultTheme="system">
       <ConfigProvider>
-        <div className="flex flex-col h-screen w-screen">
-          <TitleBar />
-          <main className="flex flex-1 overflow-hidden">
-            <Sidebar />
-            <ScrollArea className="p-8 h-full flex-1">
+        <TerminalTabsProvider>
+          <div className="flex flex-col h-screen w-screen">
+            <TitleBar />
+            <main className="flex flex-1 overflow-hidden">
               <Outlet />
-            </ScrollArea>
-          </main>
-        </div>
+            </main>
+          </div>
+        </TerminalTabsProvider>
         <Toaster />
       </ConfigProvider>
     </ThemeProvider>

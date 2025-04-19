@@ -2,7 +2,8 @@ import { Button } from "../ui/button";
 import { Home, Plus } from "lucide-react";
 import WindowControlBar from "../WindowControlBar";
 import CloseableTab from "../NavigationBar/CloseableTab";
-import { toast } from "sonner";
+import { Link } from "react-router";
+import { useTerminalTabs } from "@/context/TerminalTabsProvider";
 
 const tabs = [
   { name: "Lunar"},
@@ -11,14 +12,20 @@ const tabs = [
 ]
 
 export default function TitleBar() {
+  const { createTab } = useTerminalTabs();
+
   const handleNewTab = () => {
-    toast.warning("New tab not implemented yet");
+    createTab();
   };
 
   return (
       <nav className="draggable flex justify-between select-none text-muted-foreground h-10">
         <div className="flex items-center space-x-2">
-          <Button className="cursor-pointer nonDraggable" variant="ghost" size="icon"><Home /></Button>
+          <Link to="/">
+            <Button className="cursor-pointer nonDraggable" variant="ghost" size="icon">
+              <Home />
+            </Button>
+          </Link>
           <div className="flex space-x-1">
             {tabs.map((tab) => (
               <CloseableTab key={tab.name} name={tab.name}/>
