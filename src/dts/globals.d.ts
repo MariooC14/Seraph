@@ -2,6 +2,7 @@ declare global {
   interface Window {
     terminal: {
       spawnTerminal: (string) => string;
+      resizeTerminal: (event: ClientResizeEvent) => void;
       onNewTerminalSession: (callback: (sessionId: string) => void) => void;
       killTerminal: (sessionId: string) => void;
       sendData: (event: ClientWriteEvent) => void;
@@ -31,6 +32,12 @@ declare global {
   type ClientWriteEvent = {
     sessionId: string;
     newData: string;
+  };
+
+  type ClientResizeEvent = {
+    sessionId: string;
+    cols: number;
+    rows: number;
   };
 }
 

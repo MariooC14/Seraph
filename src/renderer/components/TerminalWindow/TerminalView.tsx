@@ -42,12 +42,15 @@ export default function TerminalView({ visible, sessionId, terminal }: TerminalV
 
     const handleResize = () => {
       fitAddon.fit(); // todo? could debounce this
+      const { rows, cols } = fitAddon.proposeDimensions();
+      const resizeEvent = { sessionId, cols, rows}
+      window.terminal.resizeTerminal(resizeEvent);
     }
 
     window.addEventListener('resize', handleResize)
 
     setTimeout(() => {
-      fitAddon.fit();
+      handleResize();
     }, 50); // Wait for the terminal to be mounted
 
     return () => {
