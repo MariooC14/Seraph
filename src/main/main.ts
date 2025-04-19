@@ -48,6 +48,7 @@ app.whenReady().then(() => {
   windowManager.startListening();
 
   ipcMain.handle("app:exit", () => {
+    terminalManager.killAllTerminals();
     if (process.platform !== "darwin") {
       app.quit();
     } else {

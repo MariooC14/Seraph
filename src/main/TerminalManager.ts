@@ -29,6 +29,9 @@ export class TerminalManager {
       console.log("Spawning new terminal with shell path:", shellPath);
       this.spawnTerminal(shellPath);
     });
+    ipcMain.handle("terminal:resize", (_, event: ClientResizeEvent) => {
+      this.resizeTerminal(event);
+    });
     ipcMain.handle("terminal:kill", (_, sessionId: string) =>
       this.killTerminal(sessionId)
     );
@@ -124,11 +127,26 @@ export class TerminalManager {
     this.window.webContents.send("terminal:newSession", newSessionId);
   }
 
+  resizeTerminal(event: ClientResizeEvent) {
+    console.log("Resizing terminal:", event.sessionId);
+    if (!this.sessions[event.sessionId]) return;
+
+    this.sessions[event.sessionId].resize(event.cols, event.rows);
+  }
+
   killTerminal(sessionId: string) {
     console.log("Killing terminal with id:", sessionId);
     if (!this.sessions[sessionId]) return;
 
     this.sessions[sessionId].kill();
     delete this.sessions[sessionId];
+  }
+
+  public killAllTerminals() {
+    console.log("Killing all terminals");
+    for (const sessionId in this.sessions) {
+      this.killTerminal(sessionId);
+    }
+    this.sessions = {};
   }
 }

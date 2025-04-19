@@ -5,6 +5,8 @@ import { contextBridge, ipcRenderer } from "electron/renderer";
 contextBridge.exposeInMainWorld("terminal", {
   spawnTerminal: (shellPath: string) =>
     ipcRenderer.invoke("terminal:spawn", shellPath),
+  resizeTerminal: (event: ClientResizeEvent) =>
+    ipcRenderer.invoke("terminal:resize", event),
   onNewTerminalSession: (callback: (sessionId: string) => void) =>
     ipcRenderer.on("terminal:newSession", (_event, sessionId) =>
       callback(sessionId)
