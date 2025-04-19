@@ -9,11 +9,15 @@ import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
 import fs from "node:fs";
 import { join } from "node:path";
 import { getAvailableShells } from "./helpers";
+import { v4 as uuidv4 } from "uuid";
+
+type TerminalSessionStore = Record<string, pty.IPty>;
 
 export class TerminalManager {
   shell: string;
   terminal?: pty.IPty;
   window: BrowserWindow;
+  sessions: TerminalSessionStore = {};
 
   public constructor(window: BrowserWindow) {
     this.window = window;
@@ -21,13 +25,16 @@ export class TerminalManager {
   }
 
   public startListening() {
-    ipcMain.handle("terminal:spawn", (_, shellPath: string) =>
-      this.spawnTerminal(shellPath)
+    ipcMain.handle("terminal:spawn", (_event, shellPath: string) => {
+      console.log("Spawning new terminal with shell path:", shellPath);
+      this.spawnTerminal(shellPath);
+    });
+    ipcMain.handle("terminal:kill", (_, sessionId: string) =>
+      this.killTerminal(sessionId)
     );
-    ipcMain.handle("terminal:kill", () => this.killTerminal());
-    ipcMain.handle("terminal:write", (_, data: string) =>
-      this.sendData(_, data)
-    );
+    ipcMain.handle("terminal:write", (_, event: ClientWriteEvent) => {
+      this.sendData(_, event);
+    });
     ipcMain.handle("terminal:getUserPreferredShell", () =>
       this.getUserPreferredShell()
     );
@@ -84,14 +91,18 @@ export class TerminalManager {
     return await getAvailableShells(os.platform());
   }
 
-  sendData(_: IpcMainInvokeEvent, data: string) {
-    if (!this.terminal) return;
-
-    this.terminal.write(data);
+  sendData(_: IpcMainInvokeEvent, event: ClientWriteEvent) {
+    if (!this.sessions[event.sessionId]) {
+      console.error("No terminal session found for ID:", event.sessionId);
+      return;
+    }
+    console.log("Sending data to terminal:", event.sessionId);
+    this.sessions[event.sessionId].write(event.newData);
   }
 
   spawnTerminal(shellPath?: string) {
-    this.terminal = pty.spawn(shellPath || this.shell, [], {
+    const newSessionId = uuidv4();
+    const newTerminal = pty.spawn(shellPath || this.shell, [], {
       name: "xterm-color",
       cols: 80,
       rows: 30,
@@ -99,13 +110,25 @@ export class TerminalManager {
       env: process.env,
     });
 
-    this.terminal.onData((e) => {
-      this.window.webContents.send("terminal:updateData", e);
+    this.sessions[newSessionId] = newTerminal;
+
+    newTerminal.onData((newData) => {
+      console.log("Received data from session:", newSessionId);
+      const payload: TerminalDataEvent = {
+        newData,
+        sessionId: newSessionId,
+      };
+      this.window.webContents.send("terminal:updateData", payload);
     });
+    // The rendeerer's Terminal Service which invoked this function is listening for this event
+    this.window.webContents.send("terminal:newSession", newSessionId);
   }
 
-  killTerminal() {
-    this.terminal?.kill();
-    this.terminal = null;
+  killTerminal(sessionId: string) {
+    console.log("Killing terminal with id:", sessionId);
+    if (!this.sessions[sessionId]) return;
+
+    this.sessions[sessionId].kill();
+    delete this.sessions[sessionId];
   }
 }

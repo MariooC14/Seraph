@@ -1,10 +1,11 @@
 declare global {
   interface Window {
     terminal: {
-      spawnTerminal: (string) => void;
-      killTerminal: () => void;
-      sendData: (data: string) => void;
-      onData: (callback: (data: string) => void) => void;
+      spawnTerminal: (string) => string;
+      onNewTerminalSession: (callback: (sessionId: string) => void) => void;
+      killTerminal: (sessionId: string) => void;
+      sendData: (event: ClientWriteEvent) => void;
+      onData: (callback: (data: TerminalDataEvent) => void) => void;
       getUserPreferredShell: () => Promise<string>;
       getAvailableShells: () => Promise<string[]>;
       saveDefaultShell: (newShellPath: string) => Promise<boolean>;
@@ -21,6 +22,16 @@ declare global {
   }
 
   type Theme = "system" | "light" | "dark";
+
+  type TerminalDataEvent = {
+    newData: string;
+    sessionId: string;
+  };
+
+  type ClientWriteEvent = {
+    sessionId: string;
+    newData: string;
+  };
 }
 
 export {};

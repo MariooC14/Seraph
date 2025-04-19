@@ -6,9 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus, TerminalIcon} from "lucide-react";
-import TerminalWindow from "@/components/TerminalWindow/TerminalWindow";
-import ServerCard from "./ServerCard";
+import { Plus} from "lucide-react";
+import TerminalPanel from "@/components/TerminalWindow/TerminalPanel";
 
 function Terminals() {
   return (
@@ -21,22 +20,6 @@ function Terminals() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <ServerCard
-          id="1"
-          host="192.168.1.1"
-          isAccessible={false}
-          name="Lunar"
-          username="marioc14"
-        />
-        <Card className="text-center">
-          <CardHeader className="text-lg font-medium">Local Terminal</CardHeader>
-          <CardContent>
-            <Button><TerminalIcon />Connect to localhost</Button>
-          </CardContent>
-        </Card>
-      </div>
-
       <Card className="mt-6">
         <CardHeader>
           <CardTitle>Terminal</CardTitle>
@@ -46,7 +29,7 @@ function Terminals() {
         </CardHeader>
         <CardContent>
           <div className="bg-black rounded-lg overflow-hidden">
-            <TerminalWindow />
+            <TerminalPanel />
           </div>
         </CardContent>
       </Card>

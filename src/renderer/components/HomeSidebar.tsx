@@ -1,16 +1,15 @@
 import { cn } from '@/lib/utils';
-import { ServerIcon, ContainerIcon, TerminalIcon, GaugeIcon, Settings } from 'lucide-react';
+import { ServerIcon, ContainerIcon, GaugeIcon, Settings } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: GaugeIcon },
+  { name: 'Dashboard', href: '/', icon: GaugeIcon },
   { name: 'Servers', href: '/servers', icon: ServerIcon },
   { name: 'Containers', href: '/containers', icon: ContainerIcon },
-  { name: 'SSH Terminal', href: '/terminals', icon: TerminalIcon },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
-function Sidebar() {
+function HomeSidebar() {
   const { pathname } = useLocation();
 
   return (
@@ -37,4 +36,4 @@ function Sidebar() {
   );
 }
 
-export default Sidebar;
+export default HomeSidebar;
