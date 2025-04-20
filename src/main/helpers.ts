@@ -35,7 +35,7 @@ async function getAvailableShellsForUnix() {
     return stdout
       .split("\n")
       .filter(Boolean)
-      .filter((line) => !line.startsWith("#"))
+      .filter((line) => !line.trim().startsWith("#"))
       .map((line) => line.trim());
   } catch (error) {
     console.error("Failed to get available shells:", error);
