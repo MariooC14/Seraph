@@ -4,17 +4,20 @@ import WindowControlBar from "../WindowControlBar";
 import CloseableTab from "../NavigationBar/CloseableTab";
 import { Link } from "react-router";
 import { useTerminalTabs } from "@/context/TerminalTabsProvider";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export default function TitleBar() {
   const { tabs, showHostSelectionDialog } = useTerminalTabs();
+  const [isMacOS] = useState(() => window.app.isMacOS())
 
   const handleNewTabClick = () => {
     showHostSelectionDialog();
-  }; 
+  };
 
   return (
       <nav className="draggable flex justify-between select-none text-muted-foreground h-10">
-        <div className="flex items-center space-x-2">
+        <div className={cn("flex items-center space-x-2", isMacOS ? "ml-18" : "ml-1")}>
           <Link to="/">
             <Button className="cursor-pointer nonDraggable" variant="ghost" size="icon">
               <Home />
@@ -31,7 +34,7 @@ export default function TitleBar() {
             <Plus />
           </Button>
         </div>
-        <WindowControlBar />
+        {!isMacOS && <WindowControlBar />}
       </nav>
   );
 }

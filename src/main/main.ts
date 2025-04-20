@@ -18,6 +18,7 @@ const createWindow = () => {
     minWidth: 800,
     minHeight: 600,
     titleBarStyle: "hidden",
+    trafficLightPosition: { x: 10, y: 12 },
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -71,6 +72,7 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
+  terminalManager.killAllTerminals();
   if (process.platform !== "darwin") {
     app.quit();
   }
