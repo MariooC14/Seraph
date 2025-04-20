@@ -3,7 +3,7 @@ import { ITerminalInitOnlyOptions, ITerminalOptions } from "@xterm/xterm";
 export const defaultTerminalOptions: ITerminalOptions &
   ITerminalInitOnlyOptions = {
   cursorBlink: true,
-  fontSize: 14,
+  fontSize: 16,
   fontFamily: 'Cascadia Mono, Monaco, "Courier New", monospace',
   theme: {
     background: "#0a0a0a",
