@@ -31,4 +31,5 @@ export const defaultTerminalOptions: ITerminalOptions &
   scrollback: 10000,
   rows: 25,
   cols: 50,
+  cursorStyle: "bar",
 };
