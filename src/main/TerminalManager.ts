@@ -6,6 +6,7 @@
 import os from "node:os";
 import * as pty from "node-pty";
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
+import log from "electron-log/main";
 import fs from "node:fs";
 import { join } from "node:path";
 import { getAvailableShells } from "./helpers";
@@ -26,7 +27,7 @@ export class TerminalManager {
 
   public startListening() {
     ipcMain.handle("terminal:spawn", (_event, shellPath: string) => {
-      console.log("Spawning new terminal with shell path:", shellPath);
+      log.info("Spawning new terminal with shell path:", shellPath);
       this.spawnTerminal(shellPath);
     });
     ipcMain.handle("terminal:resize", (_, event: ClientResizeEvent) => {
@@ -67,7 +68,7 @@ export class TerminalManager {
       return this.shell;
     } else {
       const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-      console.log("main", config);
+      log.info("[TerminalManager] - user-preferred shell:", config);
       return (config.shell as string) || this.shell;
     }
   }
@@ -85,7 +86,7 @@ export class TerminalManager {
       }
       return true;
     } catch (error) {
-      console.error("Failed to save default shell:", error);
+      log.error("[TerminalManager] - Failed to save default shell:", error);
       return false;
     }
   }
@@ -96,46 +97,56 @@ export class TerminalManager {
 
   sendData(_: IpcMainInvokeEvent, event: ClientWriteEvent) {
     if (!this.sessions[event.sessionId]) {
-      console.error("No terminal session found for ID:", event.sessionId);
+      log.error(
+        "[TerminalManager] - No terminal session found for ID:",
+        event.sessionId
+      );
       return;
     }
-    console.log("Sending data to terminal:", event.sessionId);
+    log.info("[Terminalmanager] - Sending data to terminal:", event.sessionId);
     this.sessions[event.sessionId].write(event.newData);
   }
 
   spawnTerminal(shellPath?: string) {
-    const newSessionId = uuidv4();
-    const newTerminal = pty.spawn(shellPath || this.shell, [], {
-      name: "xterm-color",
-      cols: 80,
-      rows: 30,
-      cwd: process.env.HOME,
-      env: process.env,
-    });
+    try {
+      const newSessionId = uuidv4();
+      const newTerminal = pty.spawn(shellPath || this.shell, [], {
+        name: "xterm-color",
+        cols: 80,
+        rows: 30,
+        cwd: process.env.HOME,
+        env: process.env,
+      });
+      log.info(
+        "[TerminalManager] - Spawning new terminal with id:",
+        newTerminal.pid
+      );
 
-    this.sessions[newSessionId] = newTerminal;
+      this.sessions[newSessionId] = newTerminal;
 
-    newTerminal.onData((newData) => {
-      console.log("Received data from session:", newSessionId);
-      const payload: TerminalDataEvent = {
-        newData,
-        sessionId: newSessionId,
-      };
-      this.window.webContents.send("terminal:updateData", payload);
-    });
-    // The rendeerer's Terminal Service which invoked this function is listening for this event
-    this.window.webContents.send("terminal:newSession", newSessionId);
+      newTerminal.onData((newData) => {
+        const payload: TerminalDataEvent = {
+          newData,
+          sessionId: newSessionId,
+        };
+        this.window.webContents.send("terminal:updateData", payload);
+      });
+      // The rendeerer's Terminal Service which invoked this function is listening for this event
+      this.window.webContents.send("terminal:newSession", newSessionId);
+    } catch (error) {
+      log.error("[TerminalManager] - Failed to spawn terminal:", error);
+    }
   }
 
   resizeTerminal(event: ClientResizeEvent) {
-    console.log("Resizing terminal:", event.sessionId);
+    log.info("Resizing terminal:", event.sessionId);
     if (!this.sessions[event.sessionId]) return;
 
     this.sessions[event.sessionId].resize(event.cols, event.rows);
   }
 
   killTerminal(sessionId: string) {
-    console.log("Killing terminal with id:", sessionId);
+    log.info("Killing terminal with id:", sessionId);
     if (!this.sessions[sessionId]) return;
 
     this.sessions[sessionId].kill();
@@ -143,7 +154,7 @@ export class TerminalManager {
   }
 
   public killAllTerminals() {
-    console.log("Killing all terminals");
+    log.info("Killing all terminals");
     for (const sessionId in this.sessions) {
       this.killTerminal(sessionId);
     }

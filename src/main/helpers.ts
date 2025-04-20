@@ -1,3 +1,4 @@
+import log from "electron-log/main";
 import { exec } from "child_process";
 import fs from "fs";
 import path from "path";
@@ -38,7 +39,7 @@ async function getAvailableShellsForUnix() {
       .filter((line) => !line.trim().startsWith("#"))
       .map((line) => line.trim());
   } catch (error) {
-    console.error("Failed to get available shells:", error);
+    log.error("Failed to get available shells:", error);
     return [];
   }
 }
