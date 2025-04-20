@@ -4,7 +4,7 @@ export const defaultTerminalOptions: ITerminalOptions &
   ITerminalInitOnlyOptions = {
   cursorBlink: true,
   fontSize: 14,
-  fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+  fontFamily: 'Cascadia Mono, Monaco, "Courier New", monospace',
   theme: {
     background: "#0a0a0a",
     foreground: "#f8f9fa",
