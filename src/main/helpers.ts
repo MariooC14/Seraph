@@ -22,7 +22,7 @@ async function getAvailableShellsForUnix() {
   try {
     const { stdout } = await new Promise<{ stdout: string; stderr: string }>(
       (resolve, reject) => {
-        exec("chsh -l", (error, stdout, stderr) => {
+        exec("cat /etc/shells", (error, stdout, stderr) => {
           if (error) {
             reject(error);
             return;
@@ -35,6 +35,7 @@ async function getAvailableShellsForUnix() {
     return stdout
       .split("\n")
       .filter(Boolean)
+      .filter((line) => !line.trim().startsWith("#"))
       .map((line) => line.trim());
   } catch (error) {
     console.error("Failed to get available shells:", error);
