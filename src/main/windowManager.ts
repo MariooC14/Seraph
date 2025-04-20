@@ -1,4 +1,5 @@
 import electron from "electron";
+import log from "electron-log/main";
 
 export class WindowManager {
   platform: NodeJS.Platform = process.platform;
@@ -7,7 +8,7 @@ export class WindowManager {
 
   startListening() {
     electron.nativeTheme.on("updated", () => {
-      console.log("windowManager: nativeTheme updated");
+      log.info("windowManager: nativeTheme updated");
       const theme = electron.nativeTheme.shouldUseDarkColors ? "dark" : "light";
       this.mainWindow.webContents.send("app:nativeThemeChanged", theme);
     });
