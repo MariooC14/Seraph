@@ -11,6 +11,7 @@ import { CirclePlus, Terminal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTerminalTabs } from "./TerminalTabsProvider";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 type HostSelectionDialogProps = {
   open: boolean;
@@ -34,6 +35,10 @@ export default function HostSelectionDialog({
       console.log("Dialog: Created local terminal tab", tab);
       handleOpenChange(false);
       navigate(`/terminals/${tab.id}`);
+    })
+    .catch((error) => {
+      console.error("Failed to create local terminal tab:", error);
+      toast.error("Failed to create local terminal tab:", error);
     });
   }
 

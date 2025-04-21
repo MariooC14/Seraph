@@ -5,20 +5,18 @@
 
 import os from "node:os";
 import * as pty from "node-pty";
-import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import log from "electron-log/main";
 import fs from "node:fs";
 import { join } from "node:path";
 import { getAvailableShells } from "./helpers";
-import { v4 as uuidv4 } from "uuid";
-
-type TerminalSessionStore = Record<string, pty.IPty>;
+import { TerminalSession } from "./TerminalSession";
 
 export class TerminalManager {
   shell: string;
   terminal?: pty.IPty;
   window: BrowserWindow;
-  sessions: TerminalSessionStore = {};
+  sessions: Map<string, TerminalSession> = new Map();
 
   public constructor(window: BrowserWindow) {
     this.window = window;
@@ -26,18 +24,10 @@ export class TerminalManager {
   }
 
   public startListening() {
-    ipcMain.handle("terminal:spawn", (_event, shellPath: string) => {
-      log.info("Spawning new terminal with shell path:", shellPath);
-      this.spawnTerminal(shellPath);
-    });
-    ipcMain.handle("terminal:resize", (_, event: ClientResizeEvent) => {
-      this.resizeTerminal(event);
-    });
-    ipcMain.handle("terminal:kill", (_, sessionId: string) =>
-      this.killTerminal(sessionId)
-    );
-    ipcMain.handle("terminal:write", (_, event: ClientWriteEvent) => {
-      this.sendData(_, event);
+    ipcMain.handle("terminal:createSession", (_event, shellPath: string) => {
+      log.info(`Creating new session with shell: ${shellPath}`);
+      const newSessionId = this.createSession(shellPath);
+      return newSessionId;
     });
     ipcMain.handle("terminal:getUserPreferredShell", () =>
       this.getUserPreferredShell()
@@ -95,69 +85,24 @@ export class TerminalManager {
     return await getAvailableShells(os.platform());
   }
 
-  sendData(_: IpcMainInvokeEvent, event: ClientWriteEvent) {
-    if (!this.sessions[event.sessionId]) {
-      log.error(
-        "[TerminalManager] - No terminal session found for ID:",
-        event.sessionId
-      );
-      return;
+  createSession(shellPath: string) {
+    const newTerminalSession = new TerminalSession(this, shellPath);
+    newTerminalSession.startListening();
+    this.sessions.set(newTerminalSession.sessionId, newTerminalSession);
+    return newTerminalSession.sessionId;
+  }
+
+  public terminateAllSessions() {
+    log.info("[TerminalManager] - Terminating all terminal sessions");
+    for (const session of this.sessions.values()) {
+      session.terminate();
     }
-    log.info("[Terminalmanager] - Sending data to terminal:", event.sessionId);
-    this.sessions[event.sessionId].write(event.newData);
+    this.sessions.clear();
   }
 
-  spawnTerminal(shellPath?: string) {
-    try {
-      const newSessionId = uuidv4();
-      const newTerminal = pty.spawn(shellPath || this.shell, [], {
-        name: "xterm-color",
-        cols: 80,
-        rows: 30,
-        cwd: process.env.HOME,
-        env: process.env,
-      });
-      log.info(
-        "[TerminalManager] - Spawning new terminal with id:",
-        newTerminal.pid
-      );
-
-      this.sessions[newSessionId] = newTerminal;
-
-      newTerminal.onData((newData) => {
-        const payload: TerminalDataEvent = {
-          newData,
-          sessionId: newSessionId,
-        };
-        this.window.webContents.send("terminal:updateData", payload);
-      });
-      // The rendeerer's Terminal Service which invoked this function is listening for this event
-      this.window.webContents.send("terminal:newSession", newSessionId);
-    } catch (error) {
-      log.error("[TerminalManager] - Failed to spawn terminal:", error);
-    }
-  }
-
-  resizeTerminal(event: ClientResizeEvent) {
-    log.info("Resizing terminal:", event.sessionId);
-    if (!this.sessions[event.sessionId]) return;
-
-    this.sessions[event.sessionId].resize(event.cols, event.rows);
-  }
-
-  killTerminal(sessionId: string) {
-    log.info("Killing terminal with id:", sessionId);
-    if (!this.sessions[sessionId]) return;
-
-    this.sessions[sessionId].kill();
-    delete this.sessions[sessionId];
-  }
-
-  public killAllTerminals() {
-    log.info("Killing all terminals");
-    for (const sessionId in this.sessions) {
-      this.killTerminal(sessionId);
-    }
-    this.sessions = {};
+  // Remove a session without terminating it - this can happen when a session is already closed
+  public removeSession(sessionId: string) {
+    log.info(`[TerminalManager] - Removing session ${sessionId} from manager`);
+    this.sessions.delete(sessionId);
   }
 }

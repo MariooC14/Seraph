@@ -29,7 +29,7 @@ export default function TerminalTabsProvider({ children }: { children: ReactNode
   const { defaultShellPath } = useConfig();
   const [tabs, setTabs] = useState<TerminalTab[]>([]);
   const [hostSelectionDialogVisible, setHostSelectionDialogVisible] = useState(false);
-
+ 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (isNewTabKey(e)) {
@@ -45,8 +45,20 @@ export default function TerminalTabsProvider({ children }: { children: ReactNode
     setHostSelectionDialogVisible(open);
   };
 
+  const closeTab = (id: string) => {
+    setTabs(currentTabs => {
+      const tabToClose = currentTabs.find((tab) => tab.id === id);
+      if (!tabToClose) return currentTabs;
+
+      window.terminal.terminateSession(tabToClose.session.id);
+      tabToClose.session.terminal.dispose();
+
+      return currentTabs.filter((tab) => tab.id !== id);
+    })
+  }
+
   const value: TerminalTabsContextValue = {
-    tabs,
+    tabs, closeTab,
     showHostSelectionDialog: () => setHostSelectionDialogVisible(true),
     createTab: async (name: string) => {
       console.log("Creating new terminal tab");
@@ -54,23 +66,20 @@ export default function TerminalTabsProvider({ children }: { children: ReactNode
       if (numExistingTabNames > 0) {
         name = `${name} (${numExistingTabNames})`;
       }
-      const session = await TerminalService.createTerminalSession(defaultShellPath);
-      const newTab: TerminalTab = {
-        id: session.id,
-        isActive: false,
-        name, session,
-      };
-      setTabs((prev) => ([...prev, newTab ]));
-      return newTab;
+      try {
+        const session = await TerminalService.createTerminalSession(defaultShellPath);
+        const newTab: TerminalTab = {
+          id: session.id,
+          isActive: false,
+          name, session,
+        };
+        setTabs((prev) => ([...prev, newTab ]));
+        return newTab;
+      } catch (error) {
+        console.error("Failed to create terminal session:", error);
+        throw error;
+      }
     },
-    closeTab: (id: string) => {
-      const tabToClose = tabs.find((tab) => tab.id === id);
-      if (!tabToClose) return;
-      
-      window.terminal.killTerminal(tabToClose.session.id);
-      tabToClose.session.terminal.dispose();
-      setTabs((prev) => prev.filter((tab) => tab.id !== id));
-    }
   }
 
   return (

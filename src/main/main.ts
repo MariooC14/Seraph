@@ -15,8 +15,8 @@ if (started) {
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    minWidth: 800,
-    minHeight: 600,
+    minWidth: 1600,
+    minHeight: 1000,
     titleBarStyle: "hidden",
     trafficLightPosition: { x: 10, y: 12 },
     webPreferences: {
@@ -33,8 +33,8 @@ const createWindow = () => {
     );
   }
 
-  // if (process.env.NODE_ENV === "development")
-  // mainWindow.webContents.openDevTools();
+  if (process.env.NODE_ENV === "development")
+    mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -49,7 +49,7 @@ app.whenReady().then(() => {
   windowManager.startListening();
 
   ipcMain.handle("app:exit", () => {
-    terminalManager.killAllTerminals();
+    terminalManager.terminateAllSessions();
     if (process.platform !== "darwin") {
       app.quit();
     } else {
@@ -72,7 +72,7 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  terminalManager.killAllTerminals();
+  terminalManager.terminateAllSessions();
   if (process.platform !== "darwin") {
     app.quit();
   }
