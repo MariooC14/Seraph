@@ -1,12 +1,15 @@
 declare global {
   interface Window {
     terminal: {
-      spawnTerminal: (string) => string;
-      resizeTerminal: (event: ClientResizeEvent) => void;
-      onNewTerminalSession: (callback: (sessionId: string) => void) => void;
-      killTerminal: (sessionId: string) => void;
-      sendData: (event: ClientWriteEvent) => void;
-      onData: (callback: (data: TerminalDataEvent) => void) => void;
+      createSession: (shellPath: string) => Promise<string | never>;
+      resizeTerminal: (sessionId: string, cols: number, rows: number) => void;
+      terminateSession: (sessionId: string) => void;
+      onSessionTerminated: (
+        sessionId: string,
+        callback: (code: string) => void
+      ) => void;
+      sendData: (sessionId: string, data: string) => void;
+      onData: (sessionId: string, callback: (data: string) => void) => void;
       getUserPreferredShell: () => Promise<string>;
       getAvailableShells: () => Promise<string[]>;
       saveDefaultShell: (newShellPath: string) => Promise<boolean>;
@@ -24,22 +27,6 @@ declare global {
   }
 
   type Theme = "system" | "light" | "dark";
-
-  type TerminalDataEvent = {
-    newData: string;
-    sessionId: string;
-  };
-
-  type ClientWriteEvent = {
-    sessionId: string;
-    newData: string;
-  };
-
-  type ClientResizeEvent = {
-    sessionId: string;
-    cols: number;
-    rows: number;
-  };
 }
 
 export {};

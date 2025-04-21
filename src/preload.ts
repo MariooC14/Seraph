@@ -3,21 +3,24 @@
 import { contextBridge, ipcRenderer } from "electron/renderer";
 
 contextBridge.exposeInMainWorld("terminal", {
-  spawnTerminal: (shellPath: string) =>
-    ipcRenderer.invoke("terminal:spawn", shellPath),
-  resizeTerminal: (event: ClientResizeEvent) =>
-    ipcRenderer.invoke("terminal:resize", event),
-  onNewTerminalSession: (callback: (sessionId: string) => void) =>
-    ipcRenderer.on("terminal:newSession", (_event, sessionId) =>
-      callback(sessionId)
+  createSession: (shellPath: string) =>
+    ipcRenderer.invoke("terminal:createSession", shellPath),
+  resizeTerminal: (sessionId: string, cols: number, rows: number) =>
+    ipcRenderer.invoke(`terminalSession-${sessionId}:resize`, cols, rows),
+  terminateSession: (sessionId: string) =>
+    ipcRenderer.invoke(`terminalSession-${sessionId}:kill`, sessionId),
+  onSessionTerminated: (sessionId: string, callback: (code: string) => void) =>
+    ipcRenderer.on(`terminalSession-${sessionId}:exit`, (_event, code) =>
+      callback(code)
     ),
-  killTerminal: (sessionId: string) =>
-    ipcRenderer.invoke("terminal:kill", sessionId),
   killAllTerminals: () => ipcRenderer.invoke("terminal:killAll"),
-  sendData: (event: ClientWriteEvent) =>
-    ipcRenderer.invoke("terminal:write", event),
-  onData: (callback: (event: TerminalDataEvent) => void) =>
-    ipcRenderer.on("terminal:updateData", (_event, value) => callback(value)),
+  sendData: (sessionId: string, data: string) =>
+    ipcRenderer.invoke(`terminalSession-${sessionId}:clientInput`, data),
+  onData: (sessionId: string, callback: (newData: string) => void) =>
+    ipcRenderer.on(
+      `terminalSession-${sessionId}:updateData`,
+      (_event, newData) => callback(newData)
+    ),
   getUserPreferredShell: () =>
     ipcRenderer.invoke("terminal:getUserPreferredShell"),
   getAvailableShells: () => ipcRenderer.invoke("terminal:getAvailableShells"),

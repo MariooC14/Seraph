@@ -1,8 +1,10 @@
+import { useTerminalTabs } from "@/context/TerminalTabsProvider";
 import { cn } from "@/lib/utils";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Terminal } from "@xterm/xterm";
 import { useEffect, useRef } from "react";
+import { toast } from "sonner";
 
 type TerminalViewProps = {
   sessionId: string;
@@ -12,6 +14,7 @@ type TerminalViewProps = {
 
 export default function TerminalView({ visible, sessionId, terminal }: TerminalViewProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
+  const { closeTab } = useTerminalTabs();
 
   useEffect(() => {
     console.log("Terminal for", sessionId, "mounted");
@@ -25,26 +28,24 @@ export default function TerminalView({ visible, sessionId, terminal }: TerminalV
 
     // Write to terminal
     terminal.onData((data) => {
-      const event = {
-        newData: data,
-        sessionId,
-      }
-      window.terminal.sendData(event);
+      window.terminal.sendData(sessionId, data);
     });
 
     // Read from terminal
-    window.terminal.onData((data) => {
-      if (data.sessionId !== sessionId) return;
-
-      console.log("Received data from terminal:", data);
-      terminal.write(data.newData);
+    window.terminal.onData(sessionId, (newData: string) => {
+      console.log(`Received data from terminal with sessionId ${sessionId}`, newData);
+      terminal.write(newData);
     })
+
+    window.terminal.onSessionTerminated(sessionId, (code) => {
+      toast.info(`Terminal session ended with code ${code}`);
+      closeTab(sessionId);
+    });
 
     const handleResize = () => {
       fitAddon.fit(); // todo? could debounce this
       const { rows, cols } = fitAddon.proposeDimensions();
-      const resizeEvent = { sessionId, cols, rows}
-      window.terminal.resizeTerminal(resizeEvent);
+      window.terminal.resizeTerminal(sessionId, cols, rows);
     }
 
     window.addEventListener('resize', handleResize)

@@ -3,6 +3,7 @@ import path from "node:path";
 import started from "electron-squirrel-startup";
 import { TerminalManager } from "./TerminalManager";
 import { WindowManager } from "./windowManager";
+import log from "electron-log/main";
 
 let terminalManager: TerminalManager;
 let windowManager: WindowManager;
@@ -14,9 +15,10 @@ if (started) {
 }
 
 const createWindow = () => {
+  log.info("Creating main window");
   mainWindow = new BrowserWindow({
-    minWidth: 800,
-    minHeight: 600,
+    minWidth: 1600,
+    minHeight: 1000,
     titleBarStyle: "hidden",
     trafficLightPosition: { x: 10, y: 12 },
     webPreferences: {
@@ -33,8 +35,8 @@ const createWindow = () => {
     );
   }
 
-  // if (process.env.NODE_ENV === "development")
-  // mainWindow.webContents.openDevTools();
+  if (process.env.NODE_ENV === "development")
+    mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -49,7 +51,6 @@ app.whenReady().then(() => {
   windowManager.startListening();
 
   ipcMain.handle("app:exit", () => {
-    terminalManager.killAllTerminals();
     if (process.platform !== "darwin") {
       app.quit();
     } else {
@@ -68,11 +69,15 @@ app.whenReady().then(() => {
   });
 });
 
+app.on("before-quit", () => {
+  log.info("[Main] - App is about to quit");
+  terminalManager.terminateAllSessions();
+});
+
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  terminalManager.killAllTerminals();
   if (process.platform !== "darwin") {
     app.quit();
   }
@@ -83,6 +88,8 @@ app.on("activate", () => {
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
+    terminalManager.window = mainWindow;
+    windowManager.mainWindow = mainWindow;
   }
 });
 

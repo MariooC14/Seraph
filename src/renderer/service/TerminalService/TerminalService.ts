@@ -3,18 +3,21 @@ import { TerminalSession } from "@/context/TerminalTabsProvider";
 import { Terminal } from "@xterm/xterm";
 
 export const TerminalService = {
-  async createTerminalSession(shellPath: string): Promise<TerminalSession> {
+  async createTerminalSession(
+    shellPath: string
+  ): Promise<TerminalSession | never> {
     console.log("Creating new terminal with shell path:", shellPath);
 
-    const term = new Terminal(defaultTerminalOptions);
-    const promise = new Promise<TerminalSession>((resolve) => {
-      window.terminal.onNewTerminalSession((sessionId: string) => {
+    return await window.terminal
+      .createSession(shellPath)
+      .then((sessionId: string) => {
         console.log("New terminal sessionId:", sessionId);
-        resolve({ id: sessionId, terminal: term });
+        const term = new Terminal(defaultTerminalOptions);
+        return { id: sessionId, terminal: term };
+      })
+      .catch((error) => {
+        console.error("Failed to create terminal session:", error);
+        throw error;
       });
-    });
-
-    window.terminal.spawnTerminal(shellPath);
-    return promise;
   },
 };
