@@ -4,7 +4,6 @@
  */
 
 import os from "node:os";
-import * as pty from "node-pty";
 import { app, BrowserWindow, ipcMain } from "electron";
 import log from "electron-log/main";
 import fs from "node:fs";
@@ -14,12 +13,11 @@ import { TerminalSession } from "./TerminalSession";
 
 export class TerminalManager {
   shell: string;
-  terminal?: pty.IPty;
-  window: BrowserWindow;
+  _window: BrowserWindow;
   sessions: Map<string, TerminalSession> = new Map();
 
   public constructor(window: BrowserWindow) {
-    this.window = window;
+    this._window = window;
     this.shell = this.getShell();
   }
 
@@ -104,5 +102,13 @@ export class TerminalManager {
   public removeSession(sessionId: string) {
     log.info(`[TerminalManager] - Removing session ${sessionId} from manager`);
     this.sessions.delete(sessionId);
+  }
+
+  public get window() {
+    return this._window;
+  }
+
+  public set window(newWindow: BrowserWindow) {
+    this._window = newWindow;
   }
 }
