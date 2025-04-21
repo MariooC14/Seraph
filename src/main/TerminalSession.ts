@@ -5,6 +5,8 @@ import { BrowserWindow, ipcMain } from "electron";
 import { TerminalSessionError } from "./TerminalSessionException";
 import { TerminalManager } from "./TerminalManager";
 
+const isWindows = process.platform === "win32";
+
 /**
  * TerminalSession class is responsible for managing a terminal session.
  * It handles spawning a terminal, sending input to it, resizing it, and listening for data from the terminal.
@@ -15,8 +17,6 @@ export class TerminalSession {
   private window?: BrowserWindow;
   private terminal: pty.IPty;
   private _sessionId: string;
-  private dataListenerDispoer: pty.IDisposable;
-  private exitListenerDisposer: pty.IDisposable;
   private channel: string;
 
   public constructor(manager: TerminalManager, shellPath: string) {
@@ -48,10 +48,10 @@ export class TerminalSession {
       this.terminate();
       this.manager.removeSession(this._sessionId);
     });
-    this.dataListenerDispoer = this.terminal.onData((data) => {
+    this.terminal.onData((data) => {
       this.window?.webContents.send(`${this.channel}:updateData`, data);
     });
-    this.exitListenerDisposer = this.terminal.onExit((code) => {
+    this.terminal.onExit((code) => {
       log.info("[TerminalSession] - Terminal exited with code:", code);
       this.manager.removeSession(this._sessionId);
       this.window?.webContents.send(`${this.channel}:exit`, code.exitCode);
@@ -64,6 +64,7 @@ export class TerminalSession {
     );
     ipcMain.removeHandler(`${this.channel}:clientInput`);
     ipcMain.removeHandler(`${this.channel}:resize`);
+    ipcMain.removeHandler(`${this.channel}:kill`);
   }
 
   private spawnTerminal(shellPath: string) {
@@ -71,10 +72,10 @@ export class TerminalSession {
 
     try {
       this.terminal = pty.spawn(shellPath, [], {
-        name: "xterm-color",
+        name: `seraph-session-${this._sessionId}`,
         cols: 80,
         rows: 30,
-        cwd: process.env.HOME,
+        cwd: isWindows ? process.env.USERPROFILE : process.env.HOME,
         env: process.env,
       });
       log.info(
@@ -96,8 +97,6 @@ export class TerminalSession {
       `[TerminalSession] - Terminating terminal session: ${this._sessionId}`
     );
     this.stopListening();
-    this.dataListenerDispoer.dispose();
-    this.exitListenerDisposer.dispose();
     this.terminal.kill();
   }
 
