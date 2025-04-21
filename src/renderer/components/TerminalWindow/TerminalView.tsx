@@ -52,6 +52,7 @@ export default function TerminalView({ visible, sessionId, terminal }: TerminalV
 
     setTimeout(() => {
       handleResize();
+      terminal.focus();
     }, 50); // Wait for the terminal to be mounted
 
     return () => {
