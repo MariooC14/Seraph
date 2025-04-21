@@ -96,6 +96,7 @@ export class TerminalSession {
     log.info(
       `[TerminalSession] - Terminating terminal session: ${this._sessionId}`
     );
+    this.window = null;
     this.stopListening();
     this.terminal.kill();
   }
