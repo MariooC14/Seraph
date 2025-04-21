@@ -17,8 +17,8 @@ if (started) {
 const createWindow = () => {
   log.info("Creating main window");
   mainWindow = new BrowserWindow({
-    minWidth: 1600,
-    minHeight: 1000,
+    minWidth: 800,
+    minHeight: 600,
     titleBarStyle: "hidden",
     trafficLightPosition: { x: 10, y: 12 },
     webPreferences: {
