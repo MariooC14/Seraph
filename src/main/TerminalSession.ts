@@ -77,6 +77,7 @@ export class TerminalSession {
         rows: 30,
         cwd: isWindows ? process.env.USERPROFILE : process.env.HOME,
         env: process.env,
+        useConpty: false, // Do not remove or set to true - conpty is unstable on windows
       });
       log.info(
         `[TerminalSession] - Spawned new terminal with sessionId: ${this._sessionId}`
