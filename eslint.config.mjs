@@ -13,8 +13,10 @@ export default [
   pluginReact.configs.flat.recommended,
   pluginReact.configs.flat["jsx-runtime"],
   {
+    files: ["**/*.stories.@(ts|tsx|js|jsx|mjs|cjs)"],
     rules: {
-      // Add your own rules here
+      "@typescript-eslint/no-explicit-any": "off",
+      // Add any other rules you want to disable for story files
     },
   },
 ];

@@ -9,7 +9,7 @@ export type TerminalSession = {
   terminal: Terminal;
 }
 
-type TerminalTab = {
+export type TerminalTab = {
   id: string;
   name: string;
   session: TerminalSession;
