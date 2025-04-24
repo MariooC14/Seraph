@@ -6,6 +6,7 @@ import { useTerminalTabs } from "@/context/TerminalTabsProvider";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import TerminalTabs from "../TerminalTabs/TerminalTabs";
+import QuickShellSelectNewTabTutton from "./QuickShellSelectNewTabTutton";
 
 export default function TitleBar() {
   const { tabs, showHostSelectionDialog, closeTab } = useTerminalTabs();
@@ -37,9 +38,10 @@ export default function TitleBar() {
           <TerminalTabs tabs={tabs} onTabSelect={handleTabSelect} onTabClose={handleTabClose} activeTab={terminalId} onNewTabClick={handleNewTabClick}/>
           </div>
         </div>
-          <Button variant="ghost" size="icon" className="cursor-pointer nonDraggable rounded-full size-8 ml-1" onClick={handleNewTabClick}>
-            <Plus />
-          </Button>
+        <Button variant="ghost" size="icon" className="cursor-pointer nonDraggable size-7 rounded-e-none ml-1 border-r-1" onClick={handleNewTabClick}>
+          <Plus />
+        </Button>
+        <QuickShellSelectNewTabTutton />
       </div>
       {!isMacOS && <WindowControlBar />}
     </nav>

@@ -4,17 +4,22 @@ import { toast } from "sonner";
 type ConfigContextType = {
   defaultShellPath: string;
   updateDefaultShellPath: (path: string) => void;
+  availableShells?: string[];
 };
 
 const ConfigContext = createContext<ConfigContextType>({} as ConfigContextType);
 
 export default function ConfigProvider({ children }: { children: React.ReactNode }) {
   const [defaultShellPath, setDefaultShellPath] = useState("");
+  const [availableShells, setAvailableShells] = useState<string[]>();
 
   useEffect(() => {
     window.terminal.getUserPreferredShell().then((shellPath: string) => {
       console.log("shellPath", shellPath);
       setDefaultShellPath(shellPath);
+    });
+    window.terminal.getAvailableShells().then((shells: string[]) => {
+      setAvailableShells(shells);
     });
   }, []);
 
@@ -33,7 +38,8 @@ export default function ConfigProvider({ children }: { children: React.ReactNode
 
   const value = {
     defaultShellPath, 
-    updateDefaultShellPath
+    updateDefaultShellPath,
+    availableShells,
   }
   
   return (

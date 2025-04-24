@@ -8,7 +8,7 @@ import { useConfig } from "@/context/ConfigProvider";
 import { cn } from "@/lib/utils";
 import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { ChevronsUpDown, Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function TerminalTab() {   
   return (
@@ -27,18 +27,7 @@ export default function TerminalTab() {
 }
 
 function ShellSelectionSection() {
-  const { defaultShellPath, updateDefaultShellPath } = useConfig();
-  const [loading, setLoading] = useState(true);
-
-  const [availableShells, setAvailableShells] = useState<string[]>([]);
-
-  useEffect(() => {
-    window.terminal.getAvailableShells().then((shells: string[]) => {
-      setAvailableShells(shells);
-      setLoading(false);
-    });
-  }, []);
-
+  const { defaultShellPath, updateDefaultShellPath, availableShells } = useConfig();
   const [open, setOpen] = useState(false);
 
   return (
@@ -59,7 +48,7 @@ function ShellSelectionSection() {
           <CommandList>
             <CommandEmpty>No shells found.</CommandEmpty>
             <CommandGroup>
-              {loading && <CommandItem>Loading...</CommandItem>}
+              {!availableShells && <CommandItem>Loading...</CommandItem>}
               {availableShells.map((shell) => (
                 <CommandItem
                 key={shell}
