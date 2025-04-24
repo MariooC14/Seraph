@@ -48,7 +48,7 @@ function ShellSelectionSection() {
           <CommandList>
             <CommandEmpty>No shells found.</CommandEmpty>
             <CommandGroup>
-              {!availableShells && <CommandItem>Loading...</CommandItem>}
+              {availableShells === undefined && <CommandItem>Loading...</CommandItem>}
               {availableShells.map((shell) => (
                 <CommandItem
                 key={shell}
