@@ -134,6 +134,12 @@
   }
 }
 
+@utility scrollbar-hidden {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* These styles are unique to electron and cannot be applied with tailwind or inline */
 
 .draggable {
