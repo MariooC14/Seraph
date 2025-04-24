@@ -13,11 +13,19 @@ export default function QuickShellSelectNewTabTutton() {
   const { availableShells } = useConfig();
   const navigate = useNavigate();
 
-  const handleNewTabClick = (shell: string) => {
-    createTab(shell, shell).then((tab) => {
+  const handleNewTabClick = (tabName: string, shell: string) => {
+    createTab(tabName, shell).then((tab) => {
       navigate(`/terminals/${tab.id}`);
     });
   }
+
+  const shellOptions = availableShells?.map(shell => {
+      const formattedName = formatShellName(shell);
+
+      return <DropdownMenuItem key={shell} className="p-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleNewTabClick(formattedName, shell)}>
+      {formatShellName(shell)}
+    </DropdownMenuItem>
+  });
 
   return (
     <div className="nonDraggable">
@@ -31,11 +39,7 @@ export default function QuickShellSelectNewTabTutton() {
           <DropdownMenuGroup>
             <DropdownMenuLabel className="text-xs text-muted-foreground">Local Shells</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {availableShells?.map(shell => (
-              <DropdownMenuItem key={shell} className="p-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleNewTabClick(shell)}>
-                {formatShellName(shell)}
-              </DropdownMenuItem>
-            ))}
+              {shellOptions}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
