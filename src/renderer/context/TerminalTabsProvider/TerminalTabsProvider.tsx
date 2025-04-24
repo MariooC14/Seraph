@@ -18,7 +18,7 @@ export type TerminalTab = {
 
 type TerminalTabsContextValue = {
   tabs: TerminalTab[];
-  createTab: (name: string) => Promise<TerminalTab>;
+  createTab: (name: string, shellPath?: string) => Promise<TerminalTab>;
   closeTab: (id: string) => void;
   showHostSelectionDialog: () => void;
 }
@@ -60,14 +60,14 @@ export default function TerminalTabsProvider({ children }: { children: ReactNode
   const value: TerminalTabsContextValue = {
     tabs, closeTab,
     showHostSelectionDialog: () => setHostSelectionDialogVisible(true),
-    createTab: async (name: string) => {
+    createTab: async (name: string, shellPath = defaultShellPath) => {
       console.log("Creating new terminal tab");
       const numExistingTabNames = tabs.filter((tab) => tab.name === name).length;
       if (numExistingTabNames > 0) {
         name = `${name} (${numExistingTabNames})`;
       }
       try {
-        const session = await TerminalService.createTerminalSession(defaultShellPath);
+        const session = await TerminalService.createTerminalSession(shellPath);
         const newTab: TerminalTab = {
           id: session.id,
           isActive: false,
