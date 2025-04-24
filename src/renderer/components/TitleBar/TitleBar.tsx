@@ -1,5 +1,5 @@
 import { Button } from "../ui/button";
-import { Home } from "lucide-react";
+import { Home, Plus } from "lucide-react";
 import WindowControlBar from "../WindowControlBar";
 import { Link, useNavigate, useParams } from "react-router";
 import { useTerminalTabs } from "@/context/TerminalTabsProvider";
@@ -25,14 +25,21 @@ export default function TitleBar() {
   };
 
   return (
-    <nav className="draggable flex justify-between select-none text-muted-foreground h-10">
-      <div className={cn("flex items-center space-x-2", isMacOS ? "ml-18" : "ml-1")}>
-        <Link to="/">
-          <Button className="cursor-pointer nonDraggable" variant="ghost" size="icon">
-            <Home />
+    <nav className="draggable flex justify-between select-none text-muted-foreground h-10 max-w-screen overflow-x-hidden">
+      <div className={cn("flex items-center overflow-hidden", isMacOS ? "ml-18" : "ml-1")}>
+        <div className="flex overflow-hidden">
+          <Link to="/">
+            <Button className="cursor-pointer nonDraggable" variant="ghost" size="icon">
+              <Home />
+            </Button>
+          </Link>
+          <div className="overflow-hidden my-1 ml-2">
+          <TerminalTabs tabs={tabs} onTabSelect={handleTabSelect} onTabClose={handleTabClose} activeTab={terminalId} onNewTabClick={handleNewTabClick}/>
+          </div>
+        </div>
+          <Button variant="ghost" size="icon" className="cursor-pointer nonDraggable rounded-full size-8 ml-1" onClick={handleNewTabClick}>
+            <Plus />
           </Button>
-        </Link>
-        <TerminalTabs tabs={tabs} onTabSelect={handleTabSelect} onTabClose={handleTabClose} activeTab={terminalId} onNewTabClick={handleNewTabClick}/>
       </div>
       {!isMacOS && <WindowControlBar />}
     </nav>

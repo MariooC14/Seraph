@@ -28,7 +28,7 @@ export default function WindowControlBar() {
   };
   
   return (
-    <div className="nonDraggable">
+    <div className="nonDraggable shrink-0">
       <Button variant="ghost" onClick={handleMinimize}><Minus /></Button>
       <Button variant="ghost" onClick={handleMaximize}>
        {maximized ? <Minimize />:  <Maximize /> }

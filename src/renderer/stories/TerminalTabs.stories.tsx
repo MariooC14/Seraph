@@ -3,12 +3,14 @@ import type { Meta, StoryObj } from '@storybook/react';
 import TerminalTabs from '../components/TerminalTabs/TerminalTabs';
 import { TerminalTab } from '@/context/TerminalTabsProvider';
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 const generateTabs = (numTabs: number): TerminalTab[] => {
   return Array.from({ length: numTabs }, (_, index) => ({
-    id: `${index + 1}`,
-    name: `Tab ${index + 1}`,
-    isActive: false
+    id: index,
+    name: `Tab ${index}`,
+    isActive: index === 0,
   } as any));
 }
 
@@ -31,8 +33,8 @@ function TerminalTabsStory({ numTabs = 3 }: { numTabs: number }) {
       const filteredTabs = prevTabs.filter((tab) => tab.id !== tabId);
       return filteredTabs.map((tab, idx) => {
         return { 
-          id: `${idx + 1}`, 
-          name: `Tab ${idx + 1}`, 
+          id: idx,
+          name: `Tab ${idx}`,
           } as any
       })
   });
@@ -50,13 +52,17 @@ function TerminalTabsStory({ numTabs = 3 }: { numTabs: number }) {
   };
 
   return (
-    <TerminalTabs
-      tabs={tabs}
-      activeTab={activeTab}
-      onTabSelect={(tabId) => handleTabSelect(tabId)}
-      onTabClose={(tabId) => handleTabClose(tabId)}
-      onNewTabClick={() => handleNewTabClick()}
-    />
+    <div className='flex'>
+      <TerminalTabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabSelect={(tabId) => handleTabSelect(tabId)}
+        onTabClose={(tabId) => handleTabClose(tabId)}
+        />
+      <Button size='icon' variant="ghost" onClick={handleNewTabClick}>
+        <Plus />
+      </Button>
+    </div>
   );
 }
 
@@ -70,4 +76,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: { numTabs: 5 }
+}
+
+export const Overflowing: Story = {
+  args: { numTabs: 20 },
+  decorators: [
+    (Story) => (
+      <div style={{ width: '500px', height: '100px', border: '1px solid red' }}>
+        <Story />
+      </div>
+    ),
+  ]
 }
