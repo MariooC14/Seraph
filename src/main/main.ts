@@ -35,8 +35,11 @@ const createWindow = () => {
     );
   }
 
-  if (process.env.NODE_ENV === "development")
+  if (process.env.NODE_ENV === "development") {
     mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.setMenu(null);
+  }
 };
 
 // This method will be called when Electron has finished

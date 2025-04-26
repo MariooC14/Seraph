@@ -1,11 +1,18 @@
 import { useTerminalTabs } from "@/context/TerminalTabsProvider";
-import { cn, debounce, isNewTabKey } from "@/lib/utils";
+import { cn, debounce, isCloseTabKey, isNewTabKey, isNextTabKey, isPreviousTabKey } from "@/lib/utils";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, KeyboardEvent } from "react";
 import { toast } from "sonner";
+
+const shortcutIgnoreKeys = [
+  isNewTabKey,
+  isCloseTabKey,
+  isPreviousTabKey,
+  isNextTabKey,
+]
 
 type TerminalViewProps = {
   sessionId: string;
@@ -39,8 +46,10 @@ export default function TerminalView({ visible, sessionId, terminal }: TerminalV
     })
 
     terminal.attachCustomKeyEventHandler((event) => {
-      if (isNewTabKey(event)) {
-        return false;
+      for (const isIgnoreKey of shortcutIgnoreKeys) {
+        if (isIgnoreKey(event)) {
+          return false;
+        }
       }
       return true;
     });
@@ -75,8 +84,15 @@ export default function TerminalView({ visible, sessionId, terminal }: TerminalV
     }
   }, [visible])
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (isCloseTabKey(e)) {
+      e.preventDefault();
+      closeTab(sessionId);
+    }
+  }
+
   return (
-    <div className={cn("p-4 h-full w-full bg-background", !visible && "hidden")}>
+    <div className={cn("p-4 h-full w-full bg-background", !visible && "hidden")} onKeyDown={handleKeyDown}>
       <div ref={terminalRef} className="h-full w-full bg-background rounded-2xl" />
     </div>
   );
