@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Terminal } from "@xterm/xterm";
+import "@xterm/xterm/css/xterm.css";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
