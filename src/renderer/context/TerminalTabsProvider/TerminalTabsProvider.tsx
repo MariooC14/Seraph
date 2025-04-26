@@ -3,6 +3,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 import HostSelectionDialog from "./HostSelectionDialog";
 import { TerminalService } from "@/service/TerminalService/TerminalService";
 import { useConfig } from "../ConfigProvider";
+import { isNewTabKey } from "@/lib/utils";
 
 export type TerminalSession = {
   id: string;
@@ -97,9 +98,4 @@ export function useTerminalTabs() {
     console.warn("useTerminalTabs must be used within a TerminalTabsProvider");
   }
   return context;
-}
-
-function isNewTabKey(e: KeyboardEvent) {
-  // Can also check for ctrl/cmd K
-  return e.key === "t" && (e.metaKey || e.ctrlKey);
 }

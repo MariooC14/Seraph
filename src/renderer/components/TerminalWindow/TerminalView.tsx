@@ -1,5 +1,5 @@
 import { useTerminalTabs } from "@/context/TerminalTabsProvider";
-import { cn, debounce } from "@/lib/utils";
+import { cn, debounce, isNewTabKey } from "@/lib/utils";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Terminal } from "@xterm/xterm";
@@ -38,12 +38,20 @@ export default function TerminalView({ visible, sessionId, terminal }: TerminalV
       terminal.write(newData);
     })
 
+    terminal.attachCustomKeyEventHandler((event) => {
+      if (isNewTabKey(event)) {
+        return false;
+      }
+      return true;
+    });
+
     window.terminal.onSessionTerminated(sessionId, (code) => {
       toast.info(`Terminal session ended with code ${code}`);
       closeTab(sessionId);
     });
 
     const handleResize = debounce(() => {
+      if (!visible) return;
       fitAddon.fit();
       const { rows, cols } = fitAddon.proposeDimensions();
       window.terminal.resizeTerminal(sessionId, cols, rows);
@@ -53,7 +61,6 @@ export default function TerminalView({ visible, sessionId, terminal }: TerminalV
 
     setTimeout(() => {
       handleResize();
-      terminal.focus();
     }, 50); // Wait for the terminal to be mounted
 
     return () => {
@@ -61,6 +68,12 @@ export default function TerminalView({ visible, sessionId, terminal }: TerminalV
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  useEffect(() => {
+    if (visible) {
+      terminal.focus();
+    }
+  }, [visible])
 
   return (
     <div className={cn("p-4 h-full w-full bg-background", !visible && "hidden")}>

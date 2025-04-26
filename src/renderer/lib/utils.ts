@@ -49,6 +49,10 @@ export function formatShellName(shellPath: string): string {
 
   return friendlyName;
 }
+export function isNewTabKey(e: KeyboardEvent) {
+  // Can also check for ctrl/cmd K
+  return e.key === "t" && (e.metaKey || e.ctrlKey);
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function debounce(fn: Function, ms = 300) {
