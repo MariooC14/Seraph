@@ -1,5 +1,5 @@
 import { useTerminalTabs } from "@/context/TerminalTabsProvider";
-import { cn } from "@/lib/utils";
+import { cn, debounce } from "@/lib/utils";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Terminal } from "@xterm/xterm";
@@ -43,11 +43,11 @@ export default function TerminalView({ visible, sessionId, terminal }: TerminalV
       closeTab(sessionId);
     });
 
-    const handleResize = () => {
-      fitAddon.fit(); // todo? could debounce this
+    const handleResize = debounce(() => {
+      fitAddon.fit();
       const { rows, cols } = fitAddon.proposeDimensions();
       window.terminal.resizeTerminal(sessionId, cols, rows);
-    }
+    }, 200);
 
     window.addEventListener('resize', handleResize)
 
