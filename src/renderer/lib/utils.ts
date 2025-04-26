@@ -49,3 +49,7 @@ export function formatShellName(shellPath: string): string {
 
   return friendlyName;
 }
+export function isNewTabKey(e: KeyboardEvent) {
+  // Can also check for ctrl/cmd K
+  return e.key === "t" && (e.metaKey || e.ctrlKey);
+}
