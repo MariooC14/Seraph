@@ -31,4 +31,4 @@ If applicable, add screenshots to help explain your problem.
 Add any other context about the problem here.
 
 [] I made sure no duplicate issues exist
-[] A similar issues exists: #<issue_number>
+[] A similar issue exists: #<issue_number>
