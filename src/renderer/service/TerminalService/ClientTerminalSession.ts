@@ -1,5 +1,5 @@
 import {defaultTerminalOptions} from '@/components/TerminalWindow/terminalConfig';
-import {Terminal} from '@xterm/xterm';
+import {ITerminalOptions, Terminal} from '@xterm/xterm';
 import {FitAddon} from '@xterm/addon-fit';
 import {WebLinksAddon} from '@xterm/addon-web-links';
 import { isNewTabKey } from '@/lib/utils';
@@ -73,5 +73,13 @@ export class ClientTerminalSession {
   public terminate() {
     window.terminal.terminateSession(this._sessionId);
     this.terminal.dispose();
+  }
+
+  public get terminalOptions() {
+    return this.terminal.options;
+  }
+
+  public set terminalOptions(options: ITerminalOptions) {
+    this.terminal.options = options;
   }
 }
