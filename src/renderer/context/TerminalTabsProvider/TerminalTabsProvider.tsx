@@ -1,20 +1,14 @@
-import { Terminal } from "@xterm/xterm";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react"
 import HostSelectionDialog from "./HostSelectionDialog";
 import { TerminalService } from "@/service/TerminalService/TerminalService";
 import { useConfig } from "../ConfigProvider";
 import { isNewTabKey } from "@/lib/utils";
-
-export type TerminalSession = {
-  id: string;
-  terminal: Terminal;
-}
+import {ClientTerminalSession} from '@/service/TerminalService/ClientTerminalSession';
 
 export type TerminalTab = {
   id: string;
   name: string;
-  session: TerminalSession;
-  isActive: boolean;
+  session: ClientTerminalSession;
 }
 
 type TerminalTabsContextValue = {
@@ -30,7 +24,7 @@ export default function TerminalTabsProvider({ children }: { children: ReactNode
   const { defaultShellPath } = useConfig();
   const [tabs, setTabs] = useState<TerminalTab[]>([]);
   const [hostSelectionDialogVisible, setHostSelectionDialogVisible] = useState(false);
- 
+
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (isNewTabKey(e)) {
@@ -51,8 +45,7 @@ export default function TerminalTabsProvider({ children }: { children: ReactNode
       const tabToClose = currentTabs.find((tab) => tab.id === id);
       if (!tabToClose) return currentTabs;
 
-      window.terminal.terminateSession(tabToClose.session.id);
-      tabToClose.session.terminal.dispose();
+      tabToClose.session.terminate();
 
       return currentTabs.filter((tab) => tab.id !== id);
     })
@@ -70,8 +63,7 @@ export default function TerminalTabsProvider({ children }: { children: ReactNode
       try {
         const session = await TerminalService.createTerminalSession(shellPath);
         const newTab: TerminalTab = {
-          id: session.id,
-          isActive: false,
+          id: session.sessionId,
           name, session,
         };
         setTabs((prev) => ([...prev, newTab ]));

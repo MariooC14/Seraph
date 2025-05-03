@@ -1,0 +1,77 @@
+import {defaultTerminalOptions} from '@/components/TerminalWindow/terminalConfig';
+import {Terminal} from '@xterm/xterm';
+import {FitAddon} from '@xterm/addon-fit';
+import {WebLinksAddon} from '@xterm/addon-web-links';
+import { isNewTabKey } from '@/lib/utils';
+import {isCloseTabKey, isNextTabKey, isPreviousTabKey} from '@/lib/utils';
+
+const shortcutIgnoreKeys = [
+  isNewTabKey,
+  isCloseTabKey,
+  isPreviousTabKey,
+  isNextTabKey,
+]
+
+export class ClientTerminalSession {
+  private readonly _sessionId: string;
+  private terminal: Terminal;
+  private fitAddon: FitAddon;
+  private webLinksAddon: WebLinksAddon;
+  private parentElRef: HTMLElement;
+
+  constructor(sessionId: string) {
+    this._sessionId = sessionId;
+    this.terminal = new Terminal(defaultTerminalOptions);
+  }
+
+  public attachTo(parent: HTMLElement) {
+    this.parentElRef = parent;
+    this.terminal.open(parent);
+
+    this.fitAddon = new FitAddon();
+    this.webLinksAddon = new WebLinksAddon();
+
+    this.terminal.loadAddon(this.fitAddon);
+    this.terminal.loadAddon(this.webLinksAddon);
+
+    // Handle user input
+    this.terminal.onData((data) => {
+      window.terminal.sendData(this._sessionId, data);
+    })
+
+    // Handle input from PTY
+    window.terminal.onData(this._sessionId, (newData) => {
+      this.terminal.write(newData);
+    });
+
+    this.terminal.attachCustomKeyEventHandler((event) => {
+      for (const isIgnoreKey of shortcutIgnoreKeys) {
+        if (isIgnoreKey(event)) {
+          return false;
+        }
+      }
+      return true;
+    })
+  }
+
+  public focus() {
+    this.terminal.focus();
+  }
+
+  public get sessionId() {
+    return this._sessionId;
+  }
+
+  public resize() {
+    this.fitAddon.fit();
+    console.log(this.parentElRef);
+    const { rows, cols } = this.fitAddon.proposeDimensions();
+    console.log("Terminal session resized", cols,  rows);
+    window.terminal.resizeTerminal(this._sessionId, cols,  rows);
+  }
+
+  public terminate() {
+    window.terminal.terminateSession(this._sessionId);
+    this.terminal.dispose();
+  }
+}
