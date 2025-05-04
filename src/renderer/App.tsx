@@ -44,6 +44,8 @@ function App() {
   useEffect(() => {
     if (focusedTabId) {
       navigate(`/terminals/${focusedTabId}`);
+    } else {
+      navigate("/");
     }
   }, [focusedTabId]);
 

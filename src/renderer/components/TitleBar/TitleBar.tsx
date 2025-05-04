@@ -1,23 +1,22 @@
 import { Button } from "../ui/button";
 import { Home, Plus } from "lucide-react";
 import WindowControlBar from "../WindowControlBar";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import TerminalTabs from "../TerminalTabs/TerminalTabs";
 import QuickShellSelectNewTabButton from "./QuickShellSelectNewTabButton";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { closeTab, selectTerminalTabs, toggleHostSelectionDialog } from "@/features/terminalTabs/terminalTabsSlice";
+import { closeTab, focusTab, selectTerminalTabs, toggleHostSelectionDialog } from "@/features/terminalTabs/terminalTabsSlice";
 
 export default function TitleBar() {
   const tabs = useAppSelector(selectTerminalTabs);
   const dispatch = useAppDispatch();
   const [isMacOS] = useState(() => window.app.isMacOS());
   const { terminalId } = useParams();
-  const navigate = useNavigate();
 
   const handleTabSelect = (tabId: string) => {
-    navigate(`/terminals/${tabId}`);
+    dispatch(focusTab(tabId));
   };
   const handleTabClose = (tabId: string) => {
     dispatch(closeTab(tabId));

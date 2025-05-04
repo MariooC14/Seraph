@@ -1,6 +1,5 @@
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import TerminalView from "./TerminalView";
-import { useEffect } from "react";
 import { cn } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { closeTab, selectTerminalTabs } from "@/features/terminalTabs/terminalTabsSlice";
@@ -10,16 +9,6 @@ function TerminalPanel() {
   const { terminalId } = useParams();
   const tabs = useAppSelector(selectTerminalTabs);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (tabs.length === 0) {
-      navigate("/");
-    } else if (terminalId && !tabs.find((tab) => tab.id === terminalId)) {
-      const rightmostTab = tabs[tabs.length - 1];
-      navigate(`/terminals/${rightmostTab.id}`);
-    }
-  }, [tabs]);
 
   const handleClose = (sessionId: string) => {
     dispatch(closeTab(sessionId));

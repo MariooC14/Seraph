@@ -77,7 +77,7 @@ export const terminalTabsSlice = createAppSlice({
     focusTab: create.reducer((state, action: PayloadAction<string>) => {
       const tabId = action.payload;
       const tabIdx = state.tabs.findIndex(tab => tab.id === tabId);
-      if (tabIdx) {
+      if (tabIdx !== -1) {
         state.focusedTabId = state.tabs[tabIdx].id;
         state.focusedTabIdx = tabIdx;
       }
