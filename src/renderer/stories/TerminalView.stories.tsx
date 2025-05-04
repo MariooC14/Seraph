@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import TerminalView from '@/components/TerminalWindow/TerminalView';
+import TerminalView from '@/features/terminalTabs/TerminalView';
 import { ITerminalOptions } from '@xterm/xterm';
 import createSimpleMockTerminal from './mockTerminalEnvironment';
-import { defaultTerminalOptions } from '@/components/TerminalWindow/terminalConfig';
+import { defaultTerminalOptions } from '@/features/terminalTabs/terminalConfig';
 import { useState } from 'react';
-import {ClientTerminalSession} from '@/service/TerminalService/ClientTerminalSession';
+import { ClientTerminalSession } from '@/features/terminalTabs/ClientTerminalSession';
+import { Provider } from 'react-redux';
+import { store } from '@/app/store';
 
 type TerminalViewPropsAndTerminalOptions = React.ComponentProps<typeof TerminalView> & ITerminalOptions & { themeKey: keyof typeof themeOptions };
 
@@ -45,6 +47,13 @@ const themeOptions = {
 
 const meta = {
   component: TerminalView,
+  decorators: [
+    (Story) => (
+      <Provider store={store}>
+        <Story />
+      </Provider>
+    ),
+  ]
 } satisfies Meta<TerminalViewPropsAndTerminalOptions>;
 
 export default meta;
@@ -102,14 +111,6 @@ export const Presets: Story = {
         step: 25,
       },
       defaultValue: defaultTerminalOptions.fontWeight,
-    },
-    visible: {
-      defaultValue: true,
-      table: {disable: true},
-    },
-    sessionId: {
-      defaultValue: 'mock-session-id',
-      table: {disable: true},
     },
   },
   args: {

@@ -1,4 +1,4 @@
-import { TerminalTab } from "@/context/TerminalTabsProvider";
+import { TerminalTab } from "@/features/terminalTabs/terminalTabsSlice";
 import CloseableTab from "../NavigationBar/CloseableTab";
 
 interface TerminalTabsProps {
@@ -15,12 +15,12 @@ export default function TerminalTabs({ tabs, activeTab, onTabSelect, onTabClose 
     <div className="flex space-x-2 h-full overflow-auto scrollbar-hidden">
       {tabs?.map((tab) => (
         <CloseableTab
-        key={tab.id}
-        id={tab.id}
-        name={tab.name}
-        isActive={tab.id === activeTab}
-        onClick={() => onTabSelect?.(tab.id)}
-        onClose={() => onTabClose?.(tab.id)}
+          key={tab.id}
+          id={tab.id}
+          name={tab.name}
+          isActive={tab.id === activeTab}
+          onClick={() => onTabSelect?.(tab.id)}
+          onClose={() => onTabClose?.(tab.id)}
         />
       ))}
     </div>

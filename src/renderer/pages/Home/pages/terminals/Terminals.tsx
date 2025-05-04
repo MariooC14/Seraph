@@ -6,8 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus} from "lucide-react";
-import TerminalPanel from "@/components/TerminalWindow/TerminalPanel";
+import { Plus } from "lucide-react";
+import TerminalPanel from "@/features/terminalTabs/TerminalPanel";
 
 function Terminals() {
   return (

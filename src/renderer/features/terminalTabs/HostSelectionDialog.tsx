@@ -1,3 +1,4 @@
+import { useAppDispatch } from "@/app/hooks";
 import { Button } from "@/components/ui/button";
 import {
   CommandDialog,
@@ -7,9 +8,9 @@ import {
   CommandItem,
   CommandGroup
 } from "@/components/ui/command";
+import { createTab, TerminalTab } from "@/features/terminalTabs/terminalTabsSlice";
 import { CirclePlus, Terminal } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTerminalTabs } from "./TerminalTabsProvider";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -22,7 +23,7 @@ export default function HostSelectionDialog({
   open,
   handleOpenChange,
 }: HostSelectionDialogProps) {
-  const { createTab } = useTerminalTabs();
+  const dispatch = useAppDispatch();
   const [value, setValue] = useState("");
   const navigate = useNavigate();
 
@@ -31,15 +32,17 @@ export default function HostSelectionDialog({
   }, [open]);
 
   const handleLocalTerminalClick = () => {
-    createTab("Localhost").then((tab) => {
-      console.log("Dialog: Created local terminal tab", tab);
-      handleOpenChange(false);
-      navigate(`/terminals/${tab.id}`);
-    })
-    .catch((error) => {
-      console.error("Failed to create local terminal tab:", error);
-      toast.error("Failed to create local terminal tab:", error);
-    });
+    dispatch(createTab({ name: "Localhost" }))
+      .then((action) => {
+        if (action.meta.requestStatus === "fulfilled") {
+          const tab = action.payload as TerminalTab;
+          handleOpenChange(false);
+          navigate(`/terminals/${tab.id}`);
+        } else {
+          console.error("Failed to create local terminal tab:", action.meta.requestStatus);
+          toast.error("Failed to create local terminal tab: " + action.meta.requestStatus);
+        }
+      })
   }
 
   return (
@@ -48,7 +51,7 @@ export default function HostSelectionDialog({
       <CommandEmpty>
         <span className="text-lg">No hosts found.</span>
         <Button variant="outline" className="ml-2">Add host</Button>
-        </CommandEmpty>
+      </CommandEmpty>
       <CommandList>
         <CommandGroup heading="Hosts">
           {/* Hosts from config */}

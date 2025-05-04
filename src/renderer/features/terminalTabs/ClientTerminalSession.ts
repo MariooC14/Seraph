@@ -1,16 +1,16 @@
-import {defaultTerminalOptions} from '@/components/TerminalWindow/terminalConfig';
-import {ITerminalOptions, Terminal} from '@xterm/xterm';
-import {FitAddon} from '@xterm/addon-fit';
-import {WebLinksAddon} from '@xterm/addon-web-links';
-import { isNewTabKey } from '@/lib/utils';
-import {isCloseTabKey, isNextTabKey, isPreviousTabKey} from '@/lib/utils';
+import { defaultTerminalOptions } from "@/features/terminalTabs/terminalConfig";
+import { ITerminalOptions, Terminal } from "@xterm/xterm";
+import { FitAddon } from "@xterm/addon-fit";
+import { WebLinksAddon } from "@xterm/addon-web-links";
+import { isNewTabKey } from "@/lib/utils";
+import { isCloseTabKey, isNextTabKey, isPreviousTabKey } from "@/lib/utils";
 
 const shortcutIgnoreKeys = [
   isNewTabKey,
   isCloseTabKey,
   isPreviousTabKey,
   isNextTabKey,
-]
+];
 
 export class ClientTerminalSession {
   private readonly _sessionId: string;
@@ -19,6 +19,7 @@ export class ClientTerminalSession {
   private webLinksAddon: WebLinksAddon;
   private parentElRef: HTMLElement;
 
+  /** Creates a terminal session given an existing pty's session id */
   constructor(sessionId: string) {
     this._sessionId = sessionId;
     this.terminal = new Terminal(defaultTerminalOptions);
@@ -35,23 +36,23 @@ export class ClientTerminalSession {
     this.terminal.loadAddon(this.webLinksAddon);
 
     // Handle user input
-    this.terminal.onData((data) => {
+    this.terminal.onData(data => {
       window.terminal.sendData(this._sessionId, data);
-    })
+    });
 
     // Handle input from PTY
-    window.terminal.onData(this._sessionId, (newData) => {
+    window.terminal.onData(this._sessionId, newData => {
       this.terminal.write(newData);
     });
 
-    this.terminal.attachCustomKeyEventHandler((event) => {
+    this.terminal.attachCustomKeyEventHandler(event => {
       for (const isIgnoreKey of shortcutIgnoreKeys) {
         if (isIgnoreKey(event)) {
           return false;
         }
       }
       return true;
-    })
+    });
   }
 
   public focus() {
@@ -66,8 +67,8 @@ export class ClientTerminalSession {
     this.fitAddon.fit();
     console.log(this.parentElRef);
     const { rows, cols } = this.fitAddon.proposeDimensions();
-    console.log("Terminal session resized", cols,  rows);
-    window.terminal.resizeTerminal(this._sessionId, cols,  rows);
+    console.log("Terminal session resized", cols, rows);
+    window.terminal.resizeTerminal(this._sessionId, cols, rows);
   }
 
   public terminate() {
