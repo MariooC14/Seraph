@@ -1,11 +1,11 @@
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "./components/theme-provider";
-import { Outlet, useLocation } from "react-router";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import TitleBar from "./components/TitleBar/TitleBar";
-import { cn, isNewTabKey } from "./lib/utils";
+import { cn, isNewTabKey, isNextTabKey, isPreviousTabKey } from "./lib/utils";
 import TerminalPanel from "./features/terminalTabs/TerminalPanel";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
-import { selectIsHostSelectionDialogOpen, toggleHostSelectionDialog } from "./features/terminalTabs/terminalTabsSlice";
+import { cycleNextTab, cyclePreviousTab, selectFocusedTabId, selectIsHostSelectionDialogOpen, toggleHostSelectionDialog, unfocusTabs } from "./features/terminalTabs/terminalTabsSlice";
 import { useEffect } from "react";
 import HostSelectionDialog from "./features/terminalTabs/HostSelectionDialog";
 
@@ -13,7 +13,9 @@ function App() {
   const location = useLocation();
   const isTerminalTab = location.pathname.includes("/terminals/");
   const hostSelectionDialogVisible = useAppSelector(selectIsHostSelectionDialogOpen);
+  const focusedTabId = useAppSelector(selectFocusedTabId);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const handleHostSelectionDialogOpenChange = () => {
     dispatch(toggleHostSelectionDialog());
@@ -25,10 +27,33 @@ function App() {
         e.preventDefault()
         dispatch(toggleHostSelectionDialog());
       }
+
+      if (isNextTabKey(e)) {
+        e.preventDefault();
+        dispatch(cycleNextTab());
+      }
+      if (isPreviousTabKey(e)) {
+        e.preventDefault();
+        dispatch(cyclePreviousTab());
+      }
     }
     document.addEventListener("keydown", down)
     return () => document.removeEventListener("keydown", down)
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    if (focusedTabId) {
+      navigate(`/terminals/${focusedTabId}`);
+    }
+  }, [focusedTabId]);
+
+  useEffect(() => {
+    if (!isTerminalTab) {
+      dispatch(unfocusTabs());
+    }
+  }, [location.pathname]);
+
+
 
   return (
     <ThemeProvider defaultTheme="system">

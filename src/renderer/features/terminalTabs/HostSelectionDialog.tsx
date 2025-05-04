@@ -8,11 +8,9 @@ import {
   CommandItem,
   CommandGroup
 } from "@/components/ui/command";
-import { createTab, TerminalTab } from "@/features/terminalTabs/terminalTabsSlice";
+import { createTab } from "@/features/terminalTabs/terminalTabsSlice";
 import { CirclePlus, Terminal } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import { toast } from "sonner";
 
 type HostSelectionDialogProps = {
   open: boolean;
@@ -25,24 +23,14 @@ export default function HostSelectionDialog({
 }: HostSelectionDialogProps) {
   const dispatch = useAppDispatch();
   const [value, setValue] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (open) setValue("");
   }, [open]);
 
   const handleLocalTerminalClick = () => {
-    dispatch(createTab({ name: "Localhost" }))
-      .then((action) => {
-        if (action.meta.requestStatus === "fulfilled") {
-          const tab = action.payload as TerminalTab;
-          handleOpenChange(false);
-          navigate(`/terminals/${tab.id}`);
-        } else {
-          console.error("Failed to create local terminal tab:", action.meta.requestStatus);
-          toast.error("Failed to create local terminal tab: " + action.meta.requestStatus);
-        }
-      })
+    dispatch(createTab({ name: "Localhost" }));
+    handleOpenChange(false);
   }
 
   return (
