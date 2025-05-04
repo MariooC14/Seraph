@@ -10,6 +10,7 @@ import { ChevronsUpDown, Check } from "lucide-react";
 import { useState } from "react";
 import { selectAvailableShells, selectPreferredShellPath, updatePreferredShellPath } from "@/features/config/configSlice";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { toast } from "sonner";
 
 export default function TerminalTab() {
   return (
@@ -32,6 +33,18 @@ function ShellSelectionSection() {
   const preferredShellPath = useAppSelector(selectPreferredShellPath);
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
+
+  const handlePreferredShellChange = (shell: string) => {
+    window.terminal.saveDefaultShell(shell).then(success => {
+      if (success) {
+        dispatch(updatePreferredShellPath(shell));
+      } else {
+        console.error("Failed to save the preferred shell path.");
+        toast.error("Failed to save the preferred shell path.");
+      }
+      setOpen(false);
+    });
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -56,10 +69,7 @@ function ShellSelectionSection() {
                 <CommandItem
                   key={shell}
                   value={shell}
-                  onSelect={(shell) => {
-                    dispatch(updatePreferredShellPath(shell));
-                    setOpen(false)
-                  }}
+                  onSelect={handlePreferredShellChange}
                 >
                   {shell}
                   <Check

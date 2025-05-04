@@ -19,13 +19,7 @@ const configSlice = createAppSlice({
   initialState,
   reducers: {
     updatePreferredShellPath: (state, action: PayloadAction<string>) => {
-      const prevPath = state.defaultShellPath;
       state.defaultShellPath = action.payload;
-      window.terminal.saveDefaultShell(action.payload).then(success => {
-        if (!success) {
-          state.defaultShellPath = prevPath;
-        }
-      });
     },
     updateAvailableShells: (state, action: PayloadAction<string[]>) => {
       state.availableShells = action.payload;
