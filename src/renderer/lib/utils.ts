@@ -49,10 +49,6 @@ export function formatShellName(shellPath: string): string {
 
   return friendlyName;
 }
-export function isNewTabKey(e: KeyboardEvent) {
-  // Can also check for ctrl/cmd K
-  return e.key === "t" && (e.metaKey || e.ctrlKey);
-}
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function debounce(fn: Function, ms = 300) {
@@ -62,4 +58,17 @@ export function debounce(fn: Function, ms = 300) {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => fn.apply(this, args), ms);
   };
+}
+export function isNextTabKey(e: KeyboardEvent) {
+  return e.key === "Tab" && (e.metaKey || e.ctrlKey) && !e.shiftKey;
+}
+export function isPreviousTabKey(e: KeyboardEvent) {
+  return e.key === "Tab" && (e.metaKey || e.ctrlKey) && e.shiftKey;
+}
+export function isNewTabKey(e: KeyboardEvent) {
+  // Can also check for ctrl/cmd K
+  return e.key === "t" && (e.metaKey || e.ctrlKey);
+}
+export function isCloseTabKey(e: KeyboardEvent) {
+  return e.key === "w" && (e.metaKey || e.ctrlKey);
 }

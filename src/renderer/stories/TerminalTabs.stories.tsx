@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import TerminalTabs from '../components/TerminalTabs/TerminalTabs';
-import { TerminalTab } from '@/context/TerminalTabsProvider';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { TerminalTab } from '@/features/terminalTabs/terminalTabsSlice';
+import { Provider } from 'react-redux';
+import { store } from '@/app/store';
 
 const generateTabs = (numTabs: number): TerminalTab[] => {
   return Array.from({ length: numTabs }, (_, index) => ({
@@ -16,39 +18,37 @@ const generateTabs = (numTabs: number): TerminalTab[] => {
 
 /** Mimick the functionality of the titlebar */
 function TerminalTabsStory({ numTabs = 3 }: { numTabs: number }) {
-  const [activeTab, setActiveTAb] = useState('1');
+  const [activeTab, setActiveTab] = useState('1');
   const [tabs, setTabs] = useState<TerminalTab[]>(() => generateTabs(numTabs));
 
   useEffect(() => {
     setTabs(generateTabs(numTabs));
-    setActiveTAb('1');
+    setActiveTab('1');
   }, [numTabs])
 
   const handleTabSelect = (tabId: string) => {
-    setActiveTAb(tabId);
+    setActiveTab(tabId);
   };
 
   const handleTabClose = (tabId: string) => {
     setTabs((prevTabs) => {
       const filteredTabs = prevTabs.filter((tab) => tab.id !== tabId);
       return filteredTabs.map((tab, idx) => {
-        return { 
+        return {
           id: idx,
           name: `Tab ${idx}`,
-          } as any
+        } as any
       })
-  });
+    });
   };
 
   const handleNewTabClick = () => {
     const newTab: TerminalTab = {
       id: `${tabs.length + 1}`,
       name: `Tab ${tabs.length + 1}`,
-      session: { id: `${tabs.length + 1}` } as any,
-      isActive: false
     };
     setTabs((prevTabs) => [...prevTabs, newTab]);
-    setActiveTAb(newTab.id);
+    setActiveTab(newTab.id);
   };
 
   return (
@@ -58,7 +58,7 @@ function TerminalTabsStory({ numTabs = 3 }: { numTabs: number }) {
         activeTab={activeTab}
         onTabSelect={(tabId) => handleTabSelect(tabId)}
         onTabClose={(tabId) => handleTabClose(tabId)}
-        />
+      />
       <Button size='icon' variant="ghost" onClick={handleNewTabClick}>
         <Plus />
       </Button>
@@ -68,18 +68,25 @@ function TerminalTabsStory({ numTabs = 3 }: { numTabs: number }) {
 
 const meta = {
   component: TerminalTabsStory,
-} satisfies Meta<typeof TerminalTabs>;
+  decorators: [
+    (Story) => (
+      <Provider store={store}>
+        <Story />
+      </Provider>
+    )
+  ]
+} satisfies Meta<typeof TerminalTabsStory>;
 
 export default meta;
 
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { numTabs: 5 }
+  args: { numTabs: 10 },
 }
 
 export const Overflowing: Story = {
-  args: { numTabs: 20 },
+  args: { numTabs: 10 },
   decorators: [
     (Story) => (
       <div style={{ width: '500px', height: '100px', border: '1px solid red' }}>

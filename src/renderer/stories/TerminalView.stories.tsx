@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import TerminalView from '@/components/TerminalWindow/TerminalView';
-import { ITerminalOptions, Terminal } from '@xterm/xterm';
+import TerminalView from '@/features/terminalTabs/TerminalView';
+import { ITerminalOptions } from '@xterm/xterm';
 import createSimpleMockTerminal from './mockTerminalEnvironment';
-import { defaultTerminalOptions } from '@/components/TerminalWindow/terminalConfig';
+import { defaultTerminalOptions } from '@/features/terminalTabs/terminalConfig';
 import { useState } from 'react';
+import { ClientTerminalSession } from '@/features/terminalTabs/ClientTerminalSession';
+import { Provider } from 'react-redux';
+import { store } from '@/app/store';
 
 type TerminalViewPropsAndTerminalOptions = React.ComponentProps<typeof TerminalView> & ITerminalOptions & { themeKey: keyof typeof themeOptions };
 
@@ -44,6 +47,13 @@ const themeOptions = {
 
 const meta = {
   component: TerminalView,
+  decorators: [
+    (Story) => (
+      <Provider store={store}>
+        <Story />
+      </Provider>
+    ),
+  ]
 } satisfies Meta<TerminalViewPropsAndTerminalOptions>;
 
 export default meta;
@@ -53,14 +63,13 @@ type Story = StoryObj<TerminalViewPropsAndTerminalOptions>;
 export const Presets: Story = {
   render: (args) => {
     // Maintain terminal when changing props but create new when switching stories
-    const [terminal] = useState(new Terminal(defaultTerminalOptions));
+    const [terminal] = useState(new ClientTerminalSession("mock-session-id"));
     const { themeKey, ...rest } = args;
 
-    const themeToUse = themeOptions[themeKey || 'Default'];
-    terminal.options.theme = themeToUse;
-    terminal.options = rest;
-    
-    return <TerminalView {...args} terminal={terminal} />
+    terminal.terminalOptions.theme = themeOptions[themeKey || 'Default'];
+    terminal.terminalOptions = rest;
+
+    return <TerminalView {...args} clientTerminalSession={terminal} />
   },
   argTypes: {
     themeKey: {
@@ -103,14 +112,6 @@ export const Presets: Story = {
       },
       defaultValue: defaultTerminalOptions.fontWeight,
     },
-    visible: {
-      defaultValue: true,
-      table: {disable: true},
-    },
-    sessionId: {
-      defaultValue: 'mock-session-id',
-      table: {disable: true},
-    },
   },
   args: {
     // Terminal specific
@@ -121,9 +122,5 @@ export const Presets: Story = {
     cursorStyle: defaultTerminalOptions.cursorStyle,
     fontFamily: defaultTerminalOptions.fontFamily,
     fontWeight: defaultTerminalOptions.fontWeight,
-
-    // Component specific props
-    visible: true,
-    sessionId: 'mock-session-id',
   }
 };

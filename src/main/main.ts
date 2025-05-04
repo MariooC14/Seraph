@@ -1,4 +1,9 @@
 import { app, BrowserWindow, ipcMain } from "electron";
+import {
+  installExtension,
+  REDUX_DEVTOOLS,
+  REACT_DEVELOPER_TOOLS,
+} from "electron-devtools-installer";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { TerminalManager } from "./TerminalManager";
@@ -17,7 +22,7 @@ if (started) {
 const createWindow = () => {
   log.info("Creating main window");
   mainWindow = new BrowserWindow({
-    minWidth: 800,
+    minWidth: 1500,
     minHeight: 600,
     titleBarStyle: "hidden",
     trafficLightPosition: { x: 10, y: 12 },
@@ -35,8 +40,16 @@ const createWindow = () => {
     );
   }
 
-  if (process.env.NODE_ENV === "development")
+  if (process.env.NODE_ENV === "development") {
     mainWindow.webContents.openDevTools();
+    installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
+      .then(([redux, react]) =>
+        console.log(`Added Extensions:  ${redux.name}, ${react.name}`)
+      )
+      .catch(err => console.log("An error occurred: ", err));
+  } else {
+    mainWindow.setMenu(null);
+  }
 };
 
 // This method will be called when Electron has finished

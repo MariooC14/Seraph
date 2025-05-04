@@ -1,14 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import HostSelectionDialog from '../context/TerminalTabsProvider/HostSelectionDialog';
+import HostSelectionDialog from '@/features/terminalTabs/HostSelectionDialog';
 import { HashRouter } from 'react-router';
+import { Provider } from 'react-redux';
+import { store } from "@/app/store"
 
 const meta = {
   component: HostSelectionDialog,
   decorators: [
     (Story) => (
       <HashRouter>
-        <Story />
+        <Provider store={store}>
+          <Story />
+        </Provider>
       </HashRouter>
     ),
   ]
@@ -21,6 +25,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     open: true,
-    handleOpenChange: () => {},
+    handleOpenChange: () => { },
   }
 };

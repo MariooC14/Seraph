@@ -1,28 +1,33 @@
-import { useTerminalTabs } from "@/context/TerminalTabsProvider";
 import { ChevronDown } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuGroup, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { useConfig } from "@/context/ConfigProvider";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router";
 import { formatShellName } from "@/lib/utils";
 import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { createTab, TerminalTab } from "@/features/terminalTabs/terminalTabsSlice";
+import { selectAvailableShells } from "@/features/config/configSlice";
 
 
 export default function QuickShellSelectNewTabTutton() {
-  const { createTab } = useTerminalTabs();
-  const { availableShells } = useConfig();
+  const dispatch = useAppDispatch();
+  const availableShells = useAppSelector(selectAvailableShells)
   const navigate = useNavigate();
 
-  const handleNewTabClick = (tabName: string, shell: string) => {
-    createTab(tabName, shell).then((tab) => {
-      navigate(`/terminals/${tab.id}`);
-    });
+  const handleNewTabClick = (tabName: string, shellPath: string) => {
+    dispatch(createTab({ shellPath, name: tabName }))
+      .then((action) => {
+        if (action.meta.requestStatus === "fulfilled") {
+          const tab = action.payload as TerminalTab;
+          navigate(`/terminals/${tab.id}`);
+        }
+      });
   }
 
   const shellOptions = availableShells?.map(shell => {
-      const formattedName = formatShellName(shell);
+    const formattedName = formatShellName(shell);
 
-      return <DropdownMenuItem key={shell} className="p-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleNewTabClick(formattedName, shell)}>
+    return <DropdownMenuItem key={shell} className="p-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleNewTabClick(formattedName, shell)}>
       {formatShellName(shell)}
     </DropdownMenuItem>
   });
@@ -39,7 +44,7 @@ export default function QuickShellSelectNewTabTutton() {
           <DropdownMenuGroup>
             <DropdownMenuLabel className="text-xs text-muted-foreground">Local Shells</DropdownMenuLabel>
             <DropdownMenuSeparator />
-              {shellOptions}
+            {shellOptions}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

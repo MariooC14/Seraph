@@ -1,3 +1,4 @@
+import { useAppDispatch } from "@/app/hooks";
 import { Button } from "@/components/ui/button";
 import {
   CommandDialog,
@@ -7,11 +8,9 @@ import {
   CommandItem,
   CommandGroup
 } from "@/components/ui/command";
+import { createTab } from "@/features/terminalTabs/terminalTabsSlice";
 import { CirclePlus, Terminal } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTerminalTabs } from "./TerminalTabsProvider";
-import { useNavigate } from "react-router";
-import { toast } from "sonner";
 
 type HostSelectionDialogProps = {
   open: boolean;
@@ -22,24 +21,16 @@ export default function HostSelectionDialog({
   open,
   handleOpenChange,
 }: HostSelectionDialogProps) {
-  const { createTab } = useTerminalTabs();
+  const dispatch = useAppDispatch();
   const [value, setValue] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (open) setValue("");
   }, [open]);
 
   const handleLocalTerminalClick = () => {
-    createTab("Localhost").then((tab) => {
-      console.log("Dialog: Created local terminal tab", tab);
-      handleOpenChange(false);
-      navigate(`/terminals/${tab.id}`);
-    })
-    .catch((error) => {
-      console.error("Failed to create local terminal tab:", error);
-      toast.error("Failed to create local terminal tab:", error);
-    });
+    dispatch(createTab({ name: "Localhost" }));
+    handleOpenChange(false);
   }
 
   return (
@@ -48,7 +39,7 @@ export default function HostSelectionDialog({
       <CommandEmpty>
         <span className="text-lg">No hosts found.</span>
         <Button variant="outline" className="ml-2">Add host</Button>
-        </CommandEmpty>
+      </CommandEmpty>
       <CommandList>
         <CommandGroup heading="Hosts">
           {/* Hosts from config */}

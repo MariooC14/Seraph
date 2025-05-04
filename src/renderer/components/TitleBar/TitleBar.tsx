@@ -1,28 +1,29 @@
 import { Button } from "../ui/button";
 import { Home, Plus } from "lucide-react";
 import WindowControlBar from "../WindowControlBar";
-import { Link, useNavigate, useParams } from "react-router";
-import { useTerminalTabs } from "@/context/TerminalTabsProvider";
+import { Link, useParams } from "react-router";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import TerminalTabs from "../TerminalTabs/TerminalTabs";
 import QuickShellSelectNewTabButton from "./QuickShellSelectNewTabButton";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { closeTab, focusTab, selectTerminalTabs, toggleHostSelectionDialog } from "@/features/terminalTabs/terminalTabsSlice";
 
 export default function TitleBar() {
-  const { tabs, showHostSelectionDialog, closeTab } = useTerminalTabs();
+  const tabs = useAppSelector(selectTerminalTabs);
+  const dispatch = useAppDispatch();
   const [isMacOS] = useState(() => window.app.isMacOS());
   const { terminalId } = useParams();
-  const navigate = useNavigate();
 
   const handleTabSelect = (tabId: string) => {
-    navigate(`/terminals/${tabId}`);
+    dispatch(focusTab(tabId));
   };
   const handleTabClose = (tabId: string) => {
-    closeTab(tabId);
+    dispatch(closeTab(tabId));
   }
 
   const handleNewTabClick = () => {
-    showHostSelectionDialog();
+    dispatch(toggleHostSelectionDialog());
   };
 
   return (
@@ -35,7 +36,7 @@ export default function TitleBar() {
             </Button>
           </Link>
           <div className="overflow-hidden my-1 ml-2">
-          <TerminalTabs tabs={tabs} onTabSelect={handleTabSelect} onTabClose={handleTabClose} activeTab={terminalId} onNewTabClick={handleNewTabClick}/>
+            <TerminalTabs tabs={tabs} onTabSelect={handleTabSelect} onTabClose={handleTabClose} activeTab={terminalId} onNewTabClick={handleNewTabClick} />
           </div>
         </div>
         <Button variant="ghost" size="icon" className="cursor-pointer nonDraggable size-7 rounded-e-none ml-1 border-r-1" onClick={handleNewTabClick}>
