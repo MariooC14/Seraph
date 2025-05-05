@@ -10,7 +10,7 @@ Open source ssh manager
      - MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs (Latest) (use ARM64 for Windows on ARM, but the x64/x86 may still be needed)
 3. Run `npm install`
 
-   Note: You might need to run `npm install --force` if you encounter any errors.
+   Note: You will need to run `npm install --force` if you encounter any errors. This is from a dependency mismatch between react 19 and shadcn ui.
 
 4. Run `npm start`
 
