@@ -29,7 +29,6 @@ export class LocalTerminalSession extends TerminalSession {
    * Initializes a session byt spawning a pty and setting up listeners for data and exit events.
    */
   init() {
-    this.channel = `terminalSession-${this.sessionId}`;
     try {
       this.terminal = pty.spawn(this.shellPath, [], {
         name: `seraph-session-${this.sessionId}`,

@@ -18,6 +18,8 @@ export type TerminalTabsSliceState = {
 
 type CreateTabParams = {
   name: string;
+  // quick hack to get the ssh tab working - TODO: Find a better way to do create tabs based on type
+  type: 'local' | 'ssh';
   shellPath?: string;
 };
 
@@ -50,13 +52,23 @@ export const terminalTabsSlice = createAppSlice({
     createTab: create.asyncThunk(
       async (params: CreateTabParams, { getState }) => {
         const state = getState() as RootState;
-        const { name, shellPath = state.config.defaultShellPath } = params;
-        const newSessionId = await terminalSessionRegistry.createSession(shellPath);
-        const tab: TerminalTab = {
-          id: newSessionId,
-          name: name
-        };
-        return tab;
+        if (params.type === 'ssh') {
+          const { name } = params;
+          const newSessionId = await terminalSessionRegistry.createSSHSession();
+          const tab: TerminalTab = {
+            id: newSessionId,
+            name: name
+          };
+          return tab;
+        } else {
+          const { name, shellPath = state.config.defaultShellPath } = params;
+          const newSessionId = await terminalSessionRegistry.createLocalSession(shellPath);
+          const tab: TerminalTab = {
+            id: newSessionId,
+            name: name
+          };
+          return tab;
+        }
       },
       {
         fulfilled: (state, action: PayloadAction<TerminalTab>) => {

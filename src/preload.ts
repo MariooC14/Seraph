@@ -5,6 +5,7 @@ import { contextBridge, ipcRenderer } from 'electron/renderer';
 contextBridge.exposeInMainWorld('terminal', {
   createLocalSession: (shellPath: string) =>
     ipcRenderer.invoke('terminal:createLocalSession', shellPath),
+  createSSHSession: () => ipcRenderer.invoke('terminal:createSSHSession'),
   resizeTerminal: (sessionId: string, cols: number, rows: number) =>
     ipcRenderer.invoke(`terminalSession-${sessionId}:resize`, cols, rows),
   terminateSession: (sessionId: string) =>
