@@ -7,14 +7,15 @@ import os from 'node:os';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import log from 'electron-log/main';
 import fs from 'node:fs';
+import { v4 as uuidv4 } from 'uuid';
 import { join } from 'node:path';
 import { getAvailableShells } from './helpers';
-import { TerminalSession } from './TerminalSession';
+import { LocalTerminalSession } from './LocalTerminalSession';
 
 export class TerminalManager {
   shell: string;
   _window: BrowserWindow;
-  sessions: Map<string, TerminalSession> = new Map();
+  sessions: Map<string, LocalTerminalSession> = new Map();
 
   public constructor(window: BrowserWindow) {
     this._window = window;
@@ -24,7 +25,7 @@ export class TerminalManager {
   public startListening() {
     ipcMain.handle('terminal:createSession', (_event, shellPath: string) => {
       log.info(`Creating new session with shell: ${shellPath}`);
-      const newSessionId = this.createSession(shellPath);
+      const newSessionId = this.createLocalSession(shellPath);
       return newSessionId;
     });
     ipcMain.handle('terminal:getUserPreferredShell', () => this.getUserPreferredShell());
@@ -34,11 +35,12 @@ export class TerminalManager {
     );
   }
 
+  /** Gets the shell from the env vars or the default shell for the OS. */
   getShell() {
     return process.env.SHELL || this.getDefaultShell();
   }
 
-  getDefaultShell(): string {
+  getDefaultShell() {
     if (os.platform() === 'win32') {
       return 'powershell.exe';
     }
@@ -79,11 +81,17 @@ export class TerminalManager {
     return await getAvailableShells(os.platform());
   }
 
-  createSession(shellPath: string) {
-    const newTerminalSession = new TerminalSession(this, shellPath);
-    newTerminalSession.startListening();
-    this.sessions.set(newTerminalSession.sessionId, newTerminalSession);
-    return newTerminalSession.sessionId;
+  createLocalSession(shellPath: string) {
+    const newSessionId = uuidv4();
+    const newLocalTerminalSession = new LocalTerminalSession(
+      this,
+      newSessionId,
+      this._window,
+      shellPath
+    );
+    newLocalTerminalSession.init();
+    this.sessions.set(newLocalTerminalSession.sessionId, newLocalTerminalSession);
+    return newSessionId;
   }
 
   public terminateAllSessions() {
