@@ -4,7 +4,7 @@
  * and the app will get a session using this registry.
  */
 
-import { ClientTerminalSession } from "./ClientTerminalSession";
+import { ClientTerminalSession } from './ClientTerminalSession';
 
 class TerminalSessionRegistry {
   private sessions: Map<string, ClientTerminalSession> = new Map();
@@ -14,17 +14,17 @@ class TerminalSessionRegistry {
   }
 
   async createSession(shellPath: string) {
-    console.log("Creating new terminal with shell path:", shellPath);
+    console.log('Creating new terminal with shell path:', shellPath);
     return await window.terminal
       .createSession(shellPath)
       .then((sessionId: string) => {
-        console.log("New terminal sessionId:", sessionId);
+        console.log('New terminal sessionId:', sessionId);
         const session = new ClientTerminalSession(sessionId);
         this.sessions.set(sessionId, session);
         return session.sessionId;
       })
       .catch(error => {
-        console.error("Failed to create terminal session:", error);
+        console.error('Failed to create terminal session:', error);
         throw error;
       });
   }

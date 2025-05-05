@@ -1,16 +1,26 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { TabsContent } from "@/components/ui/tabs";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { TabsContent } from '@/components/ui/tabs';
 
-import { TypographyH4 } from "@/components/ui/TypographyH4";
-import { cn } from "@/lib/utils";
-import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
-import { ChevronsUpDown, Check } from "lucide-react";
-import { useState } from "react";
-import { selectAvailableShells, selectPreferredShellPath, updatePreferredShellPath } from "@/features/config/configSlice";
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { toast } from "sonner";
+import { TypographyH4 } from '@/components/ui/TypographyH4';
+import { cn } from '@/lib/utils';
+import {
+  Command,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem
+} from '@/components/ui/command';
+import { ChevronsUpDown, Check } from 'lucide-react';
+import { useState } from 'react';
+import {
+  selectAvailableShells,
+  selectPreferredShellPath,
+  updatePreferredShellPath
+} from '@/features/config/configSlice';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { toast } from 'sonner';
 
 export default function TerminalTab() {
   return (
@@ -25,7 +35,7 @@ export default function TerminalTab() {
         </CardContent>
       </Card>
     </TabsContent>
-  )
+  );
 }
 
 function ShellSelectionSection() {
@@ -39,12 +49,12 @@ function ShellSelectionSection() {
       if (success) {
         dispatch(updatePreferredShellPath(shell));
       } else {
-        console.error("Failed to save the preferred shell path.");
-        toast.error("Failed to save the preferred shell path.");
+        console.error('Failed to save the preferred shell path.');
+        toast.error('Failed to save the preferred shell path.');
       }
       setOpen(false);
     });
-  }
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -53,8 +63,7 @@ function ShellSelectionSection() {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[400px] justify-between"
-        >
+          className="w-[400px] justify-between">
           {preferredShellPath}
           <ChevronsUpDown className="opacity-50" />
         </Button>
@@ -65,17 +74,13 @@ function ShellSelectionSection() {
             <CommandEmpty>No shells found.</CommandEmpty>
             <CommandGroup>
               {availableShells === undefined && <CommandItem>Loading...</CommandItem>}
-              {availableShells.map((shell) => (
-                <CommandItem
-                  key={shell}
-                  value={shell}
-                  onSelect={handlePreferredShellChange}
-                >
+              {availableShells.map(shell => (
+                <CommandItem key={shell} value={shell} onSelect={handlePreferredShellChange}>
                   {shell}
                   <Check
                     className={cn(
-                      "ml-auto",
-                      shell === preferredShellPath ? "opacity-100" : "opacity-0"
+                      'ml-auto',
+                      shell === preferredShellPath ? 'opacity-100' : 'opacity-0'
                     )}
                   />
                 </CommandItem>
@@ -85,5 +90,5 @@ function ShellSelectionSection() {
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

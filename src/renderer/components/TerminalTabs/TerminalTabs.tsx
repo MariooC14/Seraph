@@ -1,5 +1,5 @@
-import { TerminalTab } from "@/features/terminalTabs/terminalTabsSlice";
-import CloseableTab from "../NavigationBar/CloseableTab";
+import { TerminalTab } from '@/features/terminalTabs/terminalTabsSlice';
+import CloseableTab from '../NavigationBar/CloseableTab';
 
 interface TerminalTabsProps {
   tabs: TerminalTab[];
@@ -9,11 +9,15 @@ interface TerminalTabsProps {
   onNewTabClick?: () => void;
 }
 
-export default function TerminalTabs({ tabs, activeTab, onTabSelect, onTabClose }: TerminalTabsProps) {
-
+export default function TerminalTabs({
+  tabs,
+  activeTab,
+  onTabSelect,
+  onTabClose
+}: TerminalTabsProps) {
   return (
     <div className="flex space-x-2 h-full overflow-auto scrollbar-hidden">
-      {tabs?.map((tab) => (
+      {tabs?.map(tab => (
         <CloseableTab
           key={tab.id}
           id={tab.id}

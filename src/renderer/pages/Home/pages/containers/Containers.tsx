@@ -1,47 +1,41 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Container, Play, Square, RefreshCw, Trash2 } from "lucide-react";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Container, Play, Square, RefreshCw, Trash2 } from 'lucide-react';
 
 function Containers() {
   const [containers] = useState([
     {
-      id: "abc123",
-      name: "nginx-proxy",
-      image: "nginx:latest",
-      status: "running",
-      cpu: "0.5%",
-      memory: "128MB",
-      ports: "80:80, 443:443",
+      id: 'abc123',
+      name: 'nginx-proxy',
+      image: 'nginx:latest',
+      status: 'running',
+      cpu: '0.5%',
+      memory: '128MB',
+      ports: '80:80, 443:443'
     },
     {
-      id: "def456",
-      name: "postgres-db",
-      image: "postgres:14",
-      status: "running",
-      cpu: "1.2%",
-      memory: "256MB",
-      ports: "5432:5432",
+      id: 'def456',
+      name: 'postgres-db',
+      image: 'postgres:14',
+      status: 'running',
+      cpu: '1.2%',
+      memory: '256MB',
+      ports: '5432:5432'
     },
     {
-      id: "ghi789",
-      name: "redis-cache",
-      image: "redis:alpine",
-      status: "stopped",
-      cpu: "0%",
-      memory: "0MB",
-      ports: "6379:6379",
-    },
+      id: 'ghi789',
+      name: 'redis-cache',
+      image: 'redis:alpine',
+      status: 'stopped',
+      cpu: '0%',
+      memory: '0MB',
+      ports: '6379:6379'
+    }
   ]);
 
   return (
@@ -55,22 +49,19 @@ function Containers() {
       </div>
 
       <div className="space-y-4">
-        {containers.map((container) => (
+        {containers.map(container => (
           <Card key={container.id}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div className="space-y-1">
-                <CardTitle className="text-lg font-medium">
-                  {container.name}
-                </CardTitle>
+                <CardTitle className="text-lg font-medium">{container.name}</CardTitle>
                 <CardDescription>{container.image}</CardDescription>
               </div>
               <div
                 className={`px-2 py-1 rounded-full text-xs ${
-                  container.status === "running"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
+                  container.status === 'running'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}>
                 {container.status}
               </div>
             </CardHeader>
@@ -94,7 +85,7 @@ function Containers() {
                 </div>
               </div>
               <div className="flex space-x-2 mt-4">
-                {container.status === "running" ? (
+                {container.status === 'running' ? (
                   <Button variant="outline" size="sm">
                     <Square className="h-4 w-4 mr-2" />
                     Stop

@@ -1,24 +1,15 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { Label } from "@radix-ui/react-dropdown-menu";
-import { TabsContent } from "@radix-ui/react-tabs";
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Label } from '@radix-ui/react-dropdown-menu';
+import { TabsContent } from '@radix-ui/react-tabs';
 
 export default function SecurityTab() {
-
   return (
     <TabsContent value="security">
       <Card>
         <CardHeader>
           <CardTitle>Security Settings</CardTitle>
-          <CardDescription>
-            Configure security options for your account
-          </CardDescription>
+          <CardDescription>Configure security options for your account</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">

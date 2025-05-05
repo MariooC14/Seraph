@@ -26,18 +26,18 @@
  * ```
  */
 
-import App from "./App";
-import "./index.css";
-import { createRoot } from "react-dom/client";
-import { HashRouter, Route, Routes } from "react-router";
-import Dashboard from "./pages/Home/pages/dashboard";
-import Servers from "./pages/Home/pages/servers";
-import Containers from "./pages/Home/pages/containers";
-import Settings from "./pages/Home/pages/settings";
-import Home from "./pages/Home/Home";
-import { Provider } from "react-redux";
-import { store } from "./app/store";
-import { initializeConfigState } from "./features/config/configSlice";
+import App from './App';
+import './index.css';
+import { createRoot } from 'react-dom/client';
+import { HashRouter, Route, Routes } from 'react-router';
+import Dashboard from './pages/Home/pages/dashboard';
+import Servers from './pages/Home/pages/servers';
+import Containers from './pages/Home/pages/containers';
+import Settings from './pages/Home/pages/settings';
+import Home from './pages/Home/Home';
+import { Provider } from 'react-redux';
+import { store } from './app/store';
+import { initializeConfigState } from './features/config/configSlice';
 
 const root = createRoot(document.body);
 root.render(

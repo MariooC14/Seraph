@@ -1,7 +1,7 @@
-import { createAppSlice } from "@/app/createAppSlice";
-import { PayloadAction } from "@reduxjs/toolkit";
-import { terminalSessionRegistry } from "./ClientTerminalSessionRegistry";
-import { RootState } from "@/app/store";
+import { createAppSlice } from '@/app/createAppSlice';
+import { PayloadAction } from '@reduxjs/toolkit';
+import { terminalSessionRegistry } from './ClientTerminalSessionRegistry';
+import { RootState } from '@/app/store';
 
 export type TerminalTab = {
   /** id is also sessionId */
@@ -24,11 +24,11 @@ type CreateTabParams = {
 const initialState: TerminalTabsSliceState = {
   tabs: [],
   isHostSelectionDialogOpen: false,
-  focusedTabIdx: null,
+  focusedTabIdx: null
 };
 
 export const terminalTabsSlice = createAppSlice({
-  name: "terminalTabs",
+  name: 'terminalTabs',
   initialState,
   reducers: create => ({
     closeTab: create.reducer((state, action: PayloadAction<string>) => {
@@ -51,12 +51,10 @@ export const terminalTabsSlice = createAppSlice({
       async (params: CreateTabParams, { getState }) => {
         const state = getState() as RootState;
         const { name, shellPath = state.config.defaultShellPath } = params;
-        const newSessionId = await terminalSessionRegistry.createSession(
-          shellPath
-        );
+        const newSessionId = await terminalSessionRegistry.createSession(shellPath);
         const tab: TerminalTab = {
           id: newSessionId,
-          name: name,
+          name: name
         };
         return tab;
       },
@@ -67,8 +65,8 @@ export const terminalTabsSlice = createAppSlice({
           state.focusedTabIdx = state.tabs.length - 1;
         },
         rejected: (_, action) => {
-          console.error("Failed to create terminal tab:", action.error.message);
-        },
+          console.error('Failed to create terminal tab:', action.error.message);
+        }
       }
     ),
     toggleHostSelectionDialog: create.reducer(state => {
@@ -97,8 +95,7 @@ export const terminalTabsSlice = createAppSlice({
       if (state.focusedTabIdx === null) {
         state.focusedTabIdx = state.tabs.length - 1;
       }
-      const prevIndex =
-        (state.focusedTabIdx - 1 + state.tabs.length) % state.tabs.length;
+      const prevIndex = (state.focusedTabIdx - 1 + state.tabs.length) % state.tabs.length;
       console.log(prevIndex);
       state.focusedTabIdx = prevIndex;
       state.focusedTabId = state.tabs[prevIndex].id;
@@ -106,14 +103,13 @@ export const terminalTabsSlice = createAppSlice({
     unfocusTabs: create.reducer(state => {
       state.focusedTabId = null;
       state.focusedTabIdx = null;
-    }),
+    })
   }),
   selectors: {
     selectTerminalTabs: terminalTabs => terminalTabs.tabs,
-    selectIsHostSelectionDialogOpen: terminalTabs =>
-      terminalTabs.isHostSelectionDialogOpen,
-    selectFocusedTabId: terminalTabs => terminalTabs.focusedTabId,
-  },
+    selectIsHostSelectionDialogOpen: terminalTabs => terminalTabs.isHostSelectionDialogOpen,
+    selectFocusedTabId: terminalTabs => terminalTabs.focusedTabId
+  }
 });
 
 // Action creators are generated for each case reducer function
@@ -124,13 +120,10 @@ export const {
   focusTab,
   unfocusTabs,
   cycleNextTab,
-  cyclePreviousTab,
+  cyclePreviousTab
 } = terminalTabsSlice.actions;
 
-export const {
-  selectTerminalTabs,
-  selectIsHostSelectionDialogOpen,
-  selectFocusedTabId,
-} = terminalTabsSlice.selectors;
+export const { selectTerminalTabs, selectIsHostSelectionDialogOpen, selectFocusedTabId } =
+  terminalTabsSlice.selectors;
 
 export default terminalTabsSlice.reducer;
