@@ -1,26 +1,30 @@
-import { debounce, isCloseTabKey } from "@/lib/utils";
-import "@xterm/xterm/css/xterm.css";
-import { useEffect, useRef, KeyboardEvent } from "react";
-import { toast } from "sonner";
+import { debounce, isCloseTabKey } from '@/lib/utils';
+import '@xterm/xterm/css/xterm.css';
+import { useEffect, useRef, KeyboardEvent } from 'react';
+import { toast } from 'sonner';
 import { ClientTerminalSession } from '@/features/terminalTabs/ClientTerminalSession';
-import { useAppDispatch } from "@/app/hooks";
-import { closeTab } from "@/features/terminalTabs/terminalTabsSlice";
+import { useAppDispatch } from '@/app/hooks';
+import { closeTab } from '@/features/terminalTabs/terminalTabsSlice';
 
 type TerminalViewProps = {
-  clientTerminalSession: ClientTerminalSession,
+  clientTerminalSession: ClientTerminalSession;
   onClose: (sessionId: string) => void;
   isVisible: boolean;
-}
+};
 
-export default function TerminalView({ clientTerminalSession: cts, onClose, isVisible = false }: TerminalViewProps) {
+export default function TerminalView({
+  clientTerminalSession: cts,
+  onClose,
+  isVisible = false
+}: TerminalViewProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    console.log("Terminal for session", cts.sessionId, "mounted");
+    console.log('Terminal for session', cts.sessionId, 'mounted');
     cts.attachTo(terminalRef.current);
 
-    window.terminal.onSessionTerminated(cts.sessionId, (code) => {
+    window.terminal.onSessionTerminated(cts.sessionId, code => {
       toast.info(`Terminal session ended with code ${code}`);
       dispatch(closeTab(cts.sessionId));
     });
@@ -29,7 +33,7 @@ export default function TerminalView({ clientTerminalSession: cts, onClose, isVi
       cts.resize();
     }, 200);
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener('resize', handleResize);
 
     setTimeout(() => {
       handleResize();
@@ -37,7 +41,7 @@ export default function TerminalView({ clientTerminalSession: cts, onClose, isVi
     }, 100); // Wait for the terminal to be mounted
 
     return () => {
-      console.log("TerminalTab unmounted", cts.sessionId);
+      console.log('TerminalTab unmounted', cts.sessionId);
       window.removeEventListener('resize', handleResize);
     };
   }, []);
@@ -51,9 +55,13 @@ export default function TerminalView({ clientTerminalSession: cts, onClose, isVi
       e.preventDefault();
       onClose(cts.sessionId);
     }
-  }
+  };
 
   return (
-    <div className="h-full w-full bg-background rounded-2xl" onKeyDown={handleKeyDown} ref={terminalRef} />
+    <div
+      className="h-full w-full bg-background rounded-2xl"
+      onKeyDown={handleKeyDown}
+      ref={terminalRef}
+    />
   );
-};
+}

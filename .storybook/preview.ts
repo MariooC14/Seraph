@@ -1,26 +1,26 @@
-import type { Preview } from "@storybook/react";
-import { withThemeByClassName } from "@storybook/addon-themes";
-import "../src/renderer/index.css";
+import type { Preview } from '@storybook/react';
+import { withThemeByClassName } from '@storybook/addon-themes';
+import '../src/renderer/index.css';
 
 const preview: Preview = {
   parameters: {
     controls: {
       matchers: {
         color: /(background|color)$/i,
-        date: /Date$/i,
-      },
-    },
-  },
+        date: /Date$/i
+      }
+    }
+  }
 };
 
 export const decorators = [
   withThemeByClassName({
     themes: {
-      light: "light",
-      dark: "dark",
+      light: 'light',
+      dark: 'dark'
     },
-    defaultTheme: "dark",
-  }),
+    defaultTheme: 'dark'
+  })
 ];
 
 export default preview;

@@ -1,5 +1,5 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -7,14 +7,14 @@ export function cn(...inputs: ClassValue[]) {
 
 // Map of known shell executables to friendly names
 const shellMappings: Record<string, string> = {
-  "powershell.exe": "PowerShell",
-  "cmd.exe": "Command Prompt",
-  "bash.exe": "Git Bash",
-  "wsl.exe": "WSL",
-  "pwsh.exe": "PowerShell Core",
-  zsh: "Z Shell",
-  fish: "Fish Shell",
-  sh: "Shell",
+  'powershell.exe': 'PowerShell',
+  'cmd.exe': 'Command Prompt',
+  'bash.exe': 'Git Bash',
+  'wsl.exe': 'WSL',
+  'pwsh.exe': 'PowerShell Core',
+  zsh: 'Z Shell',
+  fish: 'Fish Shell',
+  sh: 'Shell'
 };
 
 /**
@@ -30,12 +30,12 @@ export function formatShellName(shellPath: string): string {
   const friendlyName =
     shellMappings[fileName.toLowerCase()] ||
     fileName
-      .replace(/\.exe$/i, "")
+      .replace(/\.exe$/i, '')
       .charAt(0)
-      .toUpperCase() + fileName.replace(/\.exe$/i, "").slice(1);
+      .toUpperCase() + fileName.replace(/\.exe$/i, '').slice(1);
 
   // For WSL, try to extract the distribution name
-  if (fileName.toLowerCase() === "wsl.exe" && shellPath.includes("-d")) {
+  if (fileName.toLowerCase() === 'wsl.exe' && shellPath.includes('-d')) {
     const distMatch = shellPath.match(/-d\s+([^\s]+)/);
     if (distMatch && distMatch[1]) {
       return `WSL (${distMatch[1]})`;
@@ -43,7 +43,7 @@ export function formatShellName(shellPath: string): string {
   }
 
   // For paths with special info, add it as a detail
-  if (shellPath.includes("Program Files") && !friendlyName.includes("Git")) {
+  if (shellPath.includes('Program Files') && !friendlyName.includes('Git')) {
     return `${friendlyName} (System)`;
   }
 
@@ -60,15 +60,15 @@ export function debounce(fn: Function, ms = 300) {
   };
 }
 export function isNextTabKey(e: KeyboardEvent) {
-  return e.key === "Tab" && (e.metaKey || e.ctrlKey) && !e.shiftKey;
+  return e.key === 'Tab' && (e.metaKey || e.ctrlKey) && !e.shiftKey;
 }
 export function isPreviousTabKey(e: KeyboardEvent) {
-  return e.key === "Tab" && (e.metaKey || e.ctrlKey) && e.shiftKey;
+  return e.key === 'Tab' && (e.metaKey || e.ctrlKey) && e.shiftKey;
 }
 export function isNewTabKey(e: KeyboardEvent) {
   // Can also check for ctrl/cmd K
-  return e.key === "t" && (e.metaKey || e.ctrlKey);
+  return e.key === 't' && (e.metaKey || e.ctrlKey);
 }
 export function isCloseTabKey(e: KeyboardEvent) {
-  return e.key === "w" && (e.metaKey || e.ctrlKey);
+  return e.key === 'w' && (e.metaKey || e.ctrlKey);
 }

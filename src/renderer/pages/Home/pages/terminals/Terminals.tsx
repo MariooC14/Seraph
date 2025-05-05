@@ -1,13 +1,7 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Plus } from "lucide-react";
-import TerminalPanel from "@/features/terminalTabs/TerminalPanel";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus } from 'lucide-react';
+import TerminalPanel from '@/features/terminalTabs/TerminalPanel';
 
 function Terminals() {
   return (
@@ -23,9 +17,7 @@ function Terminals() {
       <Card className="mt-6">
         <CardHeader>
           <CardTitle>Terminal</CardTitle>
-          <CardDescription>
-            Secure shell connection to the selected server
-          </CardDescription>
+          <CardDescription>Secure shell connection to the selected server</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="bg-black rounded-lg overflow-hidden">

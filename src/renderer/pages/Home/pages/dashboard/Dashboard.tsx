@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, Server, Container, Terminal } from 'lucide-react';
 
 export default function Dashboard() {
@@ -36,9 +31,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">6</div>
-            <p className="text-xs text-muted-foreground">
-              Active connections
-            </p>
+            <p className="text-xs text-muted-foreground">Active connections</p>
           </CardContent>
         </Card>
         <Card>
@@ -48,9 +41,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">76%</div>
-            <p className="text-xs text-muted-foreground">
-              Average CPU usage
-            </p>
+            <p className="text-xs text-muted-foreground">Average CPU usage</p>
           </CardContent>
         </Card>
       </div>

@@ -1,14 +1,14 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain } from 'electron';
 import {
   installExtension,
   REDUX_DEVTOOLS,
-  REACT_DEVELOPER_TOOLS,
-} from "electron-devtools-installer";
-import path from "node:path";
-import started from "electron-squirrel-startup";
-import { TerminalManager } from "./TerminalManager";
-import { WindowManager } from "./windowManager";
-import log from "electron-log/main";
+  REACT_DEVELOPER_TOOLS
+} from 'electron-devtools-installer';
+import path from 'node:path';
+import started from 'electron-squirrel-startup';
+import { TerminalManager } from './TerminalManager';
+import { WindowManager } from './windowManager';
+import log from 'electron-log/main';
 
 let terminalManager: TerminalManager;
 let windowManager: WindowManager;
@@ -20,33 +20,29 @@ if (started) {
 }
 
 const createWindow = () => {
-  log.info("Creating main window");
+  log.info('Creating main window');
   mainWindow = new BrowserWindow({
     minWidth: 1500,
     minHeight: 600,
-    titleBarStyle: "hidden",
+    titleBarStyle: 'hidden',
     trafficLightPosition: { x: 10, y: 12 },
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-    },
+      preload: path.join(__dirname, 'preload.js')
+    }
   });
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
-    );
+    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools();
     installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
-      .then(([redux, react]) =>
-        console.log(`Added Extensions:  ${redux.name}, ${react.name}`)
-      )
-      .catch(err => console.log("An error occurred: ", err));
+      .then(([redux, react]) => console.log(`Added Extensions:  ${redux.name}, ${react.name}`))
+      .catch(err => console.log('An error occurred: ', err));
   } else {
     mainWindow.setMenu(null);
   }
@@ -63,41 +59,41 @@ app.whenReady().then(() => {
   terminalManager.startListening();
   windowManager.startListening();
 
-  ipcMain.handle("app:exit", () => {
-    if (process.platform !== "darwin") {
+  ipcMain.handle('app:exit', () => {
+    if (process.platform !== 'darwin') {
       app.quit();
     } else {
       mainWindow.close();
     }
   });
-  ipcMain.handle("app:minimize", () => mainWindow.minimize());
-  ipcMain.handle("app:maximize", () => mainWindow.maximize());
-  ipcMain.handle("app:unmaximize", () => mainWindow.unmaximize());
+  ipcMain.handle('app:minimize', () => mainWindow.minimize());
+  ipcMain.handle('app:maximize', () => mainWindow.maximize());
+  ipcMain.handle('app:unmaximize', () => mainWindow.unmaximize());
 
-  mainWindow.on("maximize", () => {
-    mainWindow.webContents.send("app:maximized", true);
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('app:maximized', true);
   });
-  mainWindow.on("unmaximize", () => {
-    mainWindow.webContents.send("app:maximized", false);
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('app:maximized', false);
   });
 });
 
-app.on("before-quit", () => {
-  log.info("[Main] - App is about to quit");
+app.on('before-quit', () => {
+  log.info('[Main] - App is about to quit');
   terminalManager.terminateAllSessions();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on("window-all-closed", () => {
+app.on('window-all-closed', () => {
   terminalManager.terminateAllSessions();
-  if (process.platform !== "darwin") {
+  if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-app.on("activate", () => {
+app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {

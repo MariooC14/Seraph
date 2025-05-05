@@ -7,12 +7,12 @@ Open source ssh manager
 1. Clone the repository
 2. For windows:
    - Install the Visual C++ Build Environment by either installing the Visual Studio Build Tools or the Visual Studio Community Edition. The minimum workload to install is Desktop Development with C++. But there are additional components from "Individual components":
-      - MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs (Latest) (use ARM64 for Windows on ARM, but the x64/x86 may still be needed)
-4. Run `npm install`
+     - MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs (Latest) (use ARM64 for Windows on ARM, but the x64/x86 may still be needed)
+3. Run `npm install`
 
    Note: You will need to run `npm install --force` if you encounter any errors. This is from a dependency mismatch between react 19 and shadcn ui.
 
-5. Run `npm start`
+4. Run `npm start`
 
 # Package
 

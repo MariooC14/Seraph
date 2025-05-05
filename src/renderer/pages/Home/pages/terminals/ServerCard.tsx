@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TerminalIcon } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { TerminalIcon } from 'lucide-react';
 
 interface ServerCardProps {
   id: string;
@@ -15,18 +15,24 @@ export default function ServerCard({
   name,
   isAccessible,
   host,
-  username,
+  username
 }: ServerCardProps) {
   return (
     <Card className="relative">
       <CardHeader>
         <CardTitle className="font-medium">{name}</CardTitle>
-        <CardDescription>{username}@{host}</CardDescription>
+        <CardDescription>
+          {username}@{host}
+        </CardDescription>
         {/* Status indicator */}
-        <div className={`absolute top-3 right-3 size-3 rounded-full ${isAccessible ? "bg-green-400" : "bg-red-400"}`}></div>
+        <div
+          className={`absolute top-3 right-3 size-3 rounded-full ${isAccessible ? 'bg-green-400' : 'bg-red-400'}`}></div>
       </CardHeader>
       <CardContent>
-        <Button><TerminalIcon />Connect</Button>
+        <Button>
+          <TerminalIcon />
+          Connect
+        </Button>
       </CardContent>
     </Card>
   );

@@ -3,37 +3,37 @@
  */
 function createSimpleMockTerminal() {
   // Command input buffer
-  let inputBuffer = "";
+  let inputBuffer = '';
 
   // Simple command processor
   const processCommand = (command: string) => {
-    if (command.trim() === "") return "";
+    if (command.trim() === '') return '';
 
-    if (command.trim() === "clear") {
-      return "\x1Bc"; // ANSI clear screen
+    if (command.trim() === 'clear') {
+      return '\x1Bc'; // ANSI clear screen
     }
 
-    if (command.trim() === "hello") {
-      return "Hello, Storybook!\r\n";
+    if (command.trim() === 'hello') {
+      return 'Hello, Storybook!\r\n';
     }
 
-    if (command.trim() === "help") {
+    if (command.trim() === 'help') {
       return (
-        "Available commands:\r\n" +
-        "  hello    - Get a greeting\r\n" +
-        "  help     - Show this help\r\n" +
-        "  ls       - List files\r\n" +
-        "  clear    - Clear screen\r\n" +
-        "  whoami   - Show user info\r\n"
+        'Available commands:\r\n' +
+        '  hello    - Get a greeting\r\n' +
+        '  help     - Show this help\r\n' +
+        '  ls       - List files\r\n' +
+        '  clear    - Clear screen\r\n' +
+        '  whoami   - Show user info\r\n'
       );
     }
 
-    if (command.trim() === "ls") {
-      return "file1.txt  file2.js  directory1/  homework/\r\n";
+    if (command.trim() === 'ls') {
+      return 'file1.txt  file2.js  directory1/  homework/\r\n';
     }
 
-    if (command.trim() === "whoami") {
-      return "You are a bitch!\r\n";
+    if (command.trim() === 'whoami') {
+      return 'You are a bitch!\r\n';
     }
 
     return `Command not found: ${command}\r\n`;
@@ -43,7 +43,7 @@ function createSimpleMockTerminal() {
     onData: (_sessionId: string, callback: (data: string) => void) => {
       // Send initial terminal prompt
       setTimeout(() => {
-        callback("\r\nMock Terminal\r\n$ ");
+        callback('\r\nMock Terminal\r\n$ ');
       }, 100);
 
       // Set up the input listener
@@ -51,17 +51,17 @@ function createSimpleMockTerminal() {
         const { detail } = event as CustomEvent<string>;
 
         // Handle special keys
-        if (detail === "\r") {
+        if (detail === '\r') {
           // Enter key
           // Process the command
           const output = processCommand(inputBuffer);
-          callback("\r\n" + output + "$ ");
-          inputBuffer = "";
-        } else if (detail === "\x7F" || detail === "\b") {
+          callback('\r\n' + output + '$ ');
+          inputBuffer = '';
+        } else if (detail === '\x7F' || detail === '\b') {
           // Backspace
           if (inputBuffer.length > 0) {
             inputBuffer = inputBuffer.slice(0, -1);
-            callback("\b \b"); // Move back, clear, move back
+            callback('\b \b'); // Move back, clear, move back
           }
         } else {
           // Regular character - echo it
@@ -70,14 +70,14 @@ function createSimpleMockTerminal() {
         }
       };
 
-      window.addEventListener("mockTermSessionData", listener);
+      window.addEventListener('mockTermSessionData', listener);
     },
 
     sendData: (_sessionId: string, data: string) => {
-      console.log("User input:", data);
+      console.log('User input:', data);
       window.dispatchEvent(
-        new CustomEvent("mockTermSessionData", {
-          detail: data,
+        new CustomEvent('mockTermSessionData', {
+          detail: data
         })
       );
     },
@@ -86,7 +86,7 @@ function createSimpleMockTerminal() {
     onResize: () => ({}),
     onTitleChange: () => ({}),
     onSessionTerminated: () => ({}),
-    resizeTerminal: () => ({}),
+    resizeTerminal: () => ({})
   };
 }
 

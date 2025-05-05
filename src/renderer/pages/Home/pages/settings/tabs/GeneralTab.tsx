@@ -1,13 +1,7 @@
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { TabsContent } from "@/components/ui/tabs";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { TabsContent } from '@/components/ui/tabs';
 
 export default function GeneralTab() {
   return (
@@ -15,9 +9,7 @@ export default function GeneralTab() {
       <Card>
         <CardHeader>
           <CardTitle>General Settings</CardTitle>
-          <CardDescription>
-            Configure general application settings
-          </CardDescription>
+          <CardDescription>Configure general application settings</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">

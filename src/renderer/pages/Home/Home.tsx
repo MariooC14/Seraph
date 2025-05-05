@@ -1,13 +1,12 @@
 /**
- * 
+ *
  */
 
-import HomeSidebar from "@/components/HomeSidebar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Outlet } from "react-router";
+import HomeSidebar from '@/components/HomeSidebar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Outlet } from 'react-router';
 
 export default function Home() {
-  
   return (
     <>
       <HomeSidebar />
@@ -15,5 +14,5 @@ export default function Home() {
         <Outlet />
       </ScrollArea>
     </>
-  )
-};
+  );
+}

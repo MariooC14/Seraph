@@ -1,16 +1,11 @@
-import { defaultTerminalOptions } from "@/features/terminalTabs/terminalConfig";
-import { ITerminalOptions, Terminal } from "@xterm/xterm";
-import { FitAddon } from "@xterm/addon-fit";
-import { WebLinksAddon } from "@xterm/addon-web-links";
-import { isNewTabKey } from "@/lib/utils";
-import { isCloseTabKey, isNextTabKey, isPreviousTabKey } from "@/lib/utils";
+import { defaultTerminalOptions } from '@/features/terminalTabs/terminalConfig';
+import { ITerminalOptions, Terminal } from '@xterm/xterm';
+import { FitAddon } from '@xterm/addon-fit';
+import { WebLinksAddon } from '@xterm/addon-web-links';
+import { isNewTabKey } from '@/lib/utils';
+import { isCloseTabKey, isNextTabKey, isPreviousTabKey } from '@/lib/utils';
 
-const shortcutIgnoreKeys = [
-  isNewTabKey,
-  isCloseTabKey,
-  isPreviousTabKey,
-  isNextTabKey,
-];
+const shortcutIgnoreKeys = [isNewTabKey, isCloseTabKey, isPreviousTabKey, isNextTabKey];
 
 export class ClientTerminalSession {
   private readonly _sessionId: string;
@@ -67,7 +62,7 @@ export class ClientTerminalSession {
     this.fitAddon.fit();
     console.log(this.parentElRef);
     const { rows, cols } = this.fitAddon.proposeDimensions();
-    console.log("Terminal session resized", cols, rows);
+    console.log('Terminal session resized', cols, rows);
     window.terminal.resizeTerminal(this._sessionId, cols, rows);
   }
 
