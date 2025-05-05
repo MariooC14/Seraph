@@ -29,7 +29,7 @@ function HomeSidebar() {
               'flex items-center px-3 py-2 text-sm font-medium rounded-md hover:bg-accent',
               pathname === item.href ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
             )}>
-            <Icon className="h-5 w-5 mr-3" aria-hidden="true" />
+            <Icon className="h-5 w-5 mr-3" aria-hidden />
             {item.name}
           </NavLink>
         );
