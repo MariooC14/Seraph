@@ -26,7 +26,7 @@ export default function HostSelectionDialog({ open, handleOpenChange }: HostSele
   }, [open]);
 
   const handleLocalTerminalClick = () => {
-    dispatch(createTab({ name: 'Localhost' }));
+    dispatch(createTab({ name: 'Localhost', type: 'local' }));
     handleOpenChange(false);
   };
 

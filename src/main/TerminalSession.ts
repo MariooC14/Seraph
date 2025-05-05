@@ -25,6 +25,7 @@ export abstract class TerminalSession {
     this.terminalManager = terminalManager;
     this.sessionId = sessionId;
     this.window = window;
+    this.channel = `terminalSession-${this.sessionId}`;
   }
 
   public abstract init(...args: unknown[]): Promise<void> | void;
