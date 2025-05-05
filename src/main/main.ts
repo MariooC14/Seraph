@@ -56,7 +56,7 @@ app.whenReady().then(() => {
   terminalManager = new TerminalManager(mainWindow);
   windowManager = new WindowManager(mainWindow);
 
-  terminalManager.startListening();
+  terminalManager.init();
   windowManager.startListening();
 
   ipcMain.handle('app:exit', () => {
