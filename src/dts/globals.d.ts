@@ -1,7 +1,7 @@
 declare global {
   interface Window {
     terminal: {
-      createSession: (shellPath: string) => Promise<string | never>;
+      createLocalSession: (shellPath: string) => Promise<string | never>;
       resizeTerminal: (sessionId: string, cols: number, rows: number) => void;
       terminateSession: (sessionId: string) => void;
       onSessionTerminated: (sessionId: string, callback: (code: string) => void) => void;

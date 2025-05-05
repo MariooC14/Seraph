@@ -11,19 +11,20 @@ import { v4 as uuidv4 } from 'uuid';
 import { join } from 'node:path';
 import { getAvailableShells } from './helpers';
 import { LocalTerminalSession } from './LocalTerminalSession';
+import { TerminalSession } from './TerminalSession';
 
 export class TerminalManager {
   shell: string;
   _window: BrowserWindow;
-  sessions: Map<string, LocalTerminalSession> = new Map();
+  sessions: Map<string, TerminalSession> = new Map();
 
   public constructor(window: BrowserWindow) {
     this._window = window;
     this.shell = this.getShell();
   }
 
-  public startListening() {
-    ipcMain.handle('terminal:createSession', (_event, shellPath: string) => {
+  public init() {
+    ipcMain.handle('terminal:createLocalSession', (_event, shellPath: string) => {
       log.info(`Creating new session with shell: ${shellPath}`);
       const newSessionId = this.createLocalSession(shellPath);
       return newSessionId;

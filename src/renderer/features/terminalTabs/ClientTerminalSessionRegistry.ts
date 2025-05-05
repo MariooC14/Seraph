@@ -16,7 +16,7 @@ class TerminalSessionRegistry {
   async createSession(shellPath: string) {
     console.log('Creating new terminal with shell path:', shellPath);
     return await window.terminal
-      .createSession(shellPath)
+      .createLocalSession(shellPath)
       .then((sessionId: string) => {
         console.log('New terminal sessionId:', sessionId);
         const session = new ClientTerminalSession(sessionId);
