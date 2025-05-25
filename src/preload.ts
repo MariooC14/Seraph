@@ -34,3 +34,7 @@ contextBridge.exposeInMainWorld('app', {
     ipcRenderer.on('app:nativeThemeChanged', (_event, value) => callback(value)),
   isMacOS: () => process.platform === 'darwin'
 });
+
+contextBridge.exposeInMainWorld('docker', {
+  listContainers: () => ipcRenderer.invoke('docker:listContainers')
+});

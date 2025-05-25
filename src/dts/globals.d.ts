@@ -21,6 +21,10 @@ declare global {
       onNativeThemeChanged: (callback: (theme: Theme) => void) => void;
       isMacOS: () => boolean;
     };
+
+    docker: {
+      listContainers: () => Promise<any[]>;
+    };
   }
 
   type Theme = 'system' | 'light' | 'dark';

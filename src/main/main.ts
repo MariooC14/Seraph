@@ -9,6 +9,7 @@ import started from 'electron-squirrel-startup';
 import { TerminalManager } from './TerminalManager';
 import { WindowManager } from './windowManager';
 import log from 'electron-log/main';
+import { exec } from 'node:child_process';
 
 let terminalManager: TerminalManager;
 let windowManager: WindowManager;
@@ -69,6 +70,19 @@ app.whenReady().then(() => {
   ipcMain.handle('app:minimize', () => mainWindow.minimize());
   ipcMain.handle('app:maximize', () => mainWindow.maximize());
   ipcMain.handle('app:unmaximize', () => mainWindow.unmaximize());
+  ipcMain.handle('docker:listContainers', async () => {
+    return new Promise((resolve, reject) => {
+      exec('docker ps --format "{{json .}}"', (error, stdout) => {
+        if (error) return reject(error);
+        // Each line is a JSON object
+        const containers = stdout
+          .split('\n')
+          .filter(Boolean)
+          .map(line => JSON.parse(line));
+        resolve(containers);
+      });
+    });
+  });
 
   mainWindow.on('maximize', () => {
     mainWindow.webContents.send('app:maximized', true);
