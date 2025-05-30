@@ -11,6 +11,7 @@ function Containers() {
   const [containers, setContainers] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [envError, setEnvError] = useState<string | null>(null);
 
   const fetchContainers = async () => {
     setLoading(true);
@@ -20,23 +21,33 @@ function Containers() {
       setContainers(result);
     } catch (err: any) {
       setError(typeof err === 'string' ? err : err?.message || 'Failed to list Docker containers');
-      setContainers([]);
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchContainers();
+    // Check environment on mount
+    window.docker.checkEnvironment().then(env => {
+      if (!env.inDockerGroup) {
+        setEnvError(
+          "You are not in the 'docker' group. Please add your user to the docker group and restart your session:\n\nsudo usermod -aG docker $USER"
+        );
+      } else {
+        fetchContainers();
+      }
+    });
   }, []);
 
-  const startDocker = async () => {
-    try {
-      await window.docker.startDocker();
-      fetchContainers();
-    } catch (err: any) {
-      setError(typeof err === 'string' ? err : err?.message || 'Failed to start Docker');
-    }
-  };
+  if (envError) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-100 text-red-800 p-4 rounded">
+          <strong>Error:</strong>
+          <pre className="whitespace-pre-wrap mt-2">{envError}</pre>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -47,25 +58,7 @@ function Containers() {
           New Container
         </Button>
       </div>
-
-      {error && (
-        <div style={{ color: 'red', marginBottom: '1em' }}>
-          Error: {error}
-          <br />
-          <button onClick={fetchContainers} disabled={loading}>
-            {loading ? 'Retrying...' : 'Try Again'}
-          </button>
-          {/* Show Start Docker button if error mentions Docker not running */}
-          {error.toLowerCase().includes('docker') && (
-            <button onClick={startDocker} style={{ marginLeft: 8 }}>
-              Start Docker
-            </button>
-          )}
-        </div>
-      )}
-      {!error && loading && <div>Loading...</div>}
-      {!error && !loading && containers.length === 0 && <div>No dockers running</div>}
-
+      {error}
       <div className="space-y-4">
         {containers.map(container => (
           <Card key={container.ID}>

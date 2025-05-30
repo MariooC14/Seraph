@@ -37,5 +37,6 @@ contextBridge.exposeInMainWorld('app', {
 
 contextBridge.exposeInMainWorld('docker', {
   listContainers: () => ipcRenderer.invoke('docker:listContainers'),
-  startDocker: () => ipcRenderer.invoke('docker:startDocker')
+  startDocker: () => ipcRenderer.invoke('docker:startDocker'),
+  checkEnvironment: () => ipcRenderer.invoke('docker:checkEnvironment')
 });

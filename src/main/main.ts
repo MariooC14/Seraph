@@ -10,6 +10,7 @@ import { TerminalManager } from './TerminalManager';
 import { WindowManager } from './windowManager';
 import log from 'electron-log/main';
 import { exec } from 'node:child_process';
+import os from 'os';
 
 let terminalManager: TerminalManager;
 let windowManager: WindowManager;
@@ -39,14 +40,15 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.webContents.openDevTools();
-    installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
-      .then(([redux, react]) => console.log(`Added Extensions:  ${redux.name}, ${react.name}`))
-      .catch(err => console.log('An error occurred: ', err));
-  } else {
-    mainWindow.setMenu(null);
-  }
+  /// Temporarily disable UI DEVTOOLS
+  // if (process.env.NODE_ENV === 'development') {
+  //   mainWindow.webContents.openDevTools();
+  //   installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
+  //     .then(([redux, react]) => console.log(`Added Extensions:  ${redux.name}, ${react.name}`))
+  //     .catch(err => console.log('An error occurred: ', err));
+  // } else {
+  //   mainWindow.setMenu(null);
+  // }
 };
 
 // This method will be called when Electron has finished
@@ -85,13 +87,37 @@ app.whenReady().then(() => {
     });
   });
 
-  ipcMain.handle('docker:startDocker', async () => {
-    return new Promise((resolve, reject) => {
-      exec('systemctl start docker', (error, stdout, stderr) => {
-        if (error) return reject(stderr || error.message);
-        resolve('Docker started');
-      });
-    });
+  ipcMain.handle('docker:checkEnvironment', async () => {
+    // 1. Check if user is in the docker group
+    const user = os.userInfo().username;
+    let inDockerGroup = false;
+    try {
+      const { stdout } = await import('node:child_process').then(({ execSync }) => ({
+        stdout: execSync(`groups ${user}`).toString()
+      }));
+      inDockerGroup = stdout.split(/\s+/).includes('docker');
+    } catch {
+      inDockerGroup = false;
+    }
+
+    // 2. Set docker context to default if not already
+    let contextSwitched = false;
+    let currentContext = '';
+    try {
+      currentContext = await import('node:child_process').then(({ execSync }) =>
+        execSync('docker context show').toString().trim()
+      );
+      if (currentContext !== 'default') {
+        await import('node:child_process').then(({ execSync }) =>
+          execSync('docker context use default')
+        );
+        contextSwitched = true;
+      }
+    } catch {
+      // ignore errors
+    }
+
+    return { inDockerGroup, contextSwitched, currentContext };
   });
 
   mainWindow.on('maximize', () => {

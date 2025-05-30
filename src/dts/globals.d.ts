@@ -24,7 +24,11 @@ declare global {
 
     docker: {
       listContainers: () => Promise<any[]>;
-      startDocker: () => Promise<any[]>;
+      checkEnvironment: () => Promise<{
+        inDockerGroup: boolean;
+        contextSwitched: boolean;
+        currentContext: string;
+      }>;
     };
   }
 
