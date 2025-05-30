@@ -2,7 +2,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from './components/theme-provider';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import TitleBar from './components/TitleBar/TitleBar';
-import { cn, isNewTabKey, isNextTabKey, isPreviousTabKey } from './lib/utils';
+import { cn, isNewTabKey, isNextTabKey, isPreviousTabKey, isZoomIn, isZoomOut } from './lib/utils';
 import TerminalPanel from './features/terminalTabs/TerminalPanel';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import {
@@ -34,7 +34,6 @@ function App() {
         e.preventDefault();
         dispatch(toggleHostSelectionDialog());
       }
-
       if (isNextTabKey(e)) {
         e.preventDefault();
         dispatch(cycleNextTab());
@@ -42,6 +41,9 @@ function App() {
       if (isPreviousTabKey(e)) {
         e.preventDefault();
         dispatch(cyclePreviousTab());
+      }
+      if (isZoomIn(e) || isZoomOut(e)) {
+        e.preventDefault();
       }
     };
     document.addEventListener('keydown', down);
