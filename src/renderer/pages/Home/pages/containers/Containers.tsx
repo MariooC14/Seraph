@@ -29,6 +29,15 @@ function Containers() {
     fetchContainers();
   }, []);
 
+  const startDocker = async () => {
+    try {
+      await window.docker.startDocker();
+      fetchContainers();
+    } catch (err: any) {
+      setError(typeof err === 'string' ? err : err?.message || 'Failed to start Docker');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -46,6 +55,12 @@ function Containers() {
           <button onClick={fetchContainers} disabled={loading}>
             {loading ? 'Retrying...' : 'Try Again'}
           </button>
+          {/* Show Start Docker button if error mentions Docker not running */}
+          {error.toLowerCase().includes('docker') && (
+            <button onClick={startDocker} style={{ marginLeft: 8 }}>
+              Start Docker
+            </button>
+          )}
         </div>
       )}
       {!error && loading && <div>Loading...</div>}

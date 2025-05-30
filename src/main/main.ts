@@ -70,6 +70,7 @@ app.whenReady().then(() => {
   ipcMain.handle('app:minimize', () => mainWindow.minimize());
   ipcMain.handle('app:maximize', () => mainWindow.maximize());
   ipcMain.handle('app:unmaximize', () => mainWindow.unmaximize());
+
   ipcMain.handle('docker:listContainers', async () => {
     return new Promise((resolve, reject) => {
       exec('docker ps --format "{{json .}}"', (error, stdout) => {
@@ -80,6 +81,15 @@ app.whenReady().then(() => {
           .filter(Boolean)
           .map(line => JSON.parse(line));
         resolve(containers);
+      });
+    });
+  });
+
+  ipcMain.handle('docker:startDocker', async () => {
+    return new Promise((resolve, reject) => {
+      exec('systemctl start docker', (error, stdout, stderr) => {
+        if (error) return reject(stderr || error.message);
+        resolve('Docker started');
       });
     });
   });

@@ -24,6 +24,7 @@ declare global {
 
     docker: {
       listContainers: () => Promise<any[]>;
+      startDocker: () => Promise<any[]>;
     };
   }
 
