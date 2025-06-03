@@ -30,14 +30,13 @@ import App from './App';
 import './index.css';
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Route, Routes } from 'react-router';
-import Dashboard from './pages/Home/pages/dashboard';
-import Servers from './pages/Home/pages/servers';
 import Containers from './pages/Home/pages/containers';
 import Settings from './pages/Home/pages/settings';
 import Home from './pages/Home/Home';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
 import { initializeConfigState } from './features/config/configSlice';
+import HostsPage from './pages/Home/pages/hosts';
 
 const root = createRoot(document.body);
 root.render(
@@ -46,8 +45,7 @@ root.render(
       <Routes>
         <Route element={<App />}>
           <Route path="/" element={<Home />}>
-            <Route index element={<Dashboard />} />
-            <Route path="servers" element={<Servers />} />
+            <Route index element={<HostsPage />} />
             <Route path="containers" element={<Containers />} />
             <Route path="settings" element={<Settings />} />
             {/* The path below is rendered by App. We need to keep the terminals rendered but invisible */}

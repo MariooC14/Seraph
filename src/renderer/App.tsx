@@ -66,7 +66,7 @@ function App() {
     <ThemeProvider defaultTheme="system">
       <div className="flex flex-col h-screen w-screen">
         <TitleBar />
-        <main className="flex flex-1 overflow-hidden">
+        <main className="flex flex-1 overflow-hidden" data-vaul-drawer-wrapper>
           {!isTerminalTab && <Outlet />}
           {/* Need to keep these rendered but invisible */}
           <div className={cn('w-full h-full', !isTerminalTab && 'hidden')}>

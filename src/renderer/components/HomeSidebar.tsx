@@ -1,10 +1,9 @@
 import { cn } from '@/lib/utils';
-import { ServerIcon, ContainerIcon, GaugeIcon, Settings } from 'lucide-react';
+import { ContainerIcon, GaugeIcon, Settings } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: GaugeIcon },
-  { name: 'Servers', href: '/servers', icon: ServerIcon },
+  { name: 'Hosts', href: '/', icon: GaugeIcon },
   {
     name: 'Containers',
     href: '/containers',
