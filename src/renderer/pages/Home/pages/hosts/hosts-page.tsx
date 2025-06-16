@@ -19,7 +19,7 @@ const mockHostConfig: HostConfig = {
 
 export default function HostsPage() {
   const [hostConfigs, setHostConfigs] = useState<HostConfig[]>([mockHostConfig]);
-  const [selectedHostConfig, setSelectedHostConfig] = useState<HostConfig | null>(null);
+  const [selectedHostConfig, setSelectedHostConfig] = useState<HostConfig>();
 
   // TODO: Implement add host logic
   function handleAddNewHost() {
@@ -71,7 +71,7 @@ export default function HostsPage() {
       </div>
       <SelectedHostConfigDrawer
         hostConfig={selectedHostConfig}
-        onClose={() => setSelectedHostConfig(null)}
+        onClose={() => setSelectedHostConfig(undefined)}
         open={!!selectedHostConfig}
       />
     </>
