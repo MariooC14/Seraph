@@ -1,9 +1,6 @@
-# This Docker Compose file sets up two SSH servers using the linuxserver/openssh-server image.
-# use `docker-compose up -d` to start the services in detached mode.
-# use `ssh -p 2222 testuser@localhost` to connect to the first SSH server.
-# use `ssh -p 2223 testuser@localhost` to connect to the second SSH server.
-
-version: '3.8'
+# This file sets up two dummy SSH servers using the linuxserver/openssh-server image.
+# Make sure to have Podman installed
+# ONLY USE THIS FOR DEV PURPOSES. DO NOT USE IN PRODUCTION.
 
 services:
   sshd1:
