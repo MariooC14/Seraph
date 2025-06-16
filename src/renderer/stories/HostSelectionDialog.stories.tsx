@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import HostSelectionDialog from '@/features/terminalTabs/HostSelectionDialog';
 import { HashRouter } from 'react-router';

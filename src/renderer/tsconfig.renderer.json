@@ -10,7 +10,8 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@dts/*": ["../dts/*"]
     },
     "outDir": "dist",
     "moduleResolution": "node",
