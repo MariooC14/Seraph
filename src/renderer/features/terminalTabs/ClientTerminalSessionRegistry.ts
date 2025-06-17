@@ -21,7 +21,7 @@ class TerminalSessionRegistry {
         console.log('New terminal sessionId:', sessionId);
         const session = new ClientTerminalSession(sessionId);
         this.sessions.set(sessionId, session);
-        return session.sessionId;
+        return sessionId; // Return sessionId, not session.sessionId
       })
       .catch(error => {
         console.error('Failed to create terminal session:', error);
@@ -41,6 +41,15 @@ class TerminalSessionRegistry {
       return true;
     }
     return false;
+  }
+
+  // Add method to register existing sessions (for SSH)
+  registerSession(sessionId: string) {
+    if (!this.sessions.has(sessionId)) {
+      const session = new ClientTerminalSession(sessionId);
+      this.sessions.set(sessionId, session);
+    }
+    return sessionId;
   }
 }
 

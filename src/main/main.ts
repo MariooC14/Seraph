@@ -9,6 +9,9 @@ import started from 'electron-squirrel-startup';
 import { TerminalManager } from './TerminalManager';
 import { WindowManager } from './windowManager';
 import log from 'electron-log/main';
+import { getHostsFromConfig } from './helpers';
+import { spawn } from 'child_process';
+import { HostConfig } from '@/dts/host-config';
 
 let terminalManager: TerminalManager;
 let windowManager: WindowManager;
@@ -75,6 +78,21 @@ app.whenReady().then(() => {
   });
   mainWindow.on('unmaximize', () => {
     mainWindow.webContents.send('app:maximized', false);
+  });
+
+  ipcMain.handle('ssh:read-config', async () => {
+    return await getHostsFromConfig(process.platform);
+  });
+
+  ipcMain.handle('ssh:connect', async (event, hostConfig: HostConfig) => {
+    try {
+      log.info('SSH connecting to:', hostConfig);
+      const sessionId = terminalManager.createSSHSession(hostConfig);
+      return { success: true, sessionId: sessionId };
+    } catch (error) {
+      log.error('SSH connection failed:', error);
+      return { success: false, message: 'Failed to connect via SSH' };
+    }
   });
 });
 

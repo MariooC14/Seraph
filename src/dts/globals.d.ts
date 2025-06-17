@@ -21,6 +21,11 @@ declare global {
       onNativeThemeChanged: (callback: (theme: Theme) => void) => void;
       isMacOS: () => boolean;
     };
+
+    ssh: {
+      readConfig: () => Promise<SSHHostConfig[]>;
+      connect: (hostConfig: HostConfig) => Promise<{ success: boolean; sessionId: string }>;
+    };
   }
 
   type Theme = 'system' | 'light' | 'dark';

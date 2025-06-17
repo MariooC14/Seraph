@@ -19,6 +19,7 @@ export type TerminalTabsSliceState = {
 type CreateTabParams = {
   name: string;
   shellPath?: string;
+  sessionId?: string;
 };
 
 const initialState: TerminalTabsSliceState = {
@@ -50,8 +51,18 @@ export const terminalTabsSlice = createAppSlice({
     createTab: create.asyncThunk(
       async (params: CreateTabParams, { getState }) => {
         const state = getState() as RootState;
-        const { name, shellPath = state.config.defaultShellPath } = params;
-        const newSessionId = await terminalSessionRegistry.createSession(shellPath);
+        const { name, shellPath = state.config.defaultShellPath, sessionId } = params;
+
+        let newSessionId: string;
+
+        if (sessionId) {
+          // SSH session - register it in the registry
+          newSessionId = terminalSessionRegistry.registerSession(sessionId);
+        } else {
+          // New terminal session
+          newSessionId = await terminalSessionRegistry.createSession(shellPath);
+        }
+
         const tab: TerminalTab = {
           id: newSessionId,
           name: name

@@ -1,6 +1,7 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 import { contextBridge, ipcRenderer } from 'electron/renderer';
+import { HostConfig } from './dts/host-config';
 
 contextBridge.exposeInMainWorld('terminal', {
   createSession: (shellPath: string) => ipcRenderer.invoke('terminal:createSession', shellPath),
@@ -33,4 +34,9 @@ contextBridge.exposeInMainWorld('app', {
   onNativeThemeChanged: (callback: (theme: Theme) => void) =>
     ipcRenderer.on('app:nativeThemeChanged', (_event, value) => callback(value)),
   isMacOS: () => process.platform === 'darwin'
+});
+
+contextBridge.exposeInMainWorld('ssh', {
+  readConfig: () => ipcRenderer.invoke('ssh:read-config'),
+  connect: (hostConfig: HostConfig) => ipcRenderer.invoke('ssh:connect', hostConfig)
 });

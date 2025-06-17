@@ -2,8 +2,9 @@ import { ITerminalInitOnlyOptions, ITerminalOptions } from '@xterm/xterm';
 
 export const defaultTerminalOptions: ITerminalOptions & ITerminalInitOnlyOptions = {
   cursorBlink: true,
-  fontSize: 16,
-  fontFamily: 'Cascadia Mono, Monaco, "Courier New", monospace',
+  fontSize: 14,
+  fontFamily: '"Monocraft Nerd Font", "MonocraftNF", monospace',
+  letterSpacing: 0,
   theme: {
     background: '#0a0a0a',
     foreground: '#f8f9fa',
@@ -26,9 +27,10 @@ export const defaultTerminalOptions: ITerminalOptions & ITerminalInitOnlyOptions
     brightCyan: '#22b8cf',
     brightWhite: '#ffffff'
   },
-  allowTransparency: true,
+  allowTransparency: false,
   scrollback: 10000,
   rows: 25,
   cols: 50,
-  cursorStyle: 'bar'
+  cursorStyle: 'bar',
+  convertEol: true
 };

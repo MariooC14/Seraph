@@ -4,6 +4,7 @@ import log from 'electron-log/main';
 import { BrowserWindow, ipcMain } from 'electron';
 import { TerminalSessionError } from './TerminalSessionException';
 import { TerminalManager } from './TerminalManager';
+import { HostConfig } from '@/dts/host-config';
 
 const isWindows = process.platform === 'win32';
 
@@ -37,7 +38,6 @@ export class TerminalSession {
     ipcMain.handle(
       `${this.channel}:resize`,
       (_event: Electron.IpcMainInvokeEvent, cols: number, rows: number) => {
-        log.info('[TerminalSession] - Resizing terminal:', cols, rows);
         this.resizeTerminal(cols, rows);
       }
     );
@@ -68,11 +68,11 @@ export class TerminalSession {
 
     try {
       this.terminal = pty.spawn(shellPath, [], {
-        name: `seraph-session-${this._sessionId}`,
+        name: 'xterm-256color',
         cols: 80,
         rows: 30,
         cwd: isWindows ? process.env.USERPROFILE : process.env.HOME,
-        env: process.env,
+        env: { ...process.env, TERM: 'xterm-256color', COLORTERM: 'truecolor' },
         useConpty: false // Do not remove or set to true - conpty is unstable on windows
       });
       log.info(`[TerminalSession] - Spawned new terminal with sessionId: ${this._sessionId}`);
@@ -96,5 +96,37 @@ export class TerminalSession {
 
   get sessionId() {
     return this._sessionId;
+  }
+
+  public connectToHost(hostConfig: HostConfig) {
+    // Build SSH command arguments
+    const sshArgs = [];
+
+    log.info(`[TerminalSession] - Host config:`, JSON.stringify(hostConfig, null, 2));
+
+    if (hostConfig.port) {
+      log.info(`[TerminalSession] - Adding port: ${hostConfig.port}`);
+      sshArgs.push('-p', hostConfig.port.toString());
+    }
+
+    if (hostConfig.identityFile) {
+      log.info(`[TerminalSession] - Adding identity file: ${hostConfig.identityFile}`);
+      sshArgs.push('-i', hostConfig.identityFile);
+    }
+
+    // Add host connection string
+    const connectionString = hostConfig.username
+      ? `${hostConfig.username}@${hostConfig.host}`
+      : hostConfig.host;
+
+    log.info(`[TerminalSession] - Connection string: ${connectionString}`);
+    sshArgs.push(connectionString);
+
+    // Build and send the SSH command
+    const sshCommand = `ssh ${sshArgs.join(' ')}`;
+    log.info(`[TerminalSession] - Connecting to SSH host: ${sshCommand}`);
+
+    // Send the SSH command to the terminal
+    log.info(this.terminal.write(`${sshCommand}\n`));
   }
 }

@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import { join } from 'node:path';
 import { getAvailableShells } from './helpers';
 import { TerminalSession } from './TerminalSession';
+import { HostConfig } from '@/dts/host-config';
 
 export class TerminalManager {
   shell: string;
@@ -84,6 +85,20 @@ export class TerminalManager {
     newTerminalSession.startListening();
     this.sessions.set(newTerminalSession.sessionId, newTerminalSession);
     return newTerminalSession.sessionId;
+  }
+
+  createSSHSession(hostConfig: HostConfig) {
+    const sessionId = this.createSession(this.getUserPreferredShell());
+    const session = this.sessions.get(sessionId);
+
+    if (session) {
+      // Connect to the SSH host after a brief delay to ensure terminal is ready
+      setTimeout(() => {
+        session.connectToHost(hostConfig);
+      }, 500);
+    }
+
+    return sessionId;
   }
 
   public terminateAllSessions() {

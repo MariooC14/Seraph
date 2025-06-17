@@ -16,18 +16,28 @@ function TerminalPanel() {
 
   return (
     <>
-      {tabs.map(tab => (
-        <div
-          key={tab.id}
-          className={cn('p-4 h-full w-full bg-background', tab.id !== terminalId && 'hidden')}>
-          <TerminalView
+      {tabs.map(tab => {
+        const clientTerminalSession = terminalSessionRegistry.getSession(tab.id);
+
+        // Don't render if session doesn't exist
+        if (!clientTerminalSession) {
+          console.warn(`Terminal session ${tab.id} not found in registry`);
+          return null;
+        }
+
+        return (
+          <div
             key={tab.id}
-            clientTerminalSession={terminalSessionRegistry.getSession(tab.id)}
-            onClose={handleClose}
-            isVisible={tab.id === terminalId}
-          />
-        </div>
-      ))}
+            className={cn('p-4 h-full w-full bg-background', tab.id !== terminalId && 'hidden')}>
+            <TerminalView
+              key={tab.id}
+              clientTerminalSession={clientTerminalSession}
+              onClose={handleClose}
+              isVisible={tab.id === terminalId}
+            />
+          </div>
+        );
+      })}
     </>
   );
 }
