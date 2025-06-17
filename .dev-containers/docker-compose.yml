@@ -1,0 +1,32 @@
+# This file sets up two dummy SSH servers using the linuxserver/openssh-server image.
+# Make sure to have Podman installed
+# ONLY USE THIS FOR DEV PURPOSES. DO NOT USE IN PRODUCTION.
+
+services:
+  sshd1:
+    image: linuxserver/openssh-server:latest
+    container_name: sshd1
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - PASSWORD_ACCESS=true
+      - USER_NAME=testuser
+      - USER_PASSWORD=testpass
+    ports:
+      - '2222:2222'
+    restart: unless-stopped
+
+  sshd2:
+    image: linuxserver/openssh-server:latest
+    container_name: sshd2
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - PASSWORD_ACCESS=true
+      - USER_NAME=testuser
+      - USER_PASSWORD=testpass
+    ports:
+      - '2223:2222'
+    restart: unless-stopped
