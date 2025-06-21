@@ -7,37 +7,26 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip
 import { useState } from 'react';
 import { toast } from 'sonner';
 import SelectedHostConfigDrawer from './selected-host-config-drawer';
-
-const mockHostConfig: HostConfig = {
-  id: '1',
-  label: 'Localhost',
-  host: 'localhost',
-  port: 3000,
-  username: 'user',
-  password: 'password'
-};
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
+import { selectHostConfigs } from '@/features/config/configSlice';
 
 export default function HostsPage() {
-  const [hostConfigs, setHostConfigs] = useState<HostConfig[]>([mockHostConfig]);
+  const hostConfigs = useAppSelector(selectHostConfigs);
   const [selectedHostConfig, setSelectedHostConfig] = useState<HostConfig>();
+  const dispatch = useAppDispatch();
 
   // TODO: Implement add host logic
-  function handleAddNewHost() {
-    setHostConfigs(prevHostConfigs => [
-      ...prevHostConfigs,
-      { ...mockHostConfig, id: (prevHostConfigs.length + 1).toString() } as HostConfig
-    ]);
-  }
+  function handleAddNewHost() {}
 
   // TODO: Implement delete host logic
   function handleDelete(hostConfig: HostConfig) {
-    setHostConfigs(prevHostConfigs => prevHostConfigs.filter(h => h.id !== hostConfig.id));
     toast.success(`Deleted host ${hostConfig.label}`);
   }
 
   // TODO: Implement connect logic
   function handleConnect(hostConfig: HostConfig) {
-    toast.success(`Connecting to ${hostConfig.label}...`);
+    dispatch(createTab({ type: 'ssh', name: hostConfig.label, hostId: hostConfig.id }));
   }
 
   // TODO: Implement edit host logic

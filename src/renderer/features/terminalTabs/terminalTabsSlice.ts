@@ -2,6 +2,7 @@ import { createAppSlice } from '@/app/createAppSlice';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { terminalSessionRegistry } from './ClientTerminalSessionRegistry';
 import { RootState } from '@/app/store';
+import { toast } from 'sonner';
 
 export type TerminalTab = {
   /** id is also sessionId */
@@ -16,10 +17,20 @@ export type TerminalTabsSliceState = {
   isHostSelectionDialogOpen: boolean;
 };
 
-type CreateTabParams = {
+interface BaseCreateTabParams {
   name: string;
+  type: 'local' | 'ssh';
+}
+
+interface LocalTerminalTabParams extends BaseCreateTabParams {
+  type: 'local';
   shellPath?: string;
-};
+}
+
+interface SSHTabParams extends BaseCreateTabParams {
+  type: 'ssh';
+  hostId: string;
+}
 
 const initialState: TerminalTabsSliceState = {
   tabs: [],
@@ -48,15 +59,25 @@ export const terminalTabsSlice = createAppSlice({
       }
     }),
     createTab: create.asyncThunk(
-      async (params: CreateTabParams, { getState }) => {
+      async (params: LocalTerminalTabParams | SSHTabParams, { getState }) => {
         const state = getState() as RootState;
-        const { name, shellPath = state.config.defaultShellPath } = params;
-        const newSessionId = await terminalSessionRegistry.createSession(shellPath);
-        const tab: TerminalTab = {
-          id: newSessionId,
-          name: name
-        };
-        return tab;
+        if (params.type === 'ssh') {
+          const { name, hostId } = params;
+          const newSessionId = await terminalSessionRegistry.createSSHSession(hostId);
+          const tab: TerminalTab = {
+            id: newSessionId,
+            name: name
+          };
+          return tab;
+        } else {
+          const { name, shellPath = state.config.defaultShellPath } = params;
+          const newSessionId = await terminalSessionRegistry.createLocalSession(shellPath);
+          const tab: TerminalTab = {
+            id: newSessionId,
+            name: name
+          };
+          return tab;
+        }
       },
       {
         fulfilled: (state, action: PayloadAction<TerminalTab>) => {
@@ -65,7 +86,7 @@ export const terminalTabsSlice = createAppSlice({
           state.focusedTabIdx = state.tabs.length - 1;
         },
         rejected: (_, action) => {
-          console.error('Failed to create terminal tab:', action.error.message);
+          toast.error(action.error.message);
         }
       }
     ),

@@ -10,7 +10,7 @@ export default defineConfig({
       formats: ['cjs']
     },
     rollupOptions: {
-      external: ['node:os', 'node-pty', 'node:path']
+      external: ['node:os', 'node-pty', 'node:path', 'node-ssh']
     }
   }
 });

@@ -12,7 +12,7 @@ export class ClientTerminalSession {
   private terminal: Terminal;
   private fitAddon: FitAddon;
   private webLinksAddon: WebLinksAddon;
-  private parentElRef: HTMLElement;
+  public isVisible: boolean = false;
 
   /** Creates a terminal session given an existing pty's session id */
   constructor(sessionId: string) {
@@ -21,7 +21,6 @@ export class ClientTerminalSession {
   }
 
   public attachTo(parent: HTMLElement) {
-    this.parentElRef = parent;
     this.terminal.open(parent);
 
     this.fitAddon = new FitAddon();
@@ -59,11 +58,14 @@ export class ClientTerminalSession {
   }
 
   public resize() {
-    this.fitAddon.fit();
-    console.log(this.parentElRef);
+    if (!this.isVisible) {
+      return;
+    }
     const { rows, cols } = this.fitAddon.proposeDimensions();
-    console.log('Terminal session resized', cols, rows);
-    window.terminal.resizeTerminal(this._sessionId, cols, rows);
+    if (rows !== this.terminal.rows || cols !== this.terminal.cols) {
+      this.fitAddon.fit();
+      window.terminal.resizeTerminal(this._sessionId, cols, rows);
+    }
   }
 
   public terminate() {

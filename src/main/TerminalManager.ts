@@ -7,9 +7,13 @@ import os from 'node:os';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import log from 'electron-log/main';
 import fs from 'node:fs';
+import { v4 as uuidv4 } from 'uuid';
 import { join } from 'node:path';
 import { getAvailableShells } from './helpers';
+import { LocalTerminalSession } from './LocalTerminalSession';
 import { TerminalSession } from './TerminalSession';
+import { SSHSession } from './SSHSession';
+import { HostConfigManager } from './HostConfigManager';
 
 export class TerminalManager {
   shell: string;
@@ -21,11 +25,26 @@ export class TerminalManager {
     this.shell = this.getShell();
   }
 
-  public startListening() {
-    ipcMain.handle('terminal:createSession', (_event, shellPath: string) => {
+  public init() {
+    ipcMain.handle('terminal:createLocalSession', (_event, shellPath: string) => {
       log.info(`Creating new session with shell: ${shellPath}`);
-      const newSessionId = this.createSession(shellPath);
+      const newSessionId = this.createLocalSession(shellPath);
       return newSessionId;
+    });
+    ipcMain.handle('terminal:createSSHSession', async (_event, hostId): IPCPromise<string> => {
+      try {
+        const newSessionId = await this.createSSHSession(hostId);
+        return {
+          success: true,
+          data: newSessionId
+        };
+      } catch (error) {
+        log.error(`[TerminalManager] - Failed to create SSH session: ${error.message}`);
+        return {
+          success: false,
+          error: error.message
+        };
+      }
     });
     ipcMain.handle('terminal:getUserPreferredShell', () => this.getUserPreferredShell());
     ipcMain.handle('terminal:getAvailableShells', () => this.getAvailableShells());
@@ -34,11 +53,12 @@ export class TerminalManager {
     );
   }
 
+  /** Gets the shell from the env vars or the default shell for the OS. */
   getShell() {
     return process.env.SHELL || this.getDefaultShell();
   }
 
-  getDefaultShell(): string {
+  getDefaultShell() {
     if (os.platform() === 'win32') {
       return 'powershell.exe';
     }
@@ -79,11 +99,33 @@ export class TerminalManager {
     return await getAvailableShells(os.platform());
   }
 
-  createSession(shellPath: string) {
-    const newTerminalSession = new TerminalSession(this, shellPath);
-    newTerminalSession.startListening();
-    this.sessions.set(newTerminalSession.sessionId, newTerminalSession);
-    return newTerminalSession.sessionId;
+  createLocalSession(shellPath: string) {
+    const newSessionId = uuidv4();
+    const newLocalTerminalSession = new LocalTerminalSession(
+      this,
+      newSessionId,
+      this._window,
+      shellPath
+    );
+    newLocalTerminalSession.init();
+    this.sessions.set(newLocalTerminalSession.sessionId, newLocalTerminalSession);
+    return newSessionId;
+  }
+
+  /** Creates an ssh session with given host config
+   * @returns the session id of the new session
+   */
+  async createSSHSession(hostId: string) {
+    const hostConfig = HostConfigManager.instance.getHostConfig(hostId);
+    if (!hostConfig) {
+      log.error(`[TerminalManager] - No host config found for id: ${hostId}`);
+      throw new Error(`No host config found for id: ${hostId}`);
+    }
+    const newSessionId = uuidv4();
+    const newSSHSession = new SSHSession(this, newSessionId, this._window, hostConfig);
+    await newSSHSession.init();
+    this.sessions.set(newSSHSession.sessionId, newSSHSession);
+    return newSessionId;
   }
 
   public terminateAllSessions() {

@@ -13,10 +13,10 @@ class TerminalSessionRegistry {
     // Initialize if needed
   }
 
-  async createSession(shellPath: string) {
+  async createLocalSession(shellPath: string) {
     console.log('Creating new terminal with shell path:', shellPath);
     return await window.terminal
-      .createSession(shellPath)
+      .createLocalSession(shellPath)
       .then((sessionId: string) => {
         console.log('New terminal sessionId:', sessionId);
         const session = new ClientTerminalSession(sessionId);
@@ -27,6 +27,21 @@ class TerminalSessionRegistry {
         console.error('Failed to create terminal session:', error);
         throw error;
       });
+  }
+
+  async createSSHSession(hostId: string) {
+    console.log('Creating new SSH terminal session');
+    return await window.terminal.createSSHSession(hostId).then(res => {
+      if (res.success === true) {
+        const sessionId = res.data;
+        const session = new ClientTerminalSession(sessionId);
+        this.sessions.set(sessionId, session);
+        return sessionId;
+      } else {
+        console.error('Failed to create SSH terminal session:', res.error);
+        throw new Error(res.error);
+      }
+    });
   }
 
   getSession(id: string) {
