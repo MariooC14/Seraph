@@ -15,7 +15,7 @@ type TerminalViewProps = {
 export default function TerminalView({
   clientTerminalSession: cts,
   onClose,
-  isVisible = false
+  isVisible
 }: TerminalViewProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
@@ -47,7 +47,11 @@ export default function TerminalView({
   }, []);
 
   useEffect(() => {
-    if (isVisible) cts.focus();
+    cts.isVisible = isVisible;
+    if (cts.isVisible) {
+      cts.resize();
+      cts.focus();
+    }
   }, [isVisible]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {

@@ -29,7 +29,32 @@ export class SSHSession extends TerminalSession {
   // THIS IS FRAGILE - I don't know if this is the right way to do this
   public async init() {
     log.info('[SSHSession] - Connecting with config:', this.hostConfig);
+    this.addIpcListeners();
 
+    try {
+      this.ssh = await new NodeSSH().connect(this.hostConfig);
+      this.clientSSHChannel = await this.ssh.requestShell(DEFAULT_TTY_OPTS);
+
+      this.clientSSHChannel.on('data', (data: Buffer) => {
+        this.sendData(data.toString('utf8'));
+      });
+
+      this.clientSSHChannel.on('exit', code => {
+        log.info('[SSHSession] - SSH session closed');
+        this.window.webContents.send(`${this.channel}:exit`, code);
+      });
+
+      log.info(`[SSHSession] - SSH session initialized with sessionId: ${this.sessionId};`);
+    } catch (error) {
+      // We'll need to improve error handling here
+      if (error instanceof AggregateError) {
+        log.error(`[SSHSession] - Failed to connect to SSH server: ${error.errors}`);
+      }
+      throw new Error(error.errors[0]);
+    }
+  }
+
+  private addIpcListeners() {
     ipcMain.handle(`${this.channel}:clientInput`, (_event, input: string) => {
       this.clientSSHChannel?.write(input);
     });
@@ -40,20 +65,6 @@ export class SSHSession extends TerminalSession {
       log.info('[SSHSession] - Killing SSH session');
       this.terminate();
     });
-
-    this.ssh = await new NodeSSH().connect(this.hostConfig);
-    this.clientSSHChannel = await this.ssh.requestShell(DEFAULT_TTY_OPTS);
-
-    this.clientSSHChannel.on('data', (data: Buffer) => {
-      this.sendData(data.toString('utf8'));
-    });
-
-    this.clientSSHChannel.on('exit', () => {
-      log.info('[SSHSession] - SSH session closed');
-      this.window.webContents.send(`${this.channel}:exit`);
-    });
-
-    log.info(`[SSHSession] - SSH session initialized with sessionId: ${this.sessionId};`);
   }
 
   public terminate() {

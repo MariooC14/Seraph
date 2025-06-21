@@ -2,6 +2,7 @@ import { createAppSlice } from '@/app/createAppSlice';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { terminalSessionRegistry } from './ClientTerminalSessionRegistry';
 import { RootState } from '@/app/store';
+import { toast } from 'sonner';
 
 export type TerminalTab = {
   /** id is also sessionId */
@@ -16,12 +17,20 @@ export type TerminalTabsSliceState = {
   isHostSelectionDialogOpen: boolean;
 };
 
-type CreateTabParams = {
+interface BaseCreateTabParams {
   name: string;
-  // quick hack to get the ssh tab working - TODO: Find a better way to do create tabs based on type
   type: 'local' | 'ssh';
+}
+
+interface LocalTerminalTabParams extends BaseCreateTabParams {
+  type: 'local';
   shellPath?: string;
-};
+}
+
+interface SSHTabParams extends BaseCreateTabParams {
+  type: 'ssh';
+  hostId: string;
+}
 
 const initialState: TerminalTabsSliceState = {
   tabs: [],
@@ -50,11 +59,11 @@ export const terminalTabsSlice = createAppSlice({
       }
     }),
     createTab: create.asyncThunk(
-      async (params: CreateTabParams, { getState }) => {
+      async (params: LocalTerminalTabParams | SSHTabParams, { getState }) => {
         const state = getState() as RootState;
         if (params.type === 'ssh') {
-          const { name } = params;
-          const newSessionId = await terminalSessionRegistry.createSSHSession();
+          const { name, hostId } = params;
+          const newSessionId = await terminalSessionRegistry.createSSHSession(hostId);
           const tab: TerminalTab = {
             id: newSessionId,
             name: name
@@ -77,7 +86,7 @@ export const terminalTabsSlice = createAppSlice({
           state.focusedTabIdx = state.tabs.length - 1;
         },
         rejected: (_, action) => {
-          console.error('Failed to create terminal tab:', action.error.message);
+          toast.error(action.error.message);
         }
       }
     ),

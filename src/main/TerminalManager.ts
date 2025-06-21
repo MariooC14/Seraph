@@ -13,6 +13,7 @@ import { getAvailableShells } from './helpers';
 import { LocalTerminalSession } from './LocalTerminalSession';
 import { TerminalSession } from './TerminalSession';
 import { SSHSession } from './SSHSession';
+import { HostConfigManager } from './HostConfigManager';
 
 export class TerminalManager {
   shell: string;
@@ -30,10 +31,20 @@ export class TerminalManager {
       const newSessionId = this.createLocalSession(shellPath);
       return newSessionId;
     });
-    ipcMain.handle('terminal:createSSHSession', async () => {
-      log.info(`Creating new SSH session`);
-      const newSessionId = await this.createSSHSession();
-      return newSessionId;
+    ipcMain.handle('terminal:createSSHSession', async (_event, hostId): IPCPromise<string> => {
+      try {
+        const newSessionId = await this.createSSHSession(hostId);
+        return {
+          success: true,
+          data: newSessionId
+        };
+      } catch (error) {
+        log.error(`[TerminalManager] - Failed to create SSH session: ${error.message}`);
+        return {
+          success: false,
+          error: error.message
+        };
+      }
     });
     ipcMain.handle('terminal:getUserPreferredShell', () => this.getUserPreferredShell());
     ipcMain.handle('terminal:getAvailableShells', () => this.getAvailableShells());
@@ -104,16 +115,14 @@ export class TerminalManager {
   /** Creates an ssh session with given host config
    * @returns the session id of the new session
    */
-  async createSSHSession() {
+  async createSSHSession(hostId: string) {
+    const hostConfig = HostConfigManager.instance.getHostConfig(hostId);
+    if (!hostConfig) {
+      log.error(`[TerminalManager] - No host config found for id: ${hostId}`);
+      throw new Error(`No host config found for id: ${hostId}`);
+    }
     const newSessionId = uuidv4();
-    const newSSHSession = new SSHSession(this, newSessionId, this._window, {
-      // Can set up a docker-compose file to set up an ssh server for development
-      // This is a placeholder for now - replace with actual host config
-      host: 'docker',
-      port: 22,
-      username: 'user',
-      password: 'password'
-    });
+    const newSSHSession = new SSHSession(this, newSessionId, this._window, hostConfig);
     await newSSHSession.init();
     this.sessions.set(newSSHSession.sessionId, newSSHSession);
     return newSessionId;

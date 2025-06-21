@@ -29,20 +29,19 @@ class TerminalSessionRegistry {
       });
   }
 
-  async createSSHSession() {
+  async createSSHSession(hostId: string) {
     console.log('Creating new SSH terminal session');
-    return await window.terminal
-      .createSSHSession()
-      .then((sessionId: string) => {
-        console.log('New SSH terminal sessionId:', sessionId);
+    return await window.terminal.createSSHSession(hostId).then(res => {
+      if (res.success === true) {
+        const sessionId = res.data;
         const session = new ClientTerminalSession(sessionId);
         this.sessions.set(sessionId, session);
-        return session.sessionId;
-      })
-      .catch(error => {
-        console.error('Failed to create SSH terminal session:', error);
-        throw error;
-      });
+        return sessionId;
+      } else {
+        console.error('Failed to create SSH terminal session:', res.error);
+        throw new Error(res.error);
+      }
+    });
   }
 
   getSession(id: string) {
