@@ -72,3 +72,12 @@ export function isNewTabKey(e: KeyboardEvent) {
 export function isCloseTabKey(e: KeyboardEvent) {
   return e.key === 'w' && (e.metaKey || e.ctrlKey);
 }
+export function isZoomIn(e: KeyboardEvent) {
+  return e.key === '+' && (e.metaKey || e.ctrlKey);
+}
+export function isZoomOut(e: KeyboardEvent) {
+  return e.key === '-' && (e.metaKey || e.ctrlKey);
+}
+export function isResetZoom(e: KeyboardEvent) {
+  return e.key === '0' && (e.metaKey || e.ctrlKey);
+}
