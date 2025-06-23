@@ -1,4 +1,4 @@
-import { useAppDispatch } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { Button } from '@/components/ui/button';
 import {
   CommandDialog,
@@ -11,6 +11,8 @@ import {
 import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
 import { CirclePlus, Terminal } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { selectHostConfigs } from '../config/configSlice';
+import { HostConfig } from '@dts/host-config';
 
 type HostSelectionDialogProps = {
   open: boolean;
@@ -19,6 +21,7 @@ type HostSelectionDialogProps = {
 
 export default function HostSelectionDialog({ open, handleOpenChange }: HostSelectionDialogProps) {
   const dispatch = useAppDispatch();
+  const hostConfigs = useAppSelector(selectHostConfigs);
   const [value, setValue] = useState('');
 
   useEffect(() => {
@@ -26,7 +29,12 @@ export default function HostSelectionDialog({ open, handleOpenChange }: HostSele
   }, [open]);
 
   const handleLocalTerminalClick = () => {
-    dispatch(createTab({ name: 'Localhost' }));
+    dispatch(createTab({ name: 'Localhost', type: 'local' }));
+    handleOpenChange(false);
+  };
+
+  const handleItemSelect = (hostConfig: HostConfig) => {
+    dispatch(createTab({ type: 'ssh', name: hostConfig.label, hostId: hostConfig.id }));
     handleOpenChange(false);
   };
 
@@ -49,9 +57,11 @@ export default function HostSelectionDialog({ open, handleOpenChange }: HostSele
       </CommandEmpty>
       <CommandList>
         <CommandGroup heading="Hosts">
-          {/* Hosts from config */}
-          <CommandItem>Lunar</CommandItem>
-          <CommandItem>Solar</CommandItem>
+          {hostConfigs.map(host => (
+            <CommandItem key={host.id} onSelect={() => handleItemSelect(host)}>
+              {host.label}
+            </CommandItem>
+          ))}
         </CommandGroup>
         <CommandGroup heading="Quick Actions">
           <CommandItem>

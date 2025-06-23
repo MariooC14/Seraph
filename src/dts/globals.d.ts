@@ -1,9 +1,28 @@
 declare global {
+  interface BaseIPCResponse {
+    success: boolean;
+  }
+
+  interface SuccessResponse<T = void> extends BaseIPCResponse {
+    success: true;
+    data: T;
+  }
+
+  interface ErrorResponse extends BaseIPCResponse {
+    success: false;
+    error: string;
+    code?: string;
+  }
+
+  type IPCResponse<T = void> = SuccessResponse<T> | ErrorResponse;
+  type IPCPromise<T = void> = Promise<IPCResponse<T>>;
+
   interface Window {
     terminal: {
-      createSession: (shellPath: string) => Promise<string | never>;
-      resizeTerminal: (sessionId: string, cols: number, rows: number) => void;
-      terminateSession: (sessionId: string) => void;
+      createLocalSession: (shellPath: string) => Promise<string>;
+      createSSHSession: (hostId: string) => IPCPromise<string>;
+      resizeTerminal: (sessionId: string, cols: number, rows: number) => IPCPromise<void>;
+      terminateSession: (sessionId: string) => IPCPromise<void>;
       onSessionTerminated: (sessionId: string, callback: (code: string) => void) => void;
       sendData: (sessionId: string, data: string) => void;
       onData: (sessionId: string, callback: (data: string) => void) => void;
@@ -20,6 +39,13 @@ declare global {
       onMaximized: (callback: (maximized: boolean) => void) => void;
       onNativeThemeChanged: (callback: (theme: Theme) => void) => void;
       isMacOS: () => boolean;
+    };
+
+    hosts: {
+      getAll: () => IPCPromise<HostConfig[]>;
+      get: (id: string) => IPCPromise<HostConfig | undefined>;
+      add: (host: HostConfig) => IPCPromise<HostConfig>;
+      remove: (id: string) => IPCPromise<void>;
     };
   }
 

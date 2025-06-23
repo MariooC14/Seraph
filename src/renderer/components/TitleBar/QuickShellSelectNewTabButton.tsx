@@ -21,7 +21,7 @@ export default function QuickShellSelectNewTabTutton() {
   const navigate = useNavigate();
 
   const handleNewTabClick = (tabName: string, shellPath: string) => {
-    dispatch(createTab({ shellPath, name: tabName })).then(action => {
+    dispatch(createTab({ shellPath, name: tabName, type: 'local' })).then(action => {
       if (action.meta.requestStatus === 'fulfilled') {
         const tab = action.payload as TerminalTab;
         navigate(`/terminals/${tab.id}`);
