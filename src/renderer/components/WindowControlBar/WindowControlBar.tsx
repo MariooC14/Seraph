@@ -3,7 +3,7 @@ import { Button } from '../ui/button';
 import { useEffect, useState } from 'react';
 
 export default function WindowControlBar() {
-  const [maximized, setMaximized] = useState(false);
+  const [maximized, setMaximized] = useState(window.app.isMaximized());
 
   useEffect(() => {
     // User can maximize by e.g. double clicking the title bar

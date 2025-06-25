@@ -31,6 +31,7 @@ contextBridge.exposeInMainWorld('app', {
   maximize: () => ipcRenderer.invoke('app:maximize'),
   unmaximize: () => ipcRenderer.invoke('app:unmaximize'),
   minimize: () => ipcRenderer.invoke('app:minimize'),
+  isMaximized: () => ipcRenderer.invoke('app:isMaximized'),
   onMaximized: (callback: (maximized: boolean) => void) =>
     ipcRenderer.on('app:maximized', (_event, maximized) => callback(maximized)),
   onNativeThemeChanged: (callback: (theme: Theme) => void) =>
