@@ -67,14 +67,14 @@ const createWindow = (windowConfig: UserConfig['windowConfig']) => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  terminalManager = new TerminalManager(mainWindow);
+  terminalManager = new TerminalManager();
   windowManager = new WindowManager(mainWindow);
 
   HostConfigManager.init();
   StorageManager.init();
-  terminalManager.init();
   const userConfig = StorageManager.instance.getUserConfig();
   createWindow(userConfig.windowConfig);
+  terminalManager.init(mainWindow);
   windowManager.startListening();
 
   ipcMain.handle('app:exit', () => {

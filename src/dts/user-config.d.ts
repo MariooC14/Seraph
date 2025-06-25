@@ -7,4 +7,5 @@ type UserConfig = {
     x?: number;
     y?: number;
   };
+  preferredShell: string;
 };

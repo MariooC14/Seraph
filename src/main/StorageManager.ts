@@ -11,7 +11,9 @@ const defaultUserConfig: UserConfig = {
     maximized: false,
     x: undefined,
     y: undefined
-  }
+  },
+  preferredShell:
+    process.env.SHELL || (process.platform === 'win32' ? 'powershell.exe' : '/bin/bash')
 };
 
 const userDataPath = app.getPath('userData');
@@ -34,7 +36,13 @@ export class StorageManager {
   }
 
   public saveUserConfig(config: UserConfig) {
-    fs.writeFileSync(userConfigPath, JSON.stringify(config, null, 2), 'utf-8');
+    try {
+      fs.writeFileSync(userConfigPath, JSON.stringify(config, null, 2), 'utf-8');
+      return true;
+    } catch (error) {
+      log.error('Error saving user config:', error);
+      return false;
+    }
   }
 
   public getUserConfig() {
