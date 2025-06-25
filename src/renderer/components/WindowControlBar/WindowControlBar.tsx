@@ -11,10 +11,7 @@ export default function WindowControlBar() {
       setMaximized(isMaximized);
     });
     // User can maximize by e.g. double clicking the title bar
-    window.app.onMaximized((maximized: boolean) => {
-      console.log(',', maximized);
-      setMaximized(maximized);
-    });
+    window.app.onMaximized((maximized: boolean) => setMaximized(maximized));
   }, []);
 
   const handleMinimize = () => {
