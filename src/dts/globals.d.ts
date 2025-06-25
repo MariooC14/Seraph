@@ -37,7 +37,7 @@ declare global {
       unmaximize: () => void;
       minimize: () => void;
       onMaximized: (callback: (maximized: boolean) => void) => void;
-      isMaximized: () => boolean;
+      isMaximized: () => Promise<boolean>;
       onNativeThemeChanged: (callback: (theme: Theme) => void) => void;
       isMacOS: () => boolean;
     };
