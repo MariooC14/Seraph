@@ -9,18 +9,38 @@ import { toast } from 'sonner';
 import SelectedHostConfigDrawer from './selected-host-config-drawer';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
-import { selectHostConfigs } from '@/features/config/configSlice';
+import { fetchHostConfigs, selectHostConfigs } from '@/features/config/configSlice';
+import { AddHostDialog } from '@/features/AddHostDialog';
 
 export default function HostsPage() {
   const hostConfigs = useAppSelector(selectHostConfigs);
+  const [addHostDialogOpen, setAddHostDialogOpen] = useState(false);
   const [selectedHostConfig, setSelectedHostConfig] = useState<HostConfig>();
   const dispatch = useAppDispatch();
 
-  // TODO: Implement add host logic
-  function handleAddNewHost() {}
+  function handleAddNewHost() {
+    setAddHostDialogOpen(true);
+  }
 
-  // TODO: Implement delete host logic
-  function handleDelete(hostConfig: HostConfig) {
+  async function handleAddHost(newHost: Omit<HostConfig, 'id'>) {
+    const newHostConfig: HostConfig = {
+      ...newHost,
+      id: crypto.randomUUID() // Generate a unique ID for the new host
+    };
+
+    try {
+      await window.hosts.add(newHostConfig);
+      toast.success(`Added host ${newHostConfig.label}`);
+      setAddHostDialogOpen(false);
+      dispatch(fetchHostConfigs());
+    } catch (err) {
+      toast.error(`Failed to add host: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  }
+
+  async function handleDelete(hostConfig: HostConfig) {
+    await window.hosts.remove(hostConfig.id);
+    dispatch(fetchHostConfigs());
     toast.success(`Deleted host ${hostConfig.label}`);
   }
 
@@ -62,6 +82,12 @@ export default function HostsPage() {
         hostConfig={selectedHostConfig}
         onClose={() => setSelectedHostConfig(undefined)}
         open={!!selectedHostConfig}
+      />
+      <AddHostDialog
+        title="Add New Host"
+        open={addHostDialogOpen}
+        onOpenChange={setAddHostDialogOpen}
+        onSubmit={handleAddHost}
       />
     </>
   );
