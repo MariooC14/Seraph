@@ -80,6 +80,12 @@ export class WindowManager {
     });
   }
 
+  public closeMainWindow() {
+    log.info('Closing main window');
+    StorageManager.instance.saveMainWindowConfig();
+    this._mainWindow.close();
+  }
+
   public getMainWindowConfig(): UserConfig['windowConfig'] {
     const { x, y, width, height } = this._mainWindow.getBounds();
     const maximized = this._mainWindow.isMaximized();

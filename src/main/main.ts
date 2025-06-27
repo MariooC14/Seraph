@@ -28,7 +28,7 @@ app.whenReady().then(() => {
     if (process.platform !== 'darwin') {
       app.quit();
     } else {
-      WindowManager.instance.mainWindow.close();
+      WindowManager.instance.closeMainWindow();
     }
   });
   ipcMain.handle('app:minimize', () => WindowManager.instance.mainWindow.minimize());
@@ -47,7 +47,6 @@ app.on('before-quit', () => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  StorageManager.instance.saveMainWindowConfig();
   terminalManager.terminateAllSessions();
   if (process.platform !== 'darwin') {
     app.quit();
