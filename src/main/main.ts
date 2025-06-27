@@ -7,6 +7,7 @@ import {
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { TerminalManager } from './TerminalManager';
+import { StorageManager } from './StorageManager';
 import { WindowManager } from './windowManager';
 import log from 'electron-log/main';
 import { HostConfigManager } from './HostConfigManager';
@@ -20,17 +21,30 @@ if (started) {
   app.quit();
 }
 
-const createWindow = () => {
+const createWindow = (windowConfig: UserConfig['windowConfig']) => {
   log.info('Creating main window');
   mainWindow = new BrowserWindow({
-    minWidth: 1500,
-    minHeight: 600,
+    ...windowConfig,
+    minWidth: 500,
+    minHeight: 500,
     titleBarStyle: 'hidden',
     trafficLightPosition: { x: 10, y: 12 },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
   });
+
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('app:maximized', true);
+  });
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('app:maximized', false);
+  });
+
+  if (windowConfig.maximized) {
+    log.info('Main window is maximized');
+    mainWindow.maximize();
+  }
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -53,12 +67,14 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  createWindow();
-  terminalManager = new TerminalManager(mainWindow);
+  terminalManager = new TerminalManager();
   windowManager = new WindowManager(mainWindow);
 
   HostConfigManager.init();
-  terminalManager.init();
+  StorageManager.init();
+  const userConfig = StorageManager.instance.getUserConfig();
+  createWindow(userConfig.windowConfig);
+  terminalManager.init(mainWindow);
   windowManager.startListening();
 
   ipcMain.handle('app:exit', () => {
@@ -71,16 +87,11 @@ app.whenReady().then(() => {
   ipcMain.handle('app:minimize', () => mainWindow.minimize());
   ipcMain.handle('app:maximize', () => mainWindow.maximize());
   ipcMain.handle('app:unmaximize', () => mainWindow.unmaximize());
-
-  mainWindow.on('maximize', () => {
-    mainWindow.webContents.send('app:maximized', true);
-  });
-  mainWindow.on('unmaximize', () => {
-    mainWindow.webContents.send('app:maximized', false);
-  });
+  ipcMain.handle('app:isMaximized', () => mainWindow.isMaximized());
 });
 
 app.on('before-quit', () => {
+  StorageManager.instance.saveMainWindowConfig(mainWindow);
   log.info('[Main] - App is about to quit');
   terminalManager.terminateAllSessions();
 });
@@ -89,6 +100,7 @@ app.on('before-quit', () => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+  StorageManager.instance.saveMainWindowConfig(mainWindow);
   terminalManager.terminateAllSessions();
   if (process.platform !== 'darwin') {
     app.quit();
@@ -99,11 +111,9 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+    const userConfig = StorageManager.instance.getUserConfig();
+    createWindow(userConfig.windowConfig);
     terminalManager.window = mainWindow;
     windowManager.mainWindow = mainWindow;
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.

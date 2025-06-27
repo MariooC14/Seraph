@@ -4,28 +4,27 @@
  */
 
 import os from 'node:os';
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { BrowserWindow, ipcMain } from 'electron';
 import log from 'electron-log/main';
-import fs from 'node:fs';
 import { v4 as uuidv4 } from 'uuid';
-import { join } from 'node:path';
 import { getAvailableShells } from './helpers';
 import { LocalTerminalSession } from './LocalTerminalSession';
 import { TerminalSession } from './TerminalSession';
 import { SSHSession } from './SSHSession';
 import { HostConfigManager } from './HostConfigManager';
+import { StorageManager } from './StorageManager';
 
 export class TerminalManager {
   shell: string;
   _window: BrowserWindow;
   sessions: Map<string, TerminalSession> = new Map();
 
-  public constructor(window: BrowserWindow) {
-    this._window = window;
+  public constructor() {
     this.shell = this.getShell();
   }
 
-  public init() {
+  public init(window: BrowserWindow) {
+    this._window = window;
     ipcMain.handle('terminal:createLocalSession', (_event, shellPath: string) => {
       log.info(`Creating new session with shell: ${shellPath}`);
       const newSessionId = this.createLocalSession(shellPath);
@@ -66,33 +65,14 @@ export class TerminalManager {
   }
 
   public getUserPreferredShell() {
-    const configPath = join(app.getPath('userData'), 'config.json');
-    if (!fs.existsSync(configPath)) {
-      fs.writeFileSync(configPath, JSON.stringify({ shell: this.shell }));
-      return this.shell;
-    } else {
-      const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-      log.info('[TerminalManager] - user-preferred shell:', config);
-      return (config.shell as string) || this.shell;
-    }
+    return StorageManager.instance.getUserConfig().preferredShell;
   }
 
   public saveDefaultShell(newShellPath: string) {
-    const configPath = join(app.getPath('userData'), 'config.json');
-
-    try {
-      if (!fs.existsSync(configPath)) {
-        fs.writeFileSync(configPath, JSON.stringify({ shell: newShellPath }));
-      } else {
-        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-        config.shell = newShellPath;
-        fs.writeFileSync(configPath, JSON.stringify(config));
-      }
-      return true;
-    } catch (error) {
-      log.error('[TerminalManager] - Failed to save default shell:', error);
-      return false;
-    }
+    return StorageManager.instance.saveUserConfig({
+      ...StorageManager.instance.getUserConfig(),
+      preferredShell: newShellPath
+    });
   }
 
   public async getAvailableShells() {
