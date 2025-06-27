@@ -17,8 +17,12 @@ const commonWindowShells = [
   }
 ];
 
-export async function getAvailableShells(platform: NodeJS.Platform) {
-  if (platform === 'win32') {
+export function isWindows() {
+  return process.platform === 'win32';
+}
+
+export async function getAvailableShells() {
+  if (isWindows()) {
     return await getAvailableShellsForWindows();
   } else {
     return await getAvailableShellsForUnix();

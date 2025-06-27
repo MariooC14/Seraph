@@ -3,16 +3,16 @@
  * Only handles one terminal instance
  */
 
-import os from 'node:os';
 import { BrowserWindow, ipcMain } from 'electron';
 import log from 'electron-log/main';
 import { v4 as uuidv4 } from 'uuid';
-import { getAvailableShells } from './helpers';
+import { getAvailableShells, isWindows } from './helpers';
 import { LocalTerminalSession } from './LocalTerminalSession';
 import { TerminalSession } from './TerminalSession';
 import { SSHSession } from './SSHSession';
 import { HostConfigManager } from './HostConfigManager';
 import { StorageManager } from './StorageManager';
+import { WindowManager } from './windowManager';
 
 export class TerminalManager {
   shell: string;
@@ -23,8 +23,8 @@ export class TerminalManager {
     this.shell = this.getShell();
   }
 
-  public init(window: BrowserWindow) {
-    this._window = window;
+  public init() {
+    this._window = WindowManager.instance.mainWindow;
     ipcMain.handle('terminal:createLocalSession', (_event, shellPath: string) => {
       log.info(`Creating new session with shell: ${shellPath}`);
       const newSessionId = this.createLocalSession(shellPath);
@@ -46,7 +46,7 @@ export class TerminalManager {
       }
     });
     ipcMain.handle('terminal:getUserPreferredShell', () => this.getUserPreferredShell());
-    ipcMain.handle('terminal:getAvailableShells', () => this.getAvailableShells());
+    ipcMain.handle('terminal:getAvailableShells', () => getAvailableShells());
     ipcMain.handle('terminal:saveDefaultShell', (_, newShellPath: string) =>
       this.saveDefaultShell(newShellPath)
     );
@@ -58,7 +58,7 @@ export class TerminalManager {
   }
 
   getDefaultShell() {
-    if (os.platform() === 'win32') {
+    if (isWindows()) {
       return 'powershell.exe';
     }
     return 'bash';
@@ -73,10 +73,6 @@ export class TerminalManager {
       ...StorageManager.instance.getUserConfig(),
       preferredShell: newShellPath
     });
-  }
-
-  public async getAvailableShells() {
-    return await getAvailableShells(os.platform());
   }
 
   createLocalSession(shellPath: string) {

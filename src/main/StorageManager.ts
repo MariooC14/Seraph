@@ -1,7 +1,9 @@
 import log from 'electron-log/main';
-import { app, BrowserWindow } from 'electron';
+import { app } from 'electron';
 import fs from 'node:fs';
 import path from 'path';
+import { isWindows } from './helpers';
+import { WindowManager } from './windowManager';
 
 const defaultUserConfig: UserConfig = {
   theme: 'dark',
@@ -12,8 +14,7 @@ const defaultUserConfig: UserConfig = {
     x: undefined,
     y: undefined
   },
-  preferredShell:
-    process.env.SHELL || (process.platform === 'win32' ? 'powershell.exe' : '/bin/bash')
+  preferredShell: process.env.SHELL || (isWindows() ? 'powershell.exe' : '/bin/bash')
 };
 
 const userDataPath = app.getPath('userData');
@@ -60,12 +61,11 @@ export class StorageManager {
     }
   }
 
-  public saveMainWindowConfig(window: BrowserWindow) {
+  public saveMainWindowConfig() {
     log.info('Saving main window configuration');
-    const { x, y, width, height } = window.getBounds();
     this.saveUserConfig({
       ...this.getUserConfig(),
-      windowConfig: { x, y, width, height, maximized: window.isMaximized() }
+      windowConfig: WindowManager.instance.getMainWindowConfig()
     });
   }
 }
