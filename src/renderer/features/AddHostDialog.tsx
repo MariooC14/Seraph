@@ -23,8 +23,8 @@ export function AddHostDialog(props: AddHostDialogProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // @ts-ignore
-      setPrivateKey(file.path || file.name);
+      const filePath = 'path' in file ? (file as any).path : file.name;
+      setPrivateKey(filePath);
     }
   };
 
