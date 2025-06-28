@@ -4,8 +4,7 @@ import { BrowserWindow, ipcMain } from 'electron';
 import { TerminalSessionError } from './TerminalSessionException';
 import { TerminalManager } from './TerminalManager';
 import { TerminalSession } from './TerminalSession';
-
-const isWindows = process.platform === 'win32';
+import { isWindows } from './helpers';
 
 /**
  * TerminalSession class is responsible for managing a terminal session.
@@ -34,7 +33,7 @@ export class LocalTerminalSession extends TerminalSession {
         name: `seraph-session-${this.sessionId}`,
         cols: 80,
         rows: 30,
-        cwd: isWindows ? process.env.USERPROFILE : process.env.HOME,
+        cwd: isWindows() ? process.env.USERPROFILE : process.env.HOME,
         env: process.env,
         useConpty: false // Do not remove or set to true - conpty is unstable on windows
       });
