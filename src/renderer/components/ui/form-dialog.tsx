@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,25 +8,19 @@ import {
   DialogFooter
 } from '@/components/ui/dialog';
 
-export type FormDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title: string;
-  description?: string;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  children: React.ReactNode;
-};
-
-export default function FormDialog({
-  open,
-  onOpenChange,
-  title,
+function FormDialog({
+  title = 'Form Dialog',
   description,
   onSubmit,
-  children
-}: FormDialogProps) {
+  children,
+  ...props
+}: React.ComponentProps<typeof Dialog> & {
+  title?: string;
+  description?: string;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+}) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog {...props}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -33,9 +28,10 @@ export default function FormDialog({
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           {children}
-          <DialogFooter>{/* You can add default buttons here if you want */}</DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   );
 }
+
+export { FormDialog };

@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react';
-import FormDialog, { FormDialogProps } from '@/components/ui/form-dialog';
+import { FormDialog } from '@/components/ui/form-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 
-type AddHostDialogProps = Omit<FormDialogProps, 'onSubmit' | 'children'> & {
+type AddHostDialogProps = Omit<React.ComponentProps<typeof FormDialog>, 'onSubmit'> & {
   onSubmit: (host: { label: string; host: string; port: number; username: string }) => void;
 };
 
