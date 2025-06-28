@@ -28,31 +28,44 @@ export function AddHostDialog(props: AddHostDialogProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-
+  const validateForm = () => {
     if (!label || !host || !port || !username) {
-      setError('All fields are required.');
-      return;
+      return 'All fields are required.';
     }
+
     if (!password && !privateKey) {
-      setError('Either password or private key is required.');
-      return;
+      return 'Either password or private key is required.';
     }
+
     const portNum = Number(port);
     if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
-      setError('Port must be a number between 1 and 65535.');
-      return;
+      return 'Port must be a number between 1 and 65535.';
     }
 
-    props.onSubmit({ label, host, port: Number(port), username });
+    return null;
+  };
+
+  const resetForm = () => {
     setLabel('');
     setHost('');
     setPort('22');
     setUsername('');
     setPassword('');
     setPrivateKey('');
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    props.onSubmit({ label, host, port: Number(port), username });
+    resetForm();
     props.onOpenChange(false);
   };
 
@@ -62,6 +75,11 @@ export function AddHostDialog(props: AddHostDialogProps) {
       title={props.title ?? 'Add Host'}
       description={props.description ?? 'Fill in the details for the new host you want to add.'}
       onSubmit={handleSubmit}>
+      {error && (
+        <div className="text-red-500 text-sm mb-4 p-2 bg-red-50 border border-red-200 rounded">
+          {error}
+        </div>
+      )}
       <div className="flex flex-col gap-1">
         <Label htmlFor="label">Label</Label>
         <Input id="label" value={label} onChange={e => setLabel(e.target.value)} required />
