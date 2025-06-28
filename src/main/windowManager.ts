@@ -47,6 +47,9 @@ export class WindowManager {
     this._mainWindow.on('unmaximize', () => {
       this._mainWindow.webContents.send('app:maximized', false);
     });
+    this._mainWindow.on('close', () => {
+      StorageManager.instance.saveMainWindowConfig();
+    });
 
     if (windowConfig.maximized) {
       log.info('Main window is maximized');
@@ -82,7 +85,6 @@ export class WindowManager {
 
   public closeMainWindow() {
     log.info('Closing main window');
-    StorageManager.instance.saveMainWindowConfig();
     this._mainWindow.close();
   }
 
