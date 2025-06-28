@@ -33,8 +33,8 @@ export class WindowManager {
       ...windowConfig,
       minWidth: 500,
       minHeight: 500,
-      backgroundColor: 'rgba(10,10,10,0.5)',
       titleBarStyle: 'hidden',
+      vibrancy: 'hud',
       trafficLightPosition: { x: 10, y: 12 },
       webPreferences: {
         preload: path.join(__dirname, 'preload.js')
