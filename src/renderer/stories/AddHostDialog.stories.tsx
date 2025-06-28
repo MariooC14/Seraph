@@ -34,9 +34,9 @@ export const Open: Story = {
 
 export const Closed: Story = {
   args: {
-    open: true,
+    open: false,
     onOpenChange: () => {},
     onSubmit: () => {},
-    title: 'dddd\n'
+    title: '\n'
   }
 };
