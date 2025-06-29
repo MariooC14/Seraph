@@ -3,45 +3,63 @@ import HostCard from './host-card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-
 import { useState } from 'react';
 import { toast } from 'sonner';
-import SelectedHostConfigDrawer from './selected-host-config-drawer';
+import { HostConfigDrawer } from './host-config-drawer';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
 import { fetchHostConfigs, selectHostConfigs } from '@/features/config/configSlice';
-import { AddHostDrawer } from './add-host-drawer';
+import { type HostSubmissionData } from '@/lib/host-validation';
 
 export default function HostsPage() {
   const hostConfigs = useAppSelector(selectHostConfigs);
-  const [addHostDrawerOpen, setAddHostDrawerOpen] = useState(false);
+  const [hostDrawerOpen, setHostDrawerOpen] = useState(false);
+  const [hostDrawerMode, setHostDrawerMode] = useState<'add' | 'edit'>('add');
   const [selectedHostConfig, setSelectedHostConfig] = useState<HostConfig>();
   const dispatch = useAppDispatch();
 
   function handleAddNewHost() {
-    setAddHostDrawerOpen(true);
+    setHostDrawerMode('add');
+    setSelectedHostConfig(undefined);
+    setHostDrawerOpen(true);
   }
 
-  async function handleAddHost(newHost: Omit<HostConfig, 'id'>) {
+  async function handleAddHost(newHost: HostSubmissionData) {
     const newHostConfig: HostConfig = {
       ...newHost,
-      id: crypto.randomUUID() // Generate a unique ID for the new host
+      // TODO: Generate ID in the backend
+      id: crypto.randomUUID()
     };
 
     try {
       await window.hosts.add(newHostConfig);
       toast.success(`Added host ${newHostConfig.label}`);
-      setAddHostDrawerOpen(false);
       dispatch(fetchHostConfigs());
     } catch (err) {
       toast.error(`Failed to add host: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   }
 
-  async function handleDelete(hostConfig: HostConfig) {
-    await window.hosts.remove(hostConfig.id);
-    dispatch(fetchHostConfigs());
-    toast.success(`Deleted host ${hostConfig.label}`);
+  async function handleUpdateHost(hostConfig: HostConfig) {
+    try {
+      // TODO: Implement proper update method in the backend
+      await window.hosts.remove(hostConfig.id);
+      await window.hosts.add(hostConfig);
+      toast.success(`Updated host ${hostConfig.label}`);
+      dispatch(fetchHostConfigs());
+    } catch (err) {
+      toast.error(`Failed to update host: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  }
+
+  async function handleDeleteHost(hostConfig: HostConfig) {
+    try {
+      await window.hosts.remove(hostConfig.id);
+      toast.success(`Deleted host ${hostConfig.label}`);
+      dispatch(fetchHostConfigs());
+    } catch (err) {
+      toast.error(`Failed to delete host: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
   }
 
   // TODO: Implement connect logic
@@ -49,9 +67,10 @@ export default function HostsPage() {
     dispatch(createTab({ type: 'ssh', name: hostConfig.label, hostId: hostConfig.id }));
   }
 
-  // TODO: Implement edit host logic
   function handleEdit(hostConfig: HostConfig) {
+    setHostDrawerMode('edit');
     setSelectedHostConfig(hostConfig);
+    setHostDrawerOpen(true);
   }
 
   return (
@@ -74,20 +93,18 @@ export default function HostsPage() {
             hostConfig={hostConfig}
             onClickConnect={handleConnect}
             onClickEdit={handleEdit}
-            onClickDelete={handleDelete}
+            onClickDelete={handleDeleteHost}
           />
         ))}
       </div>
-      <SelectedHostConfigDrawer
-        hostConfig={selectedHostConfig}
-        onClose={() => setSelectedHostConfig(undefined)}
-        open={!!selectedHostConfig}
-      />
-      <AddHostDrawer
-        title="Add New Host"
-        open={addHostDrawerOpen}
-        onOpenChange={setAddHostDrawerOpen}
+      <HostConfigDrawer
+        mode={hostDrawerMode}
+        open={hostDrawerOpen}
+        onOpenChange={setHostDrawerOpen}
         onSubmit={handleAddHost}
+        onUpdate={handleUpdateHost}
+        onDelete={handleDeleteHost}
+        hostConfig={selectedHostConfig}
       />
     </>
   );

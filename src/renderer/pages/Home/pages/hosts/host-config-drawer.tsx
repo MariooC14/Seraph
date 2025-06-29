@@ -62,15 +62,14 @@ export function HostConfigDrawer({
     setValue
   } = form;
 
-  // Populate form when in edit mode or when hostConfig changes
   useEffect(() => {
     if (mode === 'edit' && hostConfig) {
       setValue('label', hostConfig.label);
       setValue('host', hostConfig.host);
       setValue('port', hostConfig.port.toString());
       setValue('username', hostConfig.username);
-      setValue('password', ''); // Don't populate password for security
-      setValue('privateKey', ''); // Don't populate private key for security
+      setValue('password', '');
+      setValue('privateKey', '');
     } else if (mode === 'add') {
       reset();
     }

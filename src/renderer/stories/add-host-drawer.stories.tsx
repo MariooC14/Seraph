@@ -1,11 +1,11 @@
 import { store } from '@/app/store';
-import { AddHostDrawer } from '@/pages/Home/pages/hosts/add-host-drawer';
+import { HostConfigDrawer } from '@/pages/Home/pages/hosts/host-config-drawer';
 import { Meta, StoryObj } from '@storybook/react';
 import { Provider } from 'react-redux';
 
-const meta: Meta<typeof AddHostDrawer> = {
-  title: 'Components/AddHostDialog',
-  component: AddHostDrawer,
+const meta: Meta<typeof HostConfigDrawer> = {
+  title: 'Components/HostConfigDrawer',
+  component: HostConfigDrawer,
   decorators: [
     Story => (
       <Provider store={store}>
@@ -16,21 +16,30 @@ const meta: Meta<typeof AddHostDrawer> = {
 };
 export default meta;
 
-type Story = StoryObj<typeof AddHostDrawer>;
+type Story = StoryObj<typeof HostConfigDrawer>;
 
-export const Open: Story = {
+export const AddMode: Story = {
   args: {
+    mode: 'add',
     open: true,
     onOpenChange: () => {},
     onSubmit: () => alert('Host added!')
   }
 };
 
-export const Closed: Story = {
+export const EditMode: Story = {
   args: {
-    open: false,
+    mode: 'edit',
+    open: true,
     onOpenChange: () => {},
-    onSubmit: () => {},
-    title: '\n'
+    onUpdate: () => alert('Host updated!'),
+    onDelete: () => alert('Host deleted!'),
+    hostConfig: {
+      id: '1',
+      label: 'My Server',
+      host: '192.168.1.100',
+      port: 22,
+      username: 'admin'
+    }
   }
 };
