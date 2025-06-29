@@ -10,16 +10,16 @@ import SelectedHostConfigDrawer from './selected-host-config-drawer';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
 import { fetchHostConfigs, selectHostConfigs } from '@/features/config/configSlice';
-import { AddHostDialog } from '@/features/AddHostDialog';
+import { AddHostDrawer } from './add-host-drawer';
 
 export default function HostsPage() {
   const hostConfigs = useAppSelector(selectHostConfigs);
-  const [addHostDialogOpen, setAddHostDialogOpen] = useState(false);
+  const [addHostDrawerOpen, setAddHostDrawerOpen] = useState(false);
   const [selectedHostConfig, setSelectedHostConfig] = useState<HostConfig>();
   const dispatch = useAppDispatch();
 
   function handleAddNewHost() {
-    setAddHostDialogOpen(true);
+    setAddHostDrawerOpen(true);
   }
 
   async function handleAddHost(newHost: Omit<HostConfig, 'id'>) {
@@ -31,7 +31,7 @@ export default function HostsPage() {
     try {
       await window.hosts.add(newHostConfig);
       toast.success(`Added host ${newHostConfig.label}`);
-      setAddHostDialogOpen(false);
+      setAddHostDrawerOpen(false);
       dispatch(fetchHostConfigs());
     } catch (err) {
       toast.error(`Failed to add host: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -83,10 +83,10 @@ export default function HostsPage() {
         onClose={() => setSelectedHostConfig(undefined)}
         open={!!selectedHostConfig}
       />
-      <AddHostDialog
+      <AddHostDrawer
         title="Add New Host"
-        open={addHostDialogOpen}
-        onOpenChange={setAddHostDialogOpen}
+        open={addHostDrawerOpen}
+        onOpenChange={setAddHostDrawerOpen}
         onSubmit={handleAddHost}
       />
     </>
