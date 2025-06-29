@@ -33,8 +33,8 @@ export class WindowManager {
       ...windowConfig,
       minWidth: 500,
       minHeight: 500,
-      backgroundColor: 'rgba(10,10,10,0.5)',
       titleBarStyle: 'hidden',
+      vibrancy: 'hud',
       trafficLightPosition: { x: 10, y: 12 },
       webPreferences: {
         preload: path.join(__dirname, 'preload.js')
@@ -46,6 +46,9 @@ export class WindowManager {
     });
     this._mainWindow.on('unmaximize', () => {
       this._mainWindow.webContents.send('app:maximized', false);
+    });
+    this._mainWindow.on('close', () => {
+      StorageManager.instance.saveMainWindowConfig();
     });
 
     if (windowConfig.maximized) {
@@ -82,7 +85,6 @@ export class WindowManager {
 
   public closeMainWindow() {
     log.info('Closing main window');
-    StorageManager.instance.saveMainWindowConfig();
     this._mainWindow.close();
   }
 

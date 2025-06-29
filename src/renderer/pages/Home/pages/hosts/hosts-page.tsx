@@ -36,7 +36,7 @@ export default function HostsPage() {
 
   return (
     <>
-      <div className="flex justify-between items-center sticky top-0 z-10 bg-background pb-2">
+      <div className="flex justify-between items-center top-0 z-10 pb-2">
         <h1 className="text-3xl font-bold">Hosts</h1>
         <Tooltip delayDuration={500}>
           <TooltipTrigger asChild>

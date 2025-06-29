@@ -38,7 +38,6 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', () => {
-  StorageManager.instance.saveMainWindowConfig();
   log.info('[Main] - App is about to quit');
   terminalManager.terminateAllSessions();
 });
