@@ -181,31 +181,46 @@ export function HostConfigDrawer({
               {errors.label && <span className="text-red-500 text-sm">{errors.label.message}</span>}
             </div>
 
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="host">Host</Label>
-              <Input id="host" {...register('host')} placeholder="Enter hostname or IP address" />
-              {errors.host && <span className="text-red-500 text-sm">{errors.host.message}</span>}
+            {/* Connection string format: username@host:port */}
+            <div className="flex items-end gap-1">
+              <div className="flex flex-col gap-1">
+                <Label htmlFor="username">Username</Label>
+                <Input id="username" {...register('username')} placeholder="me" />
+              </div>
+              <span className="my-2 mx-1">@</span>
+              <div className="flex flex-col flex-1 gap-1">
+                <Label htmlFor="host">Host</Label>
+                <Input id="host" {...register('host')} placeholder="192.168.1.2" />
+              </div>
+              <span className="my-2 mx-1">:</span>
+              <div className="flex flex-col gap-1">
+                <Label htmlFor="port">Port</Label>
+                <Input
+                  id="port"
+                  type="number"
+                  {...register('port')}
+                  min="1"
+                  max="65535"
+                  placeholder="22"
+                />
+              </div>
             </div>
 
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="port">Port</Label>
-              <Input
-                id="port"
-                type="number"
-                {...register('port')}
-                min="1"
-                max="65535"
-                placeholder="22"
-              />
-              {errors.port && <span className="text-red-500 text-sm">{errors.port.message}</span>}
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" {...register('username')} placeholder="Enter username" />
-              {errors.username && (
-                <span className="text-red-500 text-sm">{errors.username.message}</span>
-              )}
+            {/* Error messages for the connection string fields */}
+            <div className="flex gap-1">
+              <div className="flex flex-col gap-1">
+                {errors.username && (
+                  <span className="text-red-500 text-sm">{errors.username.message}</span>
+                )}
+              </div>
+              <div className="w-6"></div> {/* Spacer for @ symbol */}
+              <div className="flex flex-col flex-1 gap-1">
+                {errors.host && <span className="text-red-500 text-sm">{errors.host.message}</span>}
+              </div>
+              <div className="w-6"></div> {/* Spacer for : symbol */}
+              <div className="flex flex-col gap-1">
+                {errors.port && <span className="text-red-500 text-sm">{errors.port.message}</span>}
+              </div>
             </div>
 
             <div className="flex flex-col gap-1">

@@ -4,7 +4,6 @@ import { Meta, StoryObj } from '@storybook/react';
 import { Provider } from 'react-redux';
 
 const meta: Meta<typeof HostConfigDrawer> = {
-  title: 'Components/HostConfigDrawer',
   component: HostConfigDrawer,
   decorators: [
     Story => (
