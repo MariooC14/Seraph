@@ -17,10 +17,8 @@ import { HostConfig } from '@dts/host-config';
 
 type HostConfigDrawerMode = 'add' | 'edit';
 
-type HostConfigDrawerProps = {
+type HostConfigDrawerProps = React.ComponentProps<typeof Drawer> & {
   mode: HostConfigDrawerMode;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   onSubmit?: (host: HostSubmissionData) => void;
   onUpdate?: (hostConfig: HostConfig) => void;
   onDelete?: (hostConfig: HostConfig) => void;
@@ -31,14 +29,15 @@ type HostConfigDrawerProps = {
 
 export function HostConfigDrawer({
   mode,
-  open,
-  onOpenChange,
   onSubmit,
   onUpdate,
   onDelete,
   hostConfig,
   title,
-  description
+  description,
+  open,
+  onOpenChange,
+  ...drawerProps
 }: HostConfigDrawerProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
