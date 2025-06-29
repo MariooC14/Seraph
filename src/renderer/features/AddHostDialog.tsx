@@ -29,20 +29,37 @@ export function AddHostDialog(props: AddHostDialogProps) {
   };
 
   const validateForm = () => {
-    if (!label || !host || !port || !username) {
+    if (areRequiredFieldsMissing(label, host, port, username)) {
       return 'All fields are required.';
     }
 
-    if (!password && !privateKey) {
+    if (isAuthenticationMissing(password, privateKey)) {
       return 'Either password or private key is required.';
     }
 
-    const portNum = Number(port);
-    if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
+    if (isPortInvalid(port)) {
       return 'Port must be a number between 1 and 65535.';
     }
 
     return null;
+  };
+
+  const areRequiredFieldsMissing = (
+    label: string,
+    host: string,
+    port: string,
+    username: string
+  ): boolean => {
+    return !label || !host || !port || !username;
+  };
+
+  const isAuthenticationMissing = (password: string, privateKey: string): boolean => {
+    return !password && !privateKey;
+  };
+
+  const isPortInvalid = (port: string): boolean => {
+    const portNum = Number(port);
+    return isNaN(portNum) || portNum < 1 || portNum > 65535;
   };
 
   const resetForm = () => {
