@@ -139,7 +139,7 @@ export function HostConfigDrawer({
   const isReadOnly = mode === 'edit' && !onUpdate;
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={onOpenChange} {...drawerProps}>
       <DrawerContent className="px-4">
         <DrawerHeader>
           <DrawerTitle>{getTitle()}</DrawerTitle>
