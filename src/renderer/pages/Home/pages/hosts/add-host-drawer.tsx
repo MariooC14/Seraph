@@ -1,14 +1,14 @@
 import { useRef, useState } from 'react';
-import { FormDialog } from '@/components/ui/form-dialog';
+import { FormDrawer } from '@/components/ui/form-drawer';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 
-type AddHostDialogProps = Omit<React.ComponentProps<typeof FormDialog>, 'onSubmit'> & {
+type AddHostDrawerProps = Omit<React.ComponentProps<typeof FormDrawer>, 'onSubmit'> & {
   onSubmit: (host: { label: string; host: string; port: number; username: string }) => void;
 };
 
-export function AddHostDialog(props: AddHostDialogProps) {
+export function AddHostDrawer(props: AddHostDrawerProps) {
   const [label, setLabel] = useState('');
   const [host, setHost] = useState('');
   const [port, setPort] = useState('22');
@@ -83,12 +83,14 @@ export function AddHostDialog(props: AddHostDialogProps) {
 
     props.onSubmit({ label, host, port: Number(port), username });
     resetForm();
-    props.onOpenChange(false);
+    props.onOpenChange?.(false);
   };
 
+  const { onSubmit: _, fadeFromIndex, ...drawerProps } = props;
+
   return (
-    <FormDialog
-      {...props}
+    <FormDrawer
+      {...drawerProps}
       title={props.title ?? 'Add Host'}
       description={props.description ?? 'Fill in the details for the new host you want to add.'}
       onSubmit={handleSubmit}>
@@ -157,7 +159,9 @@ export function AddHostDialog(props: AddHostDialogProps) {
           </Button>
         </div>
       </div>
-      <Button type="submit">Add Host</Button>
-    </FormDialog>
+      <Button type="submit" className="w-full">
+        Add Host
+      </Button>
+    </FormDrawer>
   );
 }
