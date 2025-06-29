@@ -3,12 +3,14 @@ import { FormDrawer } from '@/components/ui/form-drawer';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { validateHostForm, type HostFormData } from '@/lib/host-validation';
 
 type AddHostDrawerProps = Omit<React.ComponentProps<typeof FormDrawer>, 'onSubmit'> & {
   onSubmit: (host: { label: string; host: string; port: number; username: string }) => void;
 };
 
 export function AddHostDrawer(props: AddHostDrawerProps) {
+  const { onSubmit: _, fadeFromIndex, ...drawerProps } = props;
   const [label, setLabel] = useState('');
   const [host, setHost] = useState('');
   const [port, setPort] = useState('22');
@@ -28,40 +30,6 @@ export function AddHostDrawer(props: AddHostDrawerProps) {
     }
   };
 
-  const validateForm = () => {
-    if (areRequiredFieldsMissing(label, host, port, username)) {
-      return 'All fields are required.';
-    }
-
-    if (isAuthenticationMissing(password, privateKey)) {
-      return 'Either password or private key is required.';
-    }
-
-    if (isPortInvalid(port)) {
-      return 'Port must be a number between 1 and 65535.';
-    }
-
-    return null;
-  };
-
-  const areRequiredFieldsMissing = (
-    label: string,
-    host: string,
-    port: string,
-    username: string
-  ): boolean => {
-    return !label || !host || !port || !username;
-  };
-
-  const isAuthenticationMissing = (password: string, privateKey: string): boolean => {
-    return !password && !privateKey;
-  };
-
-  const isPortInvalid = (port: string): boolean => {
-    const portNum = Number(port);
-    return isNaN(portNum) || portNum < 1 || portNum > 65535;
-  };
-
   const resetForm = () => {
     setLabel('');
     setHost('');
@@ -75,7 +43,16 @@ export function AddHostDrawer(props: AddHostDrawerProps) {
     e.preventDefault();
     setError(null);
 
-    const validationError = validateForm();
+    const formData: HostFormData = {
+      label,
+      host,
+      port,
+      username,
+      password,
+      privateKey
+    };
+
+    const validationError = validateHostForm(formData);
     if (validationError) {
       setError(validationError);
       return;
@@ -85,8 +62,6 @@ export function AddHostDrawer(props: AddHostDrawerProps) {
     resetForm();
     props.onOpenChange?.(false);
   };
-
-  const { onSubmit: _, fadeFromIndex, ...drawerProps } = props;
 
   return (
     <FormDrawer
