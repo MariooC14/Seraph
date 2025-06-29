@@ -1,17 +1,17 @@
 // AddHostDialog.stories.tsx
 
 import { store } from '@/app/store';
+import { AddHostDrawer } from '@/pages/Home/pages/hosts/add-host-drawer';
 import { Meta, StoryObj } from '@storybook/react';
-import { AddHostDialog } from '@/features/AddHostDialog';
 import { Provider } from 'react-redux';
 
 // Optionally, import any providers your dialog needs
 // import { Provider } from 'react-redux';
 // import { store } from '@/app/store';
 
-const meta: Meta<typeof AddHostDialog> = {
+const meta: Meta<typeof AddHostDrawer> = {
   title: 'Components/AddHostDialog',
-  component: AddHostDialog,
+  component: AddHostDrawer,
   decorators: [
     Story => (
       <Provider store={store}>
@@ -22,7 +22,7 @@ const meta: Meta<typeof AddHostDialog> = {
 };
 export default meta;
 
-type Story = StoryObj<typeof AddHostDialog>;
+type Story = StoryObj<typeof AddHostDrawer>;
 
 export const Open: Story = {
   args: {
