@@ -1,13 +1,7 @@
-// AddHostDialog.stories.tsx
-
 import { store } from '@/app/store';
 import { AddHostDrawer } from '@/pages/Home/pages/hosts/add-host-drawer';
 import { Meta, StoryObj } from '@storybook/react';
 import { Provider } from 'react-redux';
-
-// Optionally, import any providers your dialog needs
-// import { Provider } from 'react-redux';
-// import { store } from '@/app/store';
 
 const meta: Meta<typeof AddHostDrawer> = {
   title: 'Components/AddHostDialog',
