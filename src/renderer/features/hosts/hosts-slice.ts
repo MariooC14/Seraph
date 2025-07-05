@@ -35,37 +35,34 @@ const hostsSlice = createAppSlice({
 
 export function getHostConfigs(): AppThunk {
   return async dispatch => {
-    await window.hosts.getAll().then(res => {
-      if (res.success === true) {
-        dispatch(setHosts(res.data));
-      } else {
-        console.error('Failed to fetch host configs:', res.error);
-      }
-    });
+    const hostsResponse = await window.hosts.getAll();
+    if (hostsResponse.success === true) {
+      dispatch(setHosts(hostsResponse.data));
+    } else {
+      console.error('Failed to fetch host configs:', hostsResponse.error);
+    }
   };
 }
 
 export function addHostConfig(host: HostConfig): AppThunk {
   return async dispatch => {
-    await window.hosts.add(host).then(res => {
-      if (res.success === true) {
-        dispatch(addHost(host));
-      } else {
-        console.error('Failed to add host config:', res.error);
-      }
-    });
+    const newHostResponse = await window.hosts.add(host);
+    if (newHostResponse.success === true) {
+      dispatch(addHost(host));
+    } else {
+      console.error('Failed to add host config:', newHostResponse.error);
+    }
   };
 }
 
 export function removeHostConfig(hostId: string): AppThunk {
   return async dispatch => {
-    await window.hosts.remove(hostId).then(res => {
-      if (res.success === true) {
-        dispatch(removeHost(hostId));
-      } else {
-        console.error('Failed to remove host config:', res.error);
-      }
-    });
+    const removeResponse = await window.hosts.remove(hostId);
+    if (removeResponse.success === true) {
+      dispatch(removeHost(hostId));
+    } else {
+      console.error('Failed to remove host config:', removeResponse.error);
+    }
   };
 }
 
