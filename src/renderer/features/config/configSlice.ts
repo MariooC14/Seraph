@@ -26,9 +26,6 @@ const configSlice = createAppSlice({
     },
     updateAvailableShells: (state, action: PayloadAction<string[]>) => {
       state.availableShells = action.payload;
-    },
-    updateHostConfigs: (state, action: PayloadAction<HostConfig[]>) => {
-      state.hostConfigs = action.payload;
     }
   },
   selectors: {
@@ -38,8 +35,7 @@ const configSlice = createAppSlice({
   }
 });
 
-export const { updatePreferredShellPath, updateAvailableShells, updateHostConfigs } =
-  configSlice.actions;
+export const { updatePreferredShellPath, updateAvailableShells } = configSlice.actions;
 
 export const { selectAvailableShells, selectPreferredShellPath, selectHostConfigs } =
   configSlice.selectors;
@@ -52,24 +48,11 @@ export function fetchAvailableShells(): AppThunk {
   };
 }
 
-export function fetchHostConfigs(): AppThunk {
-  return async dispatch => {
-    await window.hosts.getAll().then(res => {
-      if (res.success === true) {
-        dispatch(updateHostConfigs(res.data));
-      } else {
-        console.error('Failed to fetch host configs:', res.error);
-      }
-    });
-  };
-}
-
 export function initializeConfigState(): AppThunk {
   return async dispatch => {
     const preferredShellPath = await window.terminal.getUserPreferredShell();
     dispatch(updatePreferredShellPath(preferredShellPath));
     dispatch(fetchAvailableShells());
-    dispatch(fetchHostConfigs());
   };
 }
 
