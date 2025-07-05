@@ -45,7 +45,7 @@ declare global {
     hosts: {
       getAll: () => IPCPromise<HostConfig[]>;
       get: (id: string) => IPCPromise<HostConfig | undefined>;
-      add: (host: HostConfig) => IPCPromise<HostConfig>;
+      add: (host: Omit<HostConfig, 'id'>) => IPCPromise<HostConfig>;
       remove: (id: string) => IPCPromise<void>;
     };
   }
