@@ -68,7 +68,6 @@ export function removeHostConfig(hostId: string): AppThunk {
   };
 }
 
-const { setHosts, clearHosts, addHost, removeHost } = hostsSlice.actions;
-export { setHosts, clearHosts, removeHost };
+const { setHosts, addHost, removeHost } = hostsSlice.actions;
 export const { selectHosts } = hostsSlice.selectors;
 export default hostsSlice.reducer;
