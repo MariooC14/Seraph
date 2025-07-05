@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'path';
 import { isWindows } from './helpers';
 import { WindowManager } from './windowManager';
+import { HostConfig } from '@/dts/host-config';
 
 const defaultUserConfig: UserConfig = {
   theme: 'dark',
@@ -19,6 +20,7 @@ const defaultUserConfig: UserConfig = {
 
 const userDataPath = app.getPath('userData');
 const userConfigPath = path.join(userDataPath, 'user-config.json');
+const hostsPath = path.join(userDataPath, 'hosts.json');
 
 export class StorageManager {
   private static _instance?: StorageManager;
@@ -67,5 +69,29 @@ export class StorageManager {
       ...this.getUserConfig(),
       windowConfig: WindowManager.instance.getMainWindowConfig()
     });
+  }
+
+  public getHosts(): HostConfig[] {
+    if (!fs.existsSync(hostsPath)) {
+      return [];
+    }
+
+    try {
+      const data = fs.readFileSync(hostsPath, 'utf-8');
+      return JSON.parse(data) as HostConfig[];
+    } catch (error) {
+      log.error('Error reading hosts:', error);
+      return [];
+    }
+  }
+
+  public saveHosts(hosts: HostConfig[]) {
+    try {
+      fs.writeFileSync(hostsPath, JSON.stringify(hosts, null, 2), 'utf-8');
+      return true;
+    } catch (error) {
+      log.error('Error saving hosts:', error);
+      return false;
+    }
   }
 }
