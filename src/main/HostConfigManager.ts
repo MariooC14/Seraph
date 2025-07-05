@@ -54,8 +54,12 @@ export class HostConfigManager {
     // We can also add validation here to ensure the hostConfig is valid
     this.hostConfigs.set(newHostId, newHostConfig);
     log.info(`[HostConfigManager] - Added new host config with id: ${newHostId}`);
-    StorageManager.instance.saveHosts(this.getHostConfigs());
-    return newHostConfig;
+    const saved = StorageManager.instance.saveHosts(this.getHostConfigs());
+    if (saved) {
+      return newHostConfig;
+    } else {
+      throw new Error('Failed to save host configuration');
+    }
   }
 
   public removeHostConfig(id: string): void {
@@ -80,8 +84,13 @@ export class HostConfigManager {
       return { success: true, data: this.getHostConfig(id) };
     });
     ipcMain.handle('hosts:add', (_event, hostConfig: HostConfig) => {
-      this.addHostConfig(hostConfig);
-      return { success: true, data: hostConfig };
+      try {
+        const newHostConfig = this.addHostConfig(hostConfig);
+        return { success: true, data: newHostConfig };
+      } catch (error) {
+        log.error('[HostConfigManager] - Error adding host config:', error);
+        return { success: false, error: error.message };
+      }
     });
     ipcMain.handle('hosts:remove', (_event, id: string) => {
       this.removeHostConfig(id);
