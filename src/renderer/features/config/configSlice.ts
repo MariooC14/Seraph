@@ -1,20 +1,17 @@
 import { createAppSlice } from '@/app/createAppSlice';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from '@/app/store';
-import { HostConfig } from '@dts/host-config';
 
 export type ConfigState = {
   defaultShellPath: string;
   availableShells: string[];
   status: 'success' | 'error' | 'loading';
-  hostConfigs: HostConfig[];
 };
 
 const initialState: ConfigState = {
   defaultShellPath: '',
   availableShells: [],
-  status: 'success',
-  hostConfigs: []
+  status: 'success'
 };
 
 const configSlice = createAppSlice({
@@ -30,15 +27,13 @@ const configSlice = createAppSlice({
   },
   selectors: {
     selectPreferredShellPath: state => state.defaultShellPath,
-    selectAvailableShells: state => state.availableShells,
-    selectHostConfigs: state => state.hostConfigs
+    selectAvailableShells: state => state.availableShells
   }
 });
 
 export const { updatePreferredShellPath, updateAvailableShells } = configSlice.actions;
 
-export const { selectAvailableShells, selectPreferredShellPath, selectHostConfigs } =
-  configSlice.selectors;
+export const { selectAvailableShells, selectPreferredShellPath } = configSlice.selectors;
 
 export function fetchAvailableShells(): AppThunk {
   return async dispatch => {

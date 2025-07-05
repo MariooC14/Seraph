@@ -1,11 +1,13 @@
 import terminalTabsReducer from '@/features/terminalTabs/terminalTabsSlice';
 import configReducer from '@/features/config/configSlice';
+import hostsReducer from '@/features/hosts/hosts-slice';
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 
 export const store = configureStore({
   reducer: {
     terminalTabs: terminalTabsReducer,
-    config: configReducer
+    config: configReducer,
+    hosts: hostsReducer
   }
 });
 

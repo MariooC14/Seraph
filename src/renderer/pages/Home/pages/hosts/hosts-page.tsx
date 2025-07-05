@@ -4,17 +4,21 @@ import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import SelectedHostConfigDrawer from './selected-host-config-drawer';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
-import { selectHostConfigs } from '@/features/config/configSlice';
+import { getHostConfigs, selectHosts } from '@/features/hosts/hosts-slice';
 
 export default function HostsPage() {
-  const hostConfigs = useAppSelector(selectHostConfigs);
+  const hostConfigs = useAppSelector(selectHosts);
   const [selectedHostConfig, setSelectedHostConfig] = useState<HostConfig>();
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getHostConfigs());
+  }, []);
 
   // TODO: Implement add host logic
   function handleAddNewHost() {}
