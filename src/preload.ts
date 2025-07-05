@@ -42,6 +42,6 @@ contextBridge.exposeInMainWorld('app', {
 contextBridge.exposeInMainWorld('hosts', {
   getAll: () => ipcRenderer.invoke('hosts:getAll'),
   get: (id: string) => ipcRenderer.invoke('hosts:getById', id),
-  add: (host: HostConfig) => ipcRenderer.invoke('hosts:add', host),
+  add: (host: Omit<HostConfig, 'id'>) => ipcRenderer.invoke('hosts:add', host),
   remove: (id: string) => ipcRenderer.invoke('hosts:remove', id)
 });

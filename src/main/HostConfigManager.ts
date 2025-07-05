@@ -1,25 +1,8 @@
 import { HostConfig } from '@/dts/host-config';
 import { ipcMain } from 'electron';
 import log from 'electron-log/main';
-
-const devContainersHostConfig: HostConfig[] = [
-  {
-    id: '2',
-    label: 'Dev Container 1',
-    host: 'localhost',
-    port: 2222,
-    username: 'testuser',
-    password: 'testpass'
-  },
-  {
-    id: '3',
-    label: 'Dev Container 2',
-    host: 'localhost',
-    port: 2223,
-    username: 'testuser',
-    password: 'testpass'
-  }
-];
+import { StorageManager } from './StorageManager';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * This class manages host configurations for terminal sessions.
@@ -29,13 +12,10 @@ const devContainersHostConfig: HostConfig[] = [
 export class HostConfigManager {
   static _instance: HostConfigManager;
   private hostConfigs: Map<string, HostConfig> = new Map();
+  private hostsLoaded = false;
 
   constructor() {
     log.info('[HostConfigManager] - Initializing HostConfigManager');
-    // Initialize with some default host configurations
-    devContainersHostConfig.forEach(config => {
-      this.addHostConfig(config);
-    });
     this.addIpcListeners();
   }
 
@@ -52,23 +32,48 @@ export class HostConfigManager {
   }
 
   public getHostConfigs(): HostConfig[] {
+    if (!this.hostsLoaded) {
+      this.loadHostsFromStorage();
+    }
     return Array.from(this.hostConfigs.values());
   }
 
   public getHostConfig(id: string): HostConfig | undefined {
+    if (!this.hostsLoaded) {
+      this.loadHostsFromStorage();
+    }
     return this.hostConfigs.get(id);
   }
 
-  public addHostConfig(hostConfig: HostConfig): void {
-    if (!hostConfig.id) {
-      throw new Error('HostConfig must have an id');
-    }
+  public addHostConfig(hostConfig: Omit<HostConfig, 'id'>): HostConfig {
+    const newHostId = uuidv4();
+    const newHostConfig: HostConfig = {
+      ...hostConfig,
+      id: newHostId
+    };
     // We can also add validation here to ensure the hostConfig is valid
-    this.hostConfigs.set(hostConfig.id, hostConfig);
+    this.hostConfigs.set(newHostId, newHostConfig);
+    log.info(`[HostConfigManager] - Added new host config with id: ${newHostId}`);
+    const saved = StorageManager.instance.saveHosts(this.getHostConfigs());
+    if (saved) {
+      return newHostConfig;
+    } else {
+      throw new Error('Failed to save host configuration');
+    }
   }
 
   public removeHostConfig(id: string): void {
     this.hostConfigs.delete(id);
+    log.info(`[HostConfigManager] - Removed host config with id: ${id}`);
+    StorageManager.instance.saveHosts(this.getHostConfigs());
+  }
+
+  private loadHostsFromStorage() {
+    log.info('[HostConfigManager] - Loading host configurations');
+    StorageManager.instance.getHosts().forEach(hostConfig => {
+      this.hostConfigs.set(hostConfig.id, hostConfig);
+    });
+    this.hostsLoaded = true;
   }
 
   private addIpcListeners() {
@@ -79,8 +84,13 @@ export class HostConfigManager {
       return { success: true, data: this.getHostConfig(id) };
     });
     ipcMain.handle('hosts:add', (_event, hostConfig: HostConfig) => {
-      this.addHostConfig(hostConfig);
-      return { success: true, data: hostConfig };
+      try {
+        const newHostConfig = this.addHostConfig(hostConfig);
+        return { success: true, data: newHostConfig };
+      } catch (error) {
+        log.error('[HostConfigManager] - Error adding host config:', error);
+        return { success: false, error: error.message };
+      }
     });
     ipcMain.handle('hosts:remove', (_event, id: string) => {
       this.removeHostConfig(id);
