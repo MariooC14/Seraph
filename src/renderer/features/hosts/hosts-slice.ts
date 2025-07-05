@@ -1,6 +1,7 @@
+import { createAppSlice } from '@/app/createAppSlice';
 import { AppThunk } from '@/app/store';
 import { HostConfig } from '@dts/host-config';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { PayloadAction } from '@reduxjs/toolkit';
 
 export interface HostsState {
   hosts: HostConfig[];
@@ -10,7 +11,7 @@ const initialState: HostsState = {
   hosts: []
 };
 
-const hostsSlice = createSlice({
+const hostsSlice = createAppSlice({
   name: 'hosts',
   initialState,
   reducers: {
