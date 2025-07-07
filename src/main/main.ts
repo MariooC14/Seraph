@@ -1,10 +1,11 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import started from 'electron-squirrel-startup';
 import { TerminalManager } from './TerminalManager';
 import { StorageManager } from './StorageManager';
 import { WindowManager } from './windowManager';
 import log from 'electron-log/main';
 import { HostConfigManager } from './HostConfigManager';
+import { WindowController } from './controllers/window-controller';
 
 let terminalManager: TerminalManager;
 
@@ -24,17 +25,7 @@ app.whenReady().then(() => {
   WindowManager.instance.createMainWindow();
   terminalManager.init();
 
-  ipcMain.handle('app:exit', () => {
-    if (process.platform !== 'darwin') {
-      app.quit();
-    } else {
-      WindowManager.instance.closeMainWindow();
-    }
-  });
-  ipcMain.handle('app:minimize', () => WindowManager.instance.mainWindow.minimize());
-  ipcMain.handle('app:maximize', () => WindowManager.instance.mainWindow.maximize());
-  ipcMain.handle('app:unmaximize', () => WindowManager.instance.mainWindow.unmaximize());
-  ipcMain.handle('app:isMaximized', () => WindowManager.instance.mainWindow.isMaximized());
+  new WindowController().startListening();
 });
 
 app.on('before-quit', () => {
