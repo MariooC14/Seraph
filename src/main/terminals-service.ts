@@ -1,8 +1,3 @@
-/**
- * Handles user input from the browser's xterm instance.
- * Only handles one terminal instance
- */
-
 import { BrowserWindow } from 'electron';
 import log from 'electron-log/main';
 import { v4 as uuidv4 } from 'uuid';

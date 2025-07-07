@@ -5,7 +5,7 @@
  */
 
 import { BrowserWindow } from 'electron';
-import { TerminalsService } from './TerminalManager';
+import { TerminalsService } from './terminals-service';
 
 export abstract class TerminalSession {
   public readonly sessionId: string;

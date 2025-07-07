@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import started from 'electron-squirrel-startup';
-import { TerminalsService } from './TerminalManager';
+import { TerminalsService } from './terminals-service';
 import { StorageManager } from './StorageManager';
 import { WindowManager } from './windowManager';
 import log from 'electron-log/main';

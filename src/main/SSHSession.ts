@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import { Config, NodeSSH } from 'node-ssh';
-import { TerminalsService } from './TerminalManager';
+import { TerminalsService } from './terminals-service';
 import log from 'electron-log/main';
 import { ClientChannel, PseudoTtyOptions } from 'ssh2';
 import { TerminalSession } from './TerminalSession';

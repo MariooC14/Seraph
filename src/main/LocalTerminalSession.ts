@@ -2,7 +2,7 @@ import * as pty from 'node-pty';
 import log from 'electron-log/main';
 import { BrowserWindow, ipcMain } from 'electron';
 import { TerminalSessionError } from './TerminalSessionException';
-import { TerminalsService } from './TerminalManager';
+import { TerminalsService } from './terminals-service';
 import { TerminalSession } from './TerminalSession';
 import { isWindows } from './helpers';
 
