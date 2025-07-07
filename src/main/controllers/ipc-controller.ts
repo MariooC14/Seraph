@@ -13,7 +13,7 @@ export abstract class IpcController {
 
   public startListening() {
     this.handlers.forEach((handler, channel) => {
-      ipcMain.handle(`${this.baseChannel}:${channel}`, handler);
+      ipcMain.handle(`${this.baseChannel}:${channel}`, (_event, ...args) => handler(...args));
     });
     return this;
   }

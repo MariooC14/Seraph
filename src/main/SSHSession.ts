@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import { Config, NodeSSH } from 'node-ssh';
-import { TerminalManager } from './TerminalManager';
+import { TerminalsService } from './TerminalManager';
 import log from 'electron-log/main';
 import { ClientChannel, PseudoTtyOptions } from 'ssh2';
 import { TerminalSession } from './TerminalSession';
@@ -16,7 +16,7 @@ export class SSHSession extends TerminalSession {
   private clientSSHChannel?: ClientChannel;
 
   constructor(
-    terminalManager: TerminalManager,
+    terminalManager: TerminalsService,
     sessionId: string,
     window: BrowserWindow,
     private hostConfig: Config

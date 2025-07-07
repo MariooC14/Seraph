@@ -2,7 +2,7 @@ import * as pty from 'node-pty';
 import log from 'electron-log/main';
 import { BrowserWindow, ipcMain } from 'electron';
 import { TerminalSessionError } from './TerminalSessionException';
-import { TerminalManager } from './TerminalManager';
+import { TerminalsService } from './TerminalManager';
 import { TerminalSession } from './TerminalSession';
 import { isWindows } from './helpers';
 
@@ -15,7 +15,7 @@ export class LocalTerminalSession extends TerminalSession {
   private shellPath: string;
 
   public constructor(
-    manager: TerminalManager,
+    manager: TerminalsService,
     sessionId: string,
     window?: BrowserWindow,
     shellPath?: string
