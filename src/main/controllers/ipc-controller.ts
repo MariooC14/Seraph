@@ -9,9 +9,9 @@ import { ipcMain } from 'electron';
 export abstract class IpcController {
   private readonly handlers: Map<string, (...args: any[]) => any> = new Map();
 
-  constructor(private readonly baseChannel: string) {}
+  constructor(protected baseChannel: string) {}
 
-  public startListening() {
+  startListening() {
     this.handlers.forEach((handler, channel) => {
       ipcMain.handle(`${this.baseChannel}:${channel}`, (_event, ...args) => handler(...args));
     });
@@ -20,5 +20,12 @@ export abstract class IpcController {
 
   protected addHandler<T>(channel: string, handler: (...args: any[]) => T): void {
     this.handlers.set(channel, handler);
+  }
+
+  stopListening(): void {
+    this.handlers.forEach((_, channel) => {
+      ipcMain.removeHandler(`${this.baseChannel}:${channel}`);
+    });
+    this.handlers.clear();
   }
 }

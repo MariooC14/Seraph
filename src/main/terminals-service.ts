@@ -8,6 +8,7 @@ import { SSHSession } from './SSHSession';
 import { HostConfigManager } from './HostConfigManager';
 import { StorageManager } from './StorageManager';
 import { WindowManager } from './windowManager';
+import { LocalSessionController } from './controllers/local-session-controller';
 
 export class TerminalsService {
   shell: string = this.getShell();
@@ -46,14 +47,10 @@ export class TerminalsService {
 
   createLocalSession(shellPath: string) {
     const newSessionId = uuidv4();
-    const newLocalTerminalSession = new LocalTerminalSession(
-      this,
-      newSessionId,
-      this._window,
-      shellPath
-    );
-    newLocalTerminalSession.init();
-    this.sessions.set(newLocalTerminalSession.sessionId, newLocalTerminalSession);
+    const newSesh = new LocalTerminalSession(this, newSessionId, shellPath);
+    const controller = new LocalSessionController(this.window, newSesh).startListening();
+    newSesh.setController(controller).init();
+    this.sessions.set(newSesh.sessionId, newSesh);
     return newSessionId;
   }
 
