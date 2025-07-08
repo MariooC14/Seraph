@@ -11,8 +11,8 @@ import {
 import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
 import { CirclePlus, Terminal } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { selectHostConfigs } from '../config/configSlice';
 import { HostConfig } from '@dts/host-config';
+import { selectHosts } from '../hosts/hosts-slice';
 
 type HostSelectionDialogProps = {
   open: boolean;
@@ -21,7 +21,7 @@ type HostSelectionDialogProps = {
 
 export default function HostSelectionDialog({ open, handleOpenChange }: HostSelectionDialogProps) {
   const dispatch = useAppDispatch();
-  const hostConfigs = useAppSelector(selectHostConfigs);
+  const hostConfigs = useAppSelector(selectHosts);
   const [value, setValue] = useState('');
 
   useEffect(() => {
