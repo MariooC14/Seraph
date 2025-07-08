@@ -5,7 +5,7 @@
  */
 
 import { BrowserWindow } from 'electron';
-import { TerminalManager } from './TerminalManager';
+import { TerminalsService } from './terminals-service';
 
 export abstract class TerminalSession {
   public readonly sessionId: string;
@@ -19,9 +19,9 @@ export abstract class TerminalSession {
    */
   protected channel: string;
   // Could use singleton pattern here
-  protected terminalManager: TerminalManager;
+  protected terminalManager: TerminalsService;
 
-  public constructor(terminalManager: TerminalManager, sessionId: string, window?: BrowserWindow) {
+  public constructor(terminalManager: TerminalsService, sessionId: string, window?: BrowserWindow) {
     this.terminalManager = terminalManager;
     this.sessionId = sessionId;
     this.window = window;
