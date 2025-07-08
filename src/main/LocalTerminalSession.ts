@@ -60,7 +60,7 @@ export class LocalTerminalSession extends TerminalSession {
 
   public terminate() {
     this.controller.stopListening();
-    this.controller = null;
+    this.controller = undefined;
     this.terminal.kill();
     this.terminalsService.removeSession(this.sessionId);
   }

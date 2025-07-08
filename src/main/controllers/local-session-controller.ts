@@ -10,7 +10,7 @@ export class LocalSessionController extends IpcController {
     super(`terminalSession-${localTerminalSession?.sessionId}`);
     this.addHandler('clientInput', (input: string) => this.handleClientInput(input));
     this.addHandler('resize', (cols: number, rows: number) => this.handleResize(cols, rows));
-    this.addHandler('kill', () => this.localTerminalSession.terminate());
+    this.addHandler('kill', () => this.handleKill());
   }
 
   handleClientInput(input: string) {
