@@ -6,6 +6,10 @@ export default function WindowControlBar() {
   const [maximized, setMaximized] = useState(false);
 
   useEffect(() => {
+    // Check if the window is maximized on initial render
+    window.app.isMaximized().then((isMaximized: boolean) => {
+      setMaximized(isMaximized);
+    });
     // User can maximize by e.g. double clicking the title bar
     window.app.onMaximized((maximized: boolean) => setMaximized(maximized));
   }, []);

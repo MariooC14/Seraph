@@ -17,8 +17,12 @@ const commonWindowShells = [
   }
 ];
 
-export async function getAvailableShells(platform: NodeJS.Platform) {
-  if (platform === 'win32') {
+export function isWindows() {
+  return process.platform === 'win32';
+}
+
+export async function getAvailableShells() {
+  if (isWindows()) {
     return await getAvailableShellsForWindows();
   } else {
     return await getAvailableShellsForUnix();
@@ -72,4 +76,27 @@ async function getAvailableShellsForWindows() {
     }
   }
   return availableShells;
+}
+
+// Decorator function that wraps the return value of a method into an IPCResponse
+// Similar in spirit to spring rest controllers but for IPC
+export function IPCResponse<T>() {
+  return function (_target: unknown, _propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = async function (...args: unknown[]): IPCPromise<T> {
+      try {
+        const result = await originalMethod.apply(this, args);
+        return { success: true, data: result };
+      } catch (error) {
+        log.error('IPC Response Error:', error);
+        return {
+          success: false,
+          error: error?.message || 'Unknown error'
+        };
+      }
+    };
+
+    return descriptor;
+  };
 }

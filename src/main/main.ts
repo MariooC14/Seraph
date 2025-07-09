@@ -1,95 +1,47 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
-import {
-  installExtension,
-  REDUX_DEVTOOLS,
-  REACT_DEVELOPER_TOOLS
-} from 'electron-devtools-installer';
-import path from 'node:path';
+import { app, BrowserWindow } from 'electron';
 import started from 'electron-squirrel-startup';
-import { TerminalManager } from './TerminalManager';
-import { WindowManager } from './windowManager';
+import { TerminalsService } from './service/terminals-service';
+import { StorageManager } from './StorageManager';
+import { WindowService } from './service/window-service';
 import log from 'electron-log/main';
-import { HostConfigManager } from './HostConfigManager';
+import { HostsService } from './service/hosts-service';
+import { WindowController } from './controllers/window-controller';
+import { TerminalsController } from './controllers/terminals-controller';
+import { HostsController } from './controllers/hosts-controller';
 
-let terminalManager: TerminalManager;
-let windowManager: WindowManager;
-let mainWindow: BrowserWindow;
+let terminalsService: TerminalsService;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
 
-const createWindow = () => {
-  log.info('Creating main window');
-  mainWindow = new BrowserWindow({
-    minWidth: 1500,
-    minHeight: 600,
-    titleBarStyle: 'hidden',
-    trafficLightPosition: { x: 10, y: 12 },
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  });
-
-  // and load the index.html of the app.
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
-  }
-
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.webContents.openDevTools();
-    installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
-      .then(([redux, react]) => console.log(`Added Extensions:  ${redux.name}, ${react.name}`))
-      .catch(err => console.log('An error occurred: ', err));
-  } else {
-    mainWindow.setMenu(null);
-  }
-};
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  createWindow();
-  terminalManager = new TerminalManager(mainWindow);
-  windowManager = new WindowManager(mainWindow);
+  const windowController = new WindowController();
+  WindowService.init(windowController);
+  HostsService.init();
+  StorageManager.init();
+  WindowService.instance.createMainWindow();
+  terminalsService = new TerminalsService();
 
-  HostConfigManager.init();
-  terminalManager.init();
-  windowManager.startListening();
-
-  ipcMain.handle('app:exit', () => {
-    if (process.platform !== 'darwin') {
-      app.quit();
-    } else {
-      mainWindow.close();
-    }
-  });
-  ipcMain.handle('app:minimize', () => mainWindow.minimize());
-  ipcMain.handle('app:maximize', () => mainWindow.maximize());
-  ipcMain.handle('app:unmaximize', () => mainWindow.unmaximize());
-
-  mainWindow.on('maximize', () => {
-    mainWindow.webContents.send('app:maximized', true);
-  });
-  mainWindow.on('unmaximize', () => {
-    mainWindow.webContents.send('app:maximized', false);
-  });
+  new HostsController(HostsService.instance).startListening();
+  new TerminalsController(terminalsService).startListening();
+  windowController.startListening();
 });
 
 app.on('before-quit', () => {
   log.info('[Main] - App is about to quit');
-  terminalManager.terminateAllSessions();
+  terminalsService.terminateAllSessions();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  terminalManager.terminateAllSessions();
+  terminalsService.terminateAllSessions();
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -99,11 +51,7 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-    terminalManager.window = mainWindow;
-    windowManager.mainWindow = mainWindow;
+    WindowService.instance.createMainWindow();
+    terminalsService.window = WindowService.instance.mainWindow;
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.

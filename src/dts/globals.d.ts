@@ -37,6 +37,7 @@ declare global {
       unmaximize: () => void;
       minimize: () => void;
       onMaximized: (callback: (maximized: boolean) => void) => void;
+      isMaximized: () => Promise<boolean>;
       onNativeThemeChanged: (callback: (theme: Theme) => void) => void;
       isMacOS: () => boolean;
     };
@@ -44,7 +45,7 @@ declare global {
     hosts: {
       getAll: () => IPCPromise<HostConfig[]>;
       get: (id: string) => IPCPromise<HostConfig | undefined>;
-      add: (host: HostConfig) => IPCPromise<HostConfig>;
+      add: (host: Omit<HostConfig, 'id'>) => IPCPromise<HostConfig>;
       remove: (id: string) => IPCPromise<void>;
     };
   }

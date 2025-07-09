@@ -3,21 +3,27 @@ import HostCard from './host-card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { useState } from 'react';
+
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { HostConfigDrawer } from './host-config-drawer';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
-import { fetchHostConfigs, selectHostConfigs } from '@/features/config/configSlice';
+import { getHostConfigs, selectHosts } from '@/features/hosts/hosts-slice';
 import { type HostSubmissionData } from '@/lib/host-validation';
 
 export default function HostsPage() {
-  const hostConfigs = useAppSelector(selectHostConfigs);
+  const hostConfigs = useAppSelector(selectHosts);
   const [hostDrawerOpen, setHostDrawerOpen] = useState(false);
   const [hostDrawerMode, setHostDrawerMode] = useState<'add' | 'edit'>('add');
   const [selectedHostConfig, setSelectedHostConfig] = useState<HostConfig>();
   const dispatch = useAppDispatch();
 
+  useEffect(() => {
+    dispatch(getHostConfigs());
+  }, []);
+
+  // TODO: Implement add host logic
   function handleAddNewHost() {
     setHostDrawerMode('add');
     setSelectedHostConfig(undefined);
@@ -52,14 +58,9 @@ export default function HostsPage() {
     }
   }
 
-  async function handleDeleteHost(hostConfig: HostConfig) {
-    try {
-      await window.hosts.remove(hostConfig.id);
-      toast.success(`Deleted host ${hostConfig.label}`);
-      dispatch(fetchHostConfigs());
-    } catch (err) {
-      toast.error(`Failed to delete host: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    }
+  // TODO: Implement delete host logic
+  function handleDeleteHost(hostConfig: HostConfig) {
+    toast.success(`Deleted host ${hostConfig.label}`);
   }
 
   // TODO: Implement connect logic
@@ -75,7 +76,7 @@ export default function HostsPage() {
 
   return (
     <>
-      <div className="flex justify-between items-center sticky top-0 z-10 bg-background pb-2">
+      <div className="flex justify-between items-center top-0 z-10 pb-2">
         <h1 className="text-3xl font-bold">Hosts</h1>
         <Tooltip delayDuration={500}>
           <TooltipTrigger asChild>

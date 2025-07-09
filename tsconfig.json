@@ -14,7 +14,8 @@
     "outDir": "dist",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "experimentalDecorators": true
   },
   "references": [{ "path": "./src/renderer/tsconfig.renderer.json" }]
 }

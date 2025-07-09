@@ -53,6 +53,9 @@ export function ThemeProvider({
   }, [theme]);
 
   useEffect(() => {
+    if (window.app.isMacOS()) {
+      document.body.classList.add('macos-background');
+    }
     // Handle case where user changes system theme from OS settings
     window.app.onNativeThemeChanged((newTheme: Theme) => {
       localStorage.setItem(storageKey, newTheme);
