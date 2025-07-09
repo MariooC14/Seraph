@@ -3,7 +3,7 @@ import { app } from 'electron';
 import fs from 'node:fs';
 import path from 'path';
 import { isWindows } from './helpers';
-import { WindowManager } from './windowManager';
+import { WindowManager } from './service/window-service';
 import { HostConfig } from '@/dts/host-config';
 
 const defaultUserConfig: UserConfig = {

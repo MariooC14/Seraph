@@ -1,8 +1,8 @@
 import { app, BrowserWindow } from 'electron';
 import started from 'electron-squirrel-startup';
-import { TerminalsService } from './terminals-service';
+import { TerminalsService } from './service/terminals-service';
 import { StorageManager } from './StorageManager';
-import { WindowManager } from './windowManager';
+import { WindowManager } from './service/window-service';
 import log from 'electron-log/main';
 import { HostConfigManager } from './HostConfigManager';
 import { WindowController } from './controllers/window-controller';
@@ -19,14 +19,15 @@ if (started) {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  WindowManager.init();
+  const windowController = new WindowController();
+  WindowManager.init(windowController);
   HostConfigManager.init();
   StorageManager.init();
   WindowManager.instance.createMainWindow();
   terminalsService = new TerminalsService();
 
   new TerminalsController(terminalsService).startListening();
-  new WindowController().startListening();
+  windowController.startListening();
 });
 
 app.on('before-quit', () => {

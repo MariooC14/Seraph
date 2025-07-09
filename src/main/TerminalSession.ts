@@ -4,7 +4,7 @@
  * connecting, disconnecting, and handling data transfer between the client and the server, be it local or remote.
  */
 
-import { TerminalsService } from './terminals-service';
+import { TerminalsService } from './service/terminals-service';
 
 export abstract class TerminalSession {
   public constructor(
