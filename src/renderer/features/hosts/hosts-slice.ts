@@ -44,11 +44,11 @@ export function getHostConfigs(): AppThunk {
   };
 }
 
-export function addHostConfig(host: HostConfig): AppThunk {
+export function addHostConfig(host: Omit<HostConfig, 'id'>): AppThunk {
   return async dispatch => {
     const newHostResponse = await window.hosts.add(host);
     if (newHostResponse.success === true) {
-      dispatch(addHost(host));
+      dispatch(addHost(newHostResponse.data));
     } else {
       console.error('Failed to add host config:', newHostResponse.error);
     }

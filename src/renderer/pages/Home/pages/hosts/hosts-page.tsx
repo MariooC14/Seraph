@@ -5,11 +5,15 @@ import { PlusCircle } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 import { HostConfigDrawer } from './host-config-drawer';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
-import { getHostConfigs, selectHosts } from '@/features/hosts/hosts-slice';
+import {
+  addHostConfig,
+  getHostConfigs,
+  removeHostConfig,
+  selectHosts
+} from '@/features/hosts/hosts-slice';
 import { type HostSubmissionData } from '@/lib/host-validation';
 
 export default function HostsPage() {
@@ -23,7 +27,6 @@ export default function HostsPage() {
     dispatch(getHostConfigs());
   }, []);
 
-  // TODO: Implement add host logic
   function handleAddNewHost() {
     setHostDrawerMode('add');
     setSelectedHostConfig(undefined);
@@ -31,36 +34,17 @@ export default function HostsPage() {
   }
 
   async function handleAddHost(newHost: HostSubmissionData) {
-    const newHostConfig: HostConfig = {
-      ...newHost,
-      // TODO: Generate ID in the backend
-      id: crypto.randomUUID()
-    };
-
-    try {
-      await window.hosts.add(newHostConfig);
-      toast.success(`Added host ${newHostConfig.label}`);
-      dispatch(fetchHostConfigs());
-    } catch (err) {
-      toast.error(`Failed to add host: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    }
+    dispatch(addHostConfig(newHost));
   }
 
   async function handleUpdateHost(hostConfig: HostConfig) {
-    try {
-      // TODO: Implement proper update method in the backend
-      await window.hosts.remove(hostConfig.id);
-      await window.hosts.add(hostConfig);
-      toast.success(`Updated host ${hostConfig.label}`);
-      dispatch(fetchHostConfigs());
-    } catch (err) {
-      toast.error(`Failed to update host: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    }
+    // TODO: Implement proper update method in the backend
+    dispatch(removeHostConfig(hostConfig.id));
+    dispatch(addHostConfig(hostConfig));
   }
 
-  // TODO: Implement delete host logic
   function handleDeleteHost(hostConfig: HostConfig) {
-    toast.success(`Deleted host ${hostConfig.label}`);
+    dispatch(removeHostConfig(hostConfig.id));
   }
 
   // TODO: Implement connect logic
