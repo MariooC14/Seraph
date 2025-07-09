@@ -5,7 +5,7 @@ import { getAvailableShells, isWindows } from '../helpers';
 import { LocalTerminalSession } from '../LocalTerminalSession';
 import { TerminalSession } from '../TerminalSession';
 import { SSHSession } from '../SSHSession';
-import { HostConfigManager } from '../HostConfigManager';
+import { HostsService } from './hosts-service';
 import { StorageManager } from '../StorageManager';
 import { WindowService } from './window-service';
 import { LocalSessionController } from '../controllers/local-session-controller';
@@ -58,7 +58,7 @@ export class TerminalsService {
    * @returns the session id of the new session
    */
   async createSSHSession(hostId: string) {
-    const hostConfig = HostConfigManager.instance.getHostConfig(hostId);
+    const hostConfig = HostsService.instance.getHostById(hostId);
     if (!hostConfig) {
       log.error(`[TerminalManager] - No host config found for id: ${hostId}`);
       throw new Error(`No host config found for id: ${hostId}`);
