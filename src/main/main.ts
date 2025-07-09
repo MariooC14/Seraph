@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron';
 import started from 'electron-squirrel-startup';
 import { TerminalsService } from './service/terminals-service';
 import { StorageManager } from './StorageManager';
-import { WindowManager } from './service/window-service';
+import { WindowService } from './service/window-service';
 import log from 'electron-log/main';
 import { HostConfigManager } from './HostConfigManager';
 import { WindowController } from './controllers/window-controller';
@@ -20,10 +20,10 @@ if (started) {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   const windowController = new WindowController();
-  WindowManager.init(windowController);
+  WindowService.init(windowController);
   HostConfigManager.init();
   StorageManager.init();
-  WindowManager.instance.createMainWindow();
+  WindowService.instance.createMainWindow();
   terminalsService = new TerminalsService();
 
   new TerminalsController(terminalsService).startListening();
@@ -49,7 +49,7 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    WindowManager.instance.createMainWindow();
-    terminalsService.window = WindowManager.instance.mainWindow;
+    WindowService.instance.createMainWindow();
+    terminalsService.window = WindowService.instance.mainWindow;
   }
 });

@@ -7,7 +7,7 @@ import { TerminalSession } from '../TerminalSession';
 import { SSHSession } from '../SSHSession';
 import { HostConfigManager } from '../HostConfigManager';
 import { StorageManager } from '../StorageManager';
-import { WindowManager } from './window-service';
+import { WindowService } from './window-service';
 import { LocalSessionController } from '../controllers/local-session-controller';
 
 export class TerminalsService {
@@ -16,7 +16,7 @@ export class TerminalsService {
   sessions: Map<string, TerminalSession> = new Map();
 
   public constructor() {
-    this._window = WindowManager.instance.mainWindow;
+    this._window = WindowService.instance.mainWindow;
   }
 
   public getAvailableShells() {

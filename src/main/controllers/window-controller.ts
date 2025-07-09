@@ -1,5 +1,5 @@
 import { app, BrowserWindow } from 'electron';
-import { WindowManager } from '../service/window-service';
+import { WindowService } from '../service/window-service';
 import { IpcController } from './ipc-controller';
 
 export class WindowController extends IpcController {
@@ -15,19 +15,19 @@ export class WindowController extends IpcController {
   }
 
   private minimize() {
-    WindowManager.instance.mainWindow.minimize();
+    WindowService.instance.mainWindow.minimize();
   }
 
   private maximize() {
-    WindowManager.instance.mainWindow.maximize();
+    WindowService.instance.mainWindow.maximize();
   }
 
   private unmaximize() {
-    WindowManager.instance.mainWindow.unmaximize();
+    WindowService.instance.mainWindow.unmaximize();
   }
 
   private isMaximized() {
-    return WindowManager.instance.mainWindow.isMaximized();
+    return WindowService.instance.mainWindow.isMaximized();
   }
 
   sendMaximizedSignal(isMaximized: boolean) {
@@ -42,7 +42,7 @@ export class WindowController extends IpcController {
     if (process.platform !== 'darwin') {
       app.quit();
     } else {
-      WindowManager.instance.closeMainWindow();
+      WindowService.instance.closeMainWindow();
     }
   }
 

@@ -8,8 +8,8 @@ import path from 'node:path';
 import { StorageManager } from '../StorageManager';
 import { WindowController } from '../controllers/window-controller';
 
-export class WindowManager {
-  private static _instance?: WindowManager;
+export class WindowService {
+  private static _instance?: WindowService;
   private _mainWindow: BrowserWindow;
   private controller: WindowController;
 
@@ -18,11 +18,14 @@ export class WindowManager {
   }
 
   static init(controller: WindowController) {
-    this._instance = new WindowManager(controller);
+    this._instance = new WindowService(controller);
     this._instance.startListening();
   }
 
-  public static get instance(): WindowManager {
+  public static get instance(): WindowService {
+    if (!this._instance) {
+      throw new Error('[window-service] - WindowService has not been init');
+    }
     return this._instance;
   }
 
