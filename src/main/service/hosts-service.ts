@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 /**
  * This class manages host configurations for terminal sessions
  * that can be used to establish connections to remote hosts.
+ * Hosts are loaded lazily to avoid unnecessary overhead at application startup.
  */
 export class HostsService {
   static _instance: HostsService;
