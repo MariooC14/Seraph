@@ -3,7 +3,7 @@ import { app } from 'electron';
 import fs from 'node:fs';
 import path from 'path';
 import { isWindows } from './helpers';
-import { WindowManager } from './windowManager';
+import { WindowService } from './service/window-service';
 import { HostConfig } from '@/dts/host-config';
 
 const defaultUserConfig: UserConfig = {
@@ -67,7 +67,7 @@ export class StorageManager {
     log.info('Saving main window configuration');
     this.saveUserConfig({
       ...this.getUserConfig(),
-      windowConfig: WindowManager.instance.getMainWindowConfig()
+      windowConfig: WindowService.instance.getMainWindowConfig()
     });
   }
 

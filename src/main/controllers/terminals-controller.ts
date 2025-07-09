@@ -1,5 +1,5 @@
 import { IPCResponse } from '../helpers';
-import { TerminalsService } from '../terminals-service';
+import { TerminalsService } from '../service/terminals-service';
 import { IpcController } from './ipc-controller';
 
 export class TerminalsController extends IpcController {

@@ -5,29 +5,31 @@ import {
   REACT_DEVELOPER_TOOLS
 } from 'electron-devtools-installer';
 import path from 'node:path';
-import log from 'electron-log/main';
-import { StorageManager } from './StorageManager';
+import { StorageManager } from '../StorageManager';
+import { WindowController } from '../controllers/window-controller';
 
-export class WindowManager {
-  private static _instance?: WindowManager;
+export class WindowService {
+  private static _instance?: WindowService;
   private _mainWindow: BrowserWindow;
+  private controller: WindowController;
 
-  constructor() {}
+  constructor(controller: WindowController) {
+    this.controller = controller;
+  }
 
-  static init() {
-    this._instance = new WindowManager();
+  static init(controller: WindowController) {
+    this._instance = new WindowService(controller);
     this._instance.startListening();
   }
 
-  public static get instance(): WindowManager {
+  public static get instance(): WindowService {
     if (!this._instance) {
-      this.init();
+      throw new Error('[window-service] - WindowService has not been init');
     }
     return this._instance;
   }
 
   public createMainWindow() {
-    log.info('Creating main window');
     const { windowConfig } = StorageManager.instance.getUserConfig();
     this._mainWindow = new BrowserWindow({
       ...windowConfig,
@@ -40,19 +42,20 @@ export class WindowManager {
         preload: path.join(__dirname, 'preload.js')
       }
     });
+    this.controller.setWindow(this._mainWindow);
 
     this._mainWindow.on('maximize', () => {
-      this._mainWindow.webContents.send('app:maximized', true);
+      this.controller.sendMaximizedSignal(true);
     });
     this._mainWindow.on('unmaximize', () => {
-      this._mainWindow.webContents.send('app:maximized', false);
+      this.controller.sendMaximizedSignal(false);
     });
     this._mainWindow.on('close', () => {
+      this.controller.setWindow(undefined);
       StorageManager.instance.saveMainWindowConfig();
     });
 
     if (windowConfig.maximized) {
-      log.info('Main window is maximized');
       this._mainWindow.maximize();
     }
 
@@ -77,14 +80,12 @@ export class WindowManager {
 
   startListening() {
     electron.nativeTheme.on('updated', () => {
-      log.info('windowManager: nativeTheme updated');
       const theme = electron.nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
-      this._mainWindow.webContents.send('app:nativeThemeChanged', theme);
+      this.controller.sendThemeChangedSignal(theme);
     });
   }
 
   public closeMainWindow() {
-    log.info('Closing main window');
     this._mainWindow.close();
   }
 

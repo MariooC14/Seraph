@@ -1,14 +1,14 @@
 import { BrowserWindow } from 'electron';
 import log from 'electron-log/main';
 import { v4 as uuidv4 } from 'uuid';
-import { getAvailableShells, isWindows } from './helpers';
-import { LocalTerminalSession } from './LocalTerminalSession';
-import { TerminalSession } from './TerminalSession';
-import { SSHSession } from './SSHSession';
-import { HostConfigManager } from './HostConfigManager';
-import { StorageManager } from './StorageManager';
-import { WindowManager } from './windowManager';
-import { LocalSessionController } from './controllers/local-session-controller';
+import { getAvailableShells, isWindows } from '../helpers';
+import { LocalTerminalSession } from '../LocalTerminalSession';
+import { TerminalSession } from '../TerminalSession';
+import { SSHSession } from '../SSHSession';
+import { HostConfigManager } from '../HostConfigManager';
+import { StorageManager } from '../StorageManager';
+import { WindowService } from './window-service';
+import { LocalSessionController } from '../controllers/local-session-controller';
 
 export class TerminalsService {
   shell: string = this.getShell();
@@ -16,7 +16,7 @@ export class TerminalsService {
   sessions: Map<string, TerminalSession> = new Map();
 
   public constructor() {
-    this._window = WindowManager.instance.mainWindow;
+    this._window = WindowService.instance.mainWindow;
   }
 
   public getAvailableShells() {
