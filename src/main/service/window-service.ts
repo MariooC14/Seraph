@@ -48,6 +48,7 @@ export class WindowManager {
       this.controller.sendMaximizedSignal(false);
     });
     this._mainWindow.on('close', () => {
+      this.controller.setWindow(undefined);
       StorageManager.instance.saveMainWindowConfig();
     });
 
