@@ -142,7 +142,7 @@ export function HostConfigDrawer({
 
           <div className="flex flex-col gap-1">
             <Label htmlFor="label">Label</Label>
-            <Input id="label" {...register('label')} placeholder="Enter host label" />
+            <Input id="label" {...register('label')} placeholder="Label" />
             {errors.label && <span className="text-red-500 text-sm">{errors.label.message}</span>}
           </div>
 
