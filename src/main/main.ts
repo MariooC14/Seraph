@@ -4,9 +4,10 @@ import { TerminalsService } from './service/terminals-service';
 import { StorageManager } from './StorageManager';
 import { WindowService } from './service/window-service';
 import log from 'electron-log/main';
-import { HostConfigManager } from './HostConfigManager';
+import { HostsService } from './service/hosts-service';
 import { WindowController } from './controllers/window-controller';
 import { TerminalsController } from './controllers/terminals-controller';
+import { HostsController } from './controllers/hosts-controller';
 
 let terminalsService: TerminalsService;
 
@@ -21,11 +22,12 @@ if (started) {
 app.whenReady().then(() => {
   const windowController = new WindowController();
   WindowService.init(windowController);
-  HostConfigManager.init();
+  HostsService.init();
   StorageManager.init();
   WindowService.instance.createMainWindow();
   terminalsService = new TerminalsService();
 
+  new HostsController(HostsService.instance).startListening();
   new TerminalsController(terminalsService).startListening();
   windowController.startListening();
 });
