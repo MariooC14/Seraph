@@ -5,10 +5,12 @@ import { PayloadAction } from '@reduxjs/toolkit';
 
 export interface HostsState {
   hosts: HostConfig[];
+  fetching: boolean;
 }
 
 const initialState: HostsState = {
-  hosts: []
+  hosts: [],
+  fetching: true
 };
 
 const hostsSlice = createAppSlice({
@@ -26,21 +28,27 @@ const hostsSlice = createAppSlice({
     },
     removeHost(state, action: PayloadAction<string>) {
       state.hosts = state.hosts.filter(host => host.id !== action.payload);
+    },
+    setFetching(state, action: PayloadAction<boolean>) {
+      state.fetching = action.payload;
     }
   },
   selectors: {
-    selectHosts: state => state.hosts
+    selectHosts: state => state.hosts,
+    selectHostsFetching: state => state.fetching
   }
 });
 
-export function getHostConfigs(): AppThunk {
+export function getHosts(): AppThunk {
   return async dispatch => {
+    dispatch(setFetching(true));
     const hostsResponse = await window.hosts.getAll();
     if (hostsResponse.success === true) {
       dispatch(setHosts(hostsResponse.data));
     } else {
       console.error('Failed to fetch host configs:', hostsResponse.error);
     }
+    dispatch(setFetching(false));
   };
 }
 
@@ -66,6 +74,6 @@ export function removeHostConfig(hostId: string): AppThunk {
   };
 }
 
-const { setHosts, addHost, removeHost } = hostsSlice.actions;
-export const { selectHosts } = hostsSlice.selectors;
+const { setHosts, addHost, removeHost, setFetching } = hostsSlice.actions;
+export const { selectHosts, selectHostsFetching } = hostsSlice.selectors;
 export default hostsSlice.reducer;
