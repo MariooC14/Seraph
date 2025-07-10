@@ -5,14 +5,21 @@ import { PlusCircle } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import SelectedHostConfigDrawer from './selected-host-config-drawer';
+import { HostConfigDrawer } from './host-config-drawer';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
-import { getHostConfigs, selectHosts } from '@/features/hosts/hosts-slice';
+import {
+  addHostConfig,
+  getHostConfigs,
+  removeHostConfig,
+  selectHosts
+} from '@/features/hosts/hosts-slice';
+import { type HostFormData } from '@/lib/host-validation';
 
 export default function HostsPage() {
   const hostConfigs = useAppSelector(selectHosts);
+  const [hostDrawerOpen, setHostDrawerOpen] = useState(false);
+  const [hostDrawerMode, setHostDrawerMode] = useState<'add' | 'edit'>('add');
   const [selectedHostConfig, setSelectedHostConfig] = useState<HostConfig>();
   const dispatch = useAppDispatch();
 
@@ -20,12 +27,24 @@ export default function HostsPage() {
     dispatch(getHostConfigs());
   }, []);
 
-  // TODO: Implement add host logic
-  function handleAddNewHost() {}
+  function handleAddNewHost() {
+    setHostDrawerMode('add');
+    setSelectedHostConfig(undefined);
+    setHostDrawerOpen(true);
+  }
 
-  // TODO: Implement delete host logic
-  function handleDelete(hostConfig: HostConfig) {
-    toast.success(`Deleted host ${hostConfig.label}`);
+  async function handleAddHost(newHost: HostFormData) {
+    dispatch(addHostConfig(newHost));
+  }
+
+  async function handleUpdateHost(hostConfig: HostConfig) {
+    // TODO: Implement proper update method in the backend
+    dispatch(removeHostConfig(hostConfig.id));
+    dispatch(addHostConfig(hostConfig));
+  }
+
+  function handleDeleteHost(hostConfig: HostConfig) {
+    dispatch(removeHostConfig(hostConfig.id));
   }
 
   // TODO: Implement connect logic
@@ -33,9 +52,10 @@ export default function HostsPage() {
     dispatch(createTab({ type: 'ssh', name: hostConfig.label, hostId: hostConfig.id }));
   }
 
-  // TODO: Implement edit host logic
   function handleEdit(hostConfig: HostConfig) {
+    setHostDrawerMode('edit');
     setSelectedHostConfig(hostConfig);
+    setHostDrawerOpen(true);
   }
 
   return (
@@ -58,14 +78,18 @@ export default function HostsPage() {
             hostConfig={hostConfig}
             onClickConnect={handleConnect}
             onClickEdit={handleEdit}
-            onClickDelete={handleDelete}
+            onClickDelete={handleDeleteHost}
           />
         ))}
       </div>
-      <SelectedHostConfigDrawer
+      <HostConfigDrawer
+        mode={hostDrawerMode}
+        open={hostDrawerOpen}
+        onOpenChange={setHostDrawerOpen}
+        onSubmit={handleAddHost}
+        onUpdate={handleUpdateHost}
+        onDelete={handleDeleteHost}
         hostConfig={selectedHostConfig}
-        onClose={() => setSelectedHostConfig(undefined)}
-        open={!!selectedHostConfig}
       />
     </>
   );
