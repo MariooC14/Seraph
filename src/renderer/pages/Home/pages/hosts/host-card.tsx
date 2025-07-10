@@ -9,6 +9,7 @@ import {
 import StatusIndicator from '@/components/ui/status-indicator';
 import { TypographyLarge } from '@/components/ui/typography-large';
 import { TypographyMuted } from '@/components/ui/typography-muted';
+import { cn } from '@/lib/utils';
 import { HostConfig } from '@dts/host-config';
 import { Ellipsis, Pencil, Server, Trash2 } from 'lucide-react';
 
@@ -28,13 +29,13 @@ export default function HostCard({
   const { host, label, username } = hostConfig;
 
   return (
-    <Card className="p-4 relative shadow-lg group hover:scale-102 transition-all">
+    <Card className="p-4 relative shadow-lg group hover:scale-102 transition-all flex flex-col justify-between">
       <StatusIndicator color="gray" className="absolute top-2 right-2" />
       <div className="flex items-center">
         <HostIcon />
         <div className="ml-2 min-w-0 flex-1">
           <TypographyLarge className="truncate">{label || host}</TypographyLarge>
-          <TypographyMuted className="truncate">
+          <TypographyMuted className={cn('truncate', (!username || !host) && 'invisible')}>
             {username}@{host}
           </TypographyMuted>
         </div>

@@ -1,18 +1,13 @@
-/**
- *
- */
-
 import HomeSidebar from '@/components/HomeSidebar';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Outlet } from 'react-router';
 
 export default function Home() {
   return (
     <>
       <HomeSidebar />
-      <ScrollArea className="p-8 h-full flex-1">
+      <div className="p-8 h-full flex flex-col flex-1 overflow-y-auto">
         <Outlet />
-      </ScrollArea>
+      </div>
     </>
   );
 }

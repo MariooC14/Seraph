@@ -20,15 +20,37 @@ function addRandomHost() {
   store.dispatch(addHostConfig(randomHost));
 }
 
+let fetching = false;
+
+function toggleFetching() {
+  fetching = !fetching;
+  store.dispatch({ type: 'hosts/setFetching', payload: fetching });
+}
+
+const ActionButtons = () => (
+  <div className="flex gap-2 mb-2">
+    <Button size="sm" onClick={() => addRandomHost()}>
+      Add random host
+    </Button>
+    <Button size="sm" onClick={() => toggleFetching()}>
+      Toggle fetching
+    </Button>
+    <Button size="sm" onClick={() => store.dispatch({ type: 'hosts/clearHosts' })}>
+      Clear hosts
+    </Button>
+  </div>
+);
+
 const meta = {
   component: HostsPage,
+  parameters: {
+    layout: 'fullscreen'
+  },
   decorators: [
     Story => (
       <Provider store={store}>
-        <Button size="sm" onClick={() => addRandomHost()}>
-          Add random host
-        </Button>
-        <div data-vaul-drawer-wrapper>
+        <div className="h-screen p-4 flex flex-col">
+          <ActionButtons />
           <Story />
         </div>
       </Provider>
