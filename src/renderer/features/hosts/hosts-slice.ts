@@ -41,13 +41,14 @@ const hostsSlice = createAppSlice({
 
 export function getHosts(): AppThunk {
   return async dispatch => {
+    dispatch(setFetching(true));
     const hostsResponse = await window.hosts.getAll();
     if (hostsResponse.success === true) {
-      dispatch(setFetching(false));
       dispatch(setHosts(hostsResponse.data));
     } else {
       console.error('Failed to fetch host configs:', hostsResponse.error);
     }
+    dispatch(setFetching(false));
   };
 }
 
