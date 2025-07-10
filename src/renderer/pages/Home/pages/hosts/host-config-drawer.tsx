@@ -11,14 +11,23 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { hostFormSchema, type HostFormData, type HostSubmissionData } from '@/lib/host-validation';
+import { HostFormData, hostFormSchema } from '@/lib/host-validation';
 import { HostConfig } from '@dts/host-config';
+
+const defaultFormValues = {
+  label: '',
+  host: '',
+  port: 22,
+  username: '',
+  password: '',
+  privateKey: ''
+};
 
 type HostConfigDrawerMode = 'add' | 'edit';
 
 type HostConfigDrawerProps = React.ComponentProps<typeof Drawer> & {
   mode: HostConfigDrawerMode;
-  onSubmit: (host: HostSubmissionData) => void;
+  onSubmit: (host: HostFormData) => void;
   onUpdate: (hostConfig: HostConfig) => void;
   onDelete: (hostConfig: HostConfig) => void;
   hostConfig?: HostConfig;
@@ -38,44 +47,31 @@ export function HostConfigDrawer({
 }: HostConfigDrawerProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const form = useForm<HostFormData>({
-    resolver: zodResolver(hostFormSchema),
-    defaultValues: {
-      label: '',
-      host: '',
-      port: '22',
-      username: '',
-      password: '',
-      privateKey: ''
-    }
-  });
+  const form = useForm({ resolver: zodResolver(hostFormSchema), defaultValues: defaultFormValues });
 
   const {
     register,
-    handleSubmit: rhfHandleSubmit,
-    formState: { errors },
-    reset,
-    setValue
+    formState: { errors }
   } = form;
 
   useEffect(() => {
     if (mode === 'edit' && hostConfig) {
-      setValue('label', hostConfig.label);
-      setValue('host', hostConfig.host);
-      setValue('port', hostConfig.port.toString());
-      setValue('username', hostConfig.username);
-      setValue('password', '');
-      setValue('privateKey', '');
+      form.setValue('label', hostConfig.label);
+      form.setValue('host', hostConfig.host);
+      form.setValue('port', hostConfig.port);
+      form.setValue('username', hostConfig.username);
+      form.setValue('password', '');
+      form.setValue('privateKey', '');
     } else if (mode === 'add') {
-      reset();
+      form.reset();
     }
-  }, [mode, hostConfig, open, setValue, reset]);
+  }, [mode, hostConfig, open]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const filePath = 'path' in file ? (file as any).path : file.name;
-      setValue('privateKey', filePath);
+      const filePath = 'path' in file ? file.path : file.name;
+      form.setValue('privateKey', filePath as string);
     }
   };
 
@@ -85,21 +81,12 @@ export function HostConfigDrawer({
     const canUpdate = isEditMode && hostConfig;
 
     if (isAddMode) {
-      const submissionData: HostSubmissionData = {
-        label: data.label,
-        host: data.host,
-        port: Number(data.port),
-        username: data.username
-      };
-      onSubmit(submissionData);
-      reset();
+      onSubmit(data);
+      form.reset();
     } else if (canUpdate) {
       const updatedHostConfig: HostConfig = {
         ...hostConfig,
-        label: data.label,
-        host: data.host,
-        port: Number(data.port),
-        username: data.username
+        ...data
       };
       onUpdate(updatedHostConfig);
     }
@@ -117,7 +104,7 @@ export function HostConfigDrawer({
   };
 
   const handleClose = () => {
-    reset();
+    form.reset();
     onOpenChange(false);
   };
 
@@ -132,21 +119,13 @@ export function HostConfigDrawer({
         <DrawerHeader>
           <DrawerTitle>{getTitle()}</DrawerTitle>
         </DrawerHeader>
-        <form onSubmit={rhfHandleSubmit(onFormSubmit)} className="space-y-4 p-4">
-          {/* Display form-level errors */}
-          {errors.password && (
-            <div className="text-red-500 text-sm mb-4 p-2 bg-red-50 border border-red-200 rounded">
-              {errors.password.message}
-            </div>
-          )}
-
+        <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4 p-4">
           <div className="flex flex-col gap-1">
             <Label htmlFor="label">Label</Label>
             <Input id="label" {...register('label')} placeholder="Label" />
             {errors.label && <span className="text-red-500 text-sm">{errors.label.message}</span>}
           </div>
 
-          {/* Connection string format: username@host:port */}
           <div className="flex items-end gap-1">
             <div className="flex flex-col gap-1">
               <Label htmlFor="username">Username</Label>
@@ -160,14 +139,7 @@ export function HostConfigDrawer({
             <span className="my-2 mx-1">:</span>
             <div className="flex flex-col gap-1">
               <Label htmlFor="port">Port</Label>
-              <Input
-                id="port"
-                type="number"
-                {...register('port')}
-                min="1"
-                max="65535"
-                placeholder="22"
-              />
+              <Input id="port" {...register('port')} placeholder="22" />
             </div>
           </div>
 
@@ -218,15 +190,15 @@ export function HostConfigDrawer({
 
         <DrawerFooter>
           <div className="flex gap-2 w-full">
-            <Button type="submit" onClick={rhfHandleSubmit(onFormSubmit)} className="flex-1">
+            <Button onClick={form.handleSubmit(onFormSubmit)} className="flex-1">
               {mode === 'add' ? 'Add Host' : 'Update Host'}
             </Button>
             {mode === 'edit' && (
-              <Button type="button" variant="destructive" onClick={handleDelete}>
+              <Button variant="destructive" onClick={handleDelete}>
                 Delete
               </Button>
             )}
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button variant="outline" onClick={handleClose}>
               Close
             </Button>
           </div>

@@ -33,7 +33,7 @@ export default function HostCard({
       <div className="flex items-center">
         <HostIcon />
         <div className="ml-2 min-w-0 flex-1">
-          <TypographyLarge className="truncate">{label}</TypographyLarge>
+          <TypographyLarge className="truncate">{label || host}</TypographyLarge>
           <TypographyMuted className="truncate">
             {username}@{host}
           </TypographyMuted>

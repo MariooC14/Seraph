@@ -14,7 +14,7 @@ import {
   removeHostConfig,
   selectHosts
 } from '@/features/hosts/hosts-slice';
-import { type HostSubmissionData } from '@/lib/host-validation';
+import { type HostFormData } from '@/lib/host-validation';
 
 export default function HostsPage() {
   const hostConfigs = useAppSelector(selectHosts);
@@ -33,7 +33,7 @@ export default function HostsPage() {
     setHostDrawerOpen(true);
   }
 
-  async function handleAddHost(newHost: HostSubmissionData) {
+  async function handleAddHost(newHost: HostFormData) {
     dispatch(addHostConfig(newHost));
   }
 

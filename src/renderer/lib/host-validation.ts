@@ -1,34 +1,16 @@
 import { z } from 'zod';
-export const hostFormSchema = z
-  .object({
-    label: z.string().min(1, 'Label is required'),
-    host: z.string().min(1, 'Host is required'),
-    port: z
-      .string()
-      .min(1, 'Port is required')
-      .refine(val => {
-        const num = Number(val);
-        return !isNaN(num) && num >= 1 && num <= 65535;
-      }, 'Port must be a number between 1 and 65535'),
-    username: z.string().min(1, 'Username is required'),
-    password: z.string().optional(),
-    privateKey: z.string().optional()
-  })
-  .refine(
-    data => {
-      return data.password || data.privateKey;
-    },
-    {
-      message: 'Either password or private key is required',
-      path: ['password']
-    }
-  );
+export const hostFormSchema = z.object({
+  label: z.string(),
+  host: z.string().min(1, 'Host is required'),
+  port: z
+    .number()
+    .gte(1, { message: 'Port must be greater than 0' })
+    .nonnegative('Port must be a non-negative number')
+    .lt(65536, 'Port must be less than 65536')
+    .default(22),
+  username: z.string(),
+  password: z.string(),
+  privateKey: z.string()
+});
 
 export type HostFormData = z.infer<typeof hostFormSchema>;
-
-export type HostSubmissionData = {
-  label: string;
-  host: string;
-  port: number;
-  username: string;
-};
