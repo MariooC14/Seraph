@@ -13,6 +13,7 @@ export class TerminalsController extends IpcController {
     this.addHandler('createLocalSession', (shellPath: string) =>
       this.createLocalSession(shellPath)
     );
+    this.addHandler('createSSHSession', (hostId: string) => this.createSSHSession(hostId));
   }
 
   createLocalSession(shellPath: string): string {

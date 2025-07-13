@@ -1,6 +1,6 @@
 import * as pty from 'node-pty';
 import { TerminalSessionError } from './TerminalSessionException';
-import { TerminalsService } from './terminals-service';
+import { TerminalsService } from './service/terminals-service';
 import { TerminalSession } from './TerminalSession';
 import { isWindows } from './helpers';
 import { LocalSessionController } from './controllers/local-session-controller';

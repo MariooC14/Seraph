@@ -64,18 +64,12 @@ export const terminalTabsSlice = createAppSlice({
         if (params.type === 'ssh') {
           const { name, hostId } = params;
           const newSessionId = await terminalSessionRegistry.createSSHSession(hostId);
-          const tab: TerminalTab = {
-            id: newSessionId,
-            name: name
-          };
+          const tab: TerminalTab = { id: newSessionId, name };
           return tab;
         } else {
           const { name, shellPath = state.config.defaultShellPath } = params;
           const newSessionId = await terminalSessionRegistry.createLocalSession(shellPath);
-          const tab: TerminalTab = {
-            id: newSessionId,
-            name: name
-          };
+          const tab: TerminalTab = { id: newSessionId, name };
           return tab;
         }
       },

@@ -1,52 +1,41 @@
-import { BrowserWindow, ipcMain } from 'electron';
 import { Config, NodeSSH } from 'node-ssh';
-import { TerminalsService } from './terminals-service';
+import { TerminalsService } from './service/terminals-service';
 import log from 'electron-log/main';
 import { ClientChannel, PseudoTtyOptions } from 'ssh2';
 import { TerminalSession } from './TerminalSession';
+import { SSHSessionController } from './controllers/ssh-session-controller';
 
 const DEFAULT_TTY_OPTS: PseudoTtyOptions = {
   cols: 80,
   rows: 24,
   term: 'xterm-color'
 };
+const DEFAULT_SSH_PORT = 22;
 
 export class SSHSession extends TerminalSession {
   private ssh?: NodeSSH;
   private clientSSHChannel?: ClientChannel;
+  private controller: SSHSessionController;
 
   constructor(
     terminalManager: TerminalsService,
     sessionId: string,
-    window: BrowserWindow,
     private hostConfig: Config
   ) {
-    super(terminalManager, sessionId, window);
+    super(terminalManager, sessionId);
   }
 
-  // Once the connection has been established, we can start listening for events
-  // and sending data to the SSH server.
-  // THIS IS FRAGILE - I don't know if this is the right way to do this
   public async init() {
     log.info('[SSHSession] - Connecting with config:', this.hostConfig);
-    this.addIpcListeners();
+    if (!this.hostConfig.port) {
+      this.hostConfig.port = DEFAULT_SSH_PORT;
+    }
 
     try {
       this.ssh = await new NodeSSH().connect(this.hostConfig);
       this.clientSSHChannel = await this.ssh.requestShell(DEFAULT_TTY_OPTS);
-
-      this.clientSSHChannel.on('data', (data: Buffer) => {
-        this.sendData(data.toString('utf8'));
-      });
-
-      this.clientSSHChannel.on('exit', code => {
-        log.info('[SSHSession] - SSH session closed');
-        this.window.webContents.send(`${this.channel}:exit`, code);
-      });
-
-      log.info(`[SSHSession] - SSH session initialized with sessionId: ${this.sessionId};`);
+      this.addPtyListeners();
     } catch (error) {
-      // We'll need to improve error handling here
       if (error instanceof AggregateError) {
         log.error(`[SSHSession] - Failed to connect to SSH server: ${error.errors}`);
       }
@@ -54,30 +43,31 @@ export class SSHSession extends TerminalSession {
     }
   }
 
-  private addIpcListeners() {
-    ipcMain.handle(`${this.channel}:clientInput`, (_event, input: string) => {
-      this.clientSSHChannel?.write(input);
+  private addPtyListeners() {
+    this.clientSSHChannel.on('data', (data: Buffer) => {
+      this.controller.sendInputToClient(data.toString('utf8'));
     });
-    ipcMain.handle(`${this.channel}:resize`, (_event, cols: number, rows: number) => {
-      this.resize(cols, rows);
+    this.clientSSHChannel.on('exit', code => {
+      this.controller.sendExitSignal(code);
     });
-    ipcMain.handle(`${this.channel}:kill`, () => {
-      log.info('[SSHSession] - Killing SSH session');
-      this.terminate();
-    });
+  }
+
+  public writeToPty(input: string) {
+    this.clientSSHChannel?.write(input);
   }
 
   public terminate() {
     this.clientSSHChannel?.close();
   }
 
-  public sendData(data: string): void {
-    this.window.webContents.send(`${this.channel}:updateData`, data);
-  }
-
   // todo: Check if this is needed
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public resize(_cols: number, _rows: number): void {
     log.warn('[SSHSession] - Resize not implemented for SSH sessions');
+  }
+
+  setController(controller: SSHSessionController) {
+    this.controller = controller;
+    return this;
   }
 }

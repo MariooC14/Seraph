@@ -51,9 +51,10 @@ export default function HostsPage() {
     dispatch(removeHostConfig(hostConfig.id));
   }
 
-  // TODO: Implement connect logic
   function handleConnect(hostConfig: HostConfig) {
-    dispatch(createTab({ type: 'ssh', name: hostConfig.label, hostId: hostConfig.id }));
+    dispatch(
+      createTab({ type: 'ssh', name: hostConfig.label || hostConfig.host, hostId: hostConfig.id })
+    );
   }
 
   function handleEdit(hostConfig: HostConfig) {

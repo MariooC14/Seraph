@@ -9,6 +9,7 @@ import { HostsService } from './hosts-service';
 import { StorageManager } from '../StorageManager';
 import { WindowService } from './window-service';
 import { LocalSessionController } from '../controllers/local-session-controller';
+import { SSHSessionController } from '../controllers/ssh-session-controller';
 
 export class TerminalsService {
   shell: string = this.getShell();
@@ -54,17 +55,15 @@ export class TerminalsService {
     return newSessionId;
   }
 
-  /** Creates an ssh session with given host config
-   * @returns the session id of the new session
-   */
   async createSSHSession(hostId: string) {
     const hostConfig = HostsService.instance.getHostById(hostId);
     if (!hostConfig) {
-      log.error(`[TerminalManager] - No host config found for id: ${hostId}`);
       throw new Error(`No host config found for id: ${hostId}`);
     }
     const newSessionId = uuidv4();
-    const newSSHSession = new SSHSession(this, newSessionId, this._window, hostConfig);
+    const newSSHSession = new SSHSession(this, newSessionId, hostConfig);
+    const controller = new SSHSessionController(this._window, newSSHSession).startListening();
+    newSSHSession.setController(controller);
     await newSSHSession.init();
     this.sessions.set(newSSHSession.sessionId, newSSHSession);
     return newSessionId;
