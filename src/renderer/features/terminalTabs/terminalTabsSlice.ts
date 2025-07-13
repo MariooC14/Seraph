@@ -1,12 +1,12 @@
 import { createAppSlice } from '@/app/createAppSlice';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { terminalSessionRegistry } from './ClientTerminalSessionRegistry';
-import { RootState } from '@/app/store';
-import { toast } from 'sonner';
+import { AppThunk } from '@/app/store';
 
 export type TerminalTab = {
   /** id is also sessionId */
   id: string;
+  type: 'local' | 'ssh';
   name: string;
 };
 
@@ -17,21 +17,6 @@ export type TerminalTabsSliceState = {
   isHostSelectionDialogOpen: boolean;
 };
 
-interface BaseCreateTabParams {
-  name: string;
-  type: 'local' | 'ssh';
-}
-
-interface LocalTerminalTabParams extends BaseCreateTabParams {
-  type: 'local';
-  shellPath?: string;
-}
-
-interface SSHTabParams extends BaseCreateTabParams {
-  type: 'ssh';
-  hostId: string;
-}
-
 const initialState: TerminalTabsSliceState = {
   tabs: [],
   isHostSelectionDialogOpen: false,
@@ -41,8 +26,8 @@ const initialState: TerminalTabsSliceState = {
 export const terminalTabsSlice = createAppSlice({
   name: 'terminalTabs',
   initialState,
-  reducers: create => ({
-    closeTab: create.reducer((state, action: PayloadAction<string>) => {
+  reducers: {
+    closeTab: (state, action: PayloadAction<string>) => {
       const sessionId = action.payload;
       const tabToClose = state.tabs.find(tab => tab.id === sessionId);
       if (!tabToClose) return;
@@ -57,45 +42,22 @@ export const terminalTabsSlice = createAppSlice({
         state.focusedTabIdx = null;
         state.focusedTabId = null;
       }
-    }),
-    createTab: create.asyncThunk(
-      async (params: LocalTerminalTabParams | SSHTabParams, { getState }) => {
-        const state = getState() as RootState;
-        if (params.type === 'ssh') {
-          const { name, hostId } = params;
-          const newSessionId = await terminalSessionRegistry.createSSHSession(hostId);
-          const tab: TerminalTab = { id: newSessionId, name };
-          return tab;
-        } else {
-          const { name, shellPath = state.config.defaultShellPath } = params;
-          const newSessionId = await terminalSessionRegistry.createLocalSession(shellPath);
-          const tab: TerminalTab = { id: newSessionId, name };
-          return tab;
-        }
-      },
-      {
-        fulfilled: (state, action: PayloadAction<TerminalTab>) => {
-          state.tabs.push(action.payload);
-          state.focusedTabId = action.payload.id;
-          state.focusedTabIdx = state.tabs.length - 1;
-        },
-        rejected: (_, action) => {
-          toast.error(action.error.message);
-        }
-      }
-    ),
-    toggleHostSelectionDialog: create.reducer(state => {
+    },
+    addTab: (state, action: PayloadAction<TerminalTab>) => {
+      state.tabs.push(action.payload);
+    },
+    toggleHostSelectionDialog: state => {
       state.isHostSelectionDialogOpen = !state.isHostSelectionDialogOpen;
-    }),
-    focusTab: create.reducer((state, action: PayloadAction<string>) => {
+    },
+    focusTab: (state, action: PayloadAction<string>) => {
       const tabId = action.payload;
       const tabIdx = state.tabs.findIndex(tab => tab.id === tabId);
       if (tabIdx !== -1) {
         state.focusedTabId = state.tabs[tabIdx].id;
         state.focusedTabIdx = tabIdx;
       }
-    }),
-    cycleNextTab: create.reducer(state => {
+    },
+    cycleNextTab: state => {
       if (state.tabs.length === 0) return;
       if (state.focusedTabIdx === null) {
         // If no tab was previously focused, set the first tab as focused
@@ -104,22 +66,21 @@ export const terminalTabsSlice = createAppSlice({
       const nextIndex = (state.focusedTabIdx + 1) % state.tabs.length;
       state.focusedTabIdx = nextIndex;
       state.focusedTabId = state.tabs[nextIndex].id;
-    }),
-    cyclePreviousTab: create.reducer(state => {
+    },
+    cyclePreviousTab: state => {
       if (state.tabs.length === 0) return;
       if (state.focusedTabIdx === null) {
         state.focusedTabIdx = state.tabs.length - 1;
       }
       const prevIndex = (state.focusedTabIdx - 1 + state.tabs.length) % state.tabs.length;
-      console.log(prevIndex);
       state.focusedTabIdx = prevIndex;
       state.focusedTabId = state.tabs[prevIndex].id;
-    }),
-    unfocusTabs: create.reducer(state => {
+    },
+    unfocusTabs: state => {
       state.focusedTabId = null;
       state.focusedTabIdx = null;
-    })
-  }),
+    }
+  },
   selectors: {
     selectTerminalTabs: terminalTabs => terminalTabs.tabs,
     selectIsHostSelectionDialogOpen: terminalTabs => terminalTabs.isHostSelectionDialogOpen,
@@ -127,9 +88,26 @@ export const terminalTabsSlice = createAppSlice({
   }
 });
 
-// Action creators are generated for each case reducer function
+export function createLocalTerminalTab(name: string, shellPath: string): AppThunk {
+  return async dispatch => {
+    const newSessionId = await terminalSessionRegistry.createLocalSession(shellPath);
+    const tab: TerminalTab = { id: newSessionId, name, type: 'local' };
+    dispatch(addTab(tab));
+    dispatch(focusTab(newSessionId));
+  };
+}
+
+export function createSSHTerminalTab(name: string, hostId: string): AppThunk {
+  return async dispatch => {
+    const newSessionId = await terminalSessionRegistry.createSSHSession(hostId);
+    const tab: TerminalTab = { id: newSessionId, name, type: 'ssh' };
+    dispatch(addTab(tab));
+    dispatch(focusTab(newSessionId));
+  };
+}
+
+const { addTab } = terminalTabsSlice.actions;
 export const {
-  createTab,
   closeTab,
   toggleHostSelectionDialog,
   focusTab,
