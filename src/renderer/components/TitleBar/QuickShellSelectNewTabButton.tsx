@@ -8,25 +8,18 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { Button } from '../ui/button';
-import { useNavigate } from 'react-router';
 import { formatShellName } from '@/lib/utils';
 import { DropdownMenuLabel } from '@radix-ui/react-dropdown-menu';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { createTab, TerminalTab } from '@/features/terminalTabs/terminalTabsSlice';
+import { createLocalTerminalTab } from '@/features/terminalTabs/terminalTabsSlice';
 import { selectAvailableShells } from '@/features/config/configSlice';
 
 export default function QuickShellSelectNewTabTutton() {
   const dispatch = useAppDispatch();
   const availableShells = useAppSelector(selectAvailableShells);
-  const navigate = useNavigate();
 
   const handleNewTabClick = (tabName: string, shellPath: string) => {
-    dispatch(createTab({ shellPath, name: tabName, type: 'local' })).then(action => {
-      if (action.meta.requestStatus === 'fulfilled') {
-        const tab = action.payload as TerminalTab;
-        navigate(`/terminals/${tab.id}`);
-      }
-    });
+    dispatch(createLocalTerminalTab(tabName, shellPath));
   };
 
   const shellOptions = availableShells?.map(shell => {

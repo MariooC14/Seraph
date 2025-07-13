@@ -7,7 +7,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip
 import { useEffect, useState } from 'react';
 import { HostConfigDrawer } from './host-config-drawer';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
+import { createSSHTerminalTab } from '@/features/terminalTabs/terminalTabsSlice';
 import {
   addHostConfig,
   getHosts,
@@ -51,9 +51,8 @@ export default function HostsPage() {
     dispatch(removeHostConfig(hostConfig.id));
   }
 
-  // TODO: Implement connect logic
   function handleConnect(hostConfig: HostConfig) {
-    dispatch(createTab({ type: 'ssh', name: hostConfig.label, hostId: hostConfig.id }));
+    dispatch(createSSHTerminalTab(hostConfig.label || hostConfig.host, hostConfig.id));
   }
 
   function handleEdit(hostConfig: HostConfig) {

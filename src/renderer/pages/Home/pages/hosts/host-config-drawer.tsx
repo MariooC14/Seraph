@@ -139,7 +139,12 @@ export function HostConfigDrawer({
             <span className="my-2 mx-1">:</span>
             <div className="flex flex-col gap-1">
               <Label htmlFor="port">Port</Label>
-              <Input id="port" {...register('port')} placeholder="22" />
+              <Input
+                id="port"
+                type="number"
+                {...register('port', { valueAsNumber: true })}
+                placeholder="22"
+              />
             </div>
           </div>
 

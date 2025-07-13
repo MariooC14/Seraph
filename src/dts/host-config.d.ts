@@ -3,7 +3,7 @@ export interface HostConfig {
   label: string;
   // The host address, e.g., 'localhost', '192.168.1.1
   host: string;
-  port: number;
+  port?: number;
   username?: string;
   password?: string;
 }

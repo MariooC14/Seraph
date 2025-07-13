@@ -8,7 +8,10 @@ import {
   CommandItem,
   CommandGroup
 } from '@/components/ui/command';
-import { createTab } from '@/features/terminalTabs/terminalTabsSlice';
+import {
+  createLocalTerminalTab,
+  createSSHTerminalTab
+} from '@/features/terminalTabs/terminalTabsSlice';
 import { CirclePlus, Terminal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { HostConfig } from '@dts/host-config';
@@ -29,12 +32,12 @@ export default function HostSelectionDialog({ open, handleOpenChange }: HostSele
   }, [open]);
 
   const handleLocalTerminalClick = () => {
-    dispatch(createTab({ name: 'Localhost', type: 'local' }));
+    dispatch(createLocalTerminalTab('Localhost', ''));
     handleOpenChange(false);
   };
 
   const handleItemSelect = (hostConfig: HostConfig) => {
-    dispatch(createTab({ type: 'ssh', name: hostConfig.label, hostId: hostConfig.id }));
+    dispatch(createSSHTerminalTab(hostConfig.label || hostConfig.host, hostConfig.id));
     handleOpenChange(false);
   };
 
