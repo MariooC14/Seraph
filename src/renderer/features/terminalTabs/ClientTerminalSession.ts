@@ -8,15 +8,17 @@ import { isCloseTabKey, isNextTabKey, isPreviousTabKey } from '@/lib/utils';
 const shortcutIgnoreKeys = [isNewTabKey, isCloseTabKey, isPreviousTabKey, isNextTabKey];
 
 export class ClientTerminalSession {
+  public isVisible: boolean = false;
+  readonly type: 'local' | 'ssh';
   private readonly _sessionId: string;
   private terminal: Terminal;
   private fitAddon: FitAddon;
   private webLinksAddon: WebLinksAddon;
-  public isVisible: boolean = false;
 
   /** Creates a terminal session given an existing pty's session id */
-  constructor(sessionId: string) {
+  constructor(sessionId: string, terminalType: 'local' | 'ssh') {
     this._sessionId = sessionId;
+    this.type = terminalType;
     this.terminal = new Terminal(defaultTerminalOptions);
   }
 

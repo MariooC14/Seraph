@@ -3,15 +3,10 @@
  * Redux cannot use this since terminal sessions are not serializable. Redux manages sessions using the session ids,
  * and the app will get a session using this registry.
  */
-
 import { ClientTerminalSession } from './ClientTerminalSession';
 
 class TerminalSessionRegistry {
   private sessions: Map<string, ClientTerminalSession> = new Map();
-
-  constructor() {
-    // Initialize if needed
-  }
 
   async createLocalSession(shellPath: string) {
     console.log('Creating new terminal with shell path:', shellPath);
@@ -19,7 +14,7 @@ class TerminalSessionRegistry {
       .createLocalSession(shellPath)
       .then((sessionId: string) => {
         console.log('New terminal sessionId:', sessionId);
-        const session = new ClientTerminalSession(sessionId);
+        const session = new ClientTerminalSession(sessionId, 'local');
         this.sessions.set(sessionId, session);
         return session.sessionId;
       })
@@ -34,7 +29,7 @@ class TerminalSessionRegistry {
     return await window.terminal.createSSHSession(hostId).then(res => {
       if (res.success === true) {
         const sessionId = res.data;
-        const session = new ClientTerminalSession(sessionId);
+        const session = new ClientTerminalSession(sessionId, 'ssh');
         this.sessions.set(sessionId, session);
         return sessionId;
       } else {

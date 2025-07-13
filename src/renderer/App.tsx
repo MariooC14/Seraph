@@ -3,7 +3,7 @@ import { ThemeProvider } from './components/theme-provider';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import TitleBar from './components/TitleBar/TitleBar';
 import { cn, isNewTabKey, isNextTabKey, isPreviousTabKey } from './lib/utils';
-import TerminalPanel from './features/terminalTabs/TerminalPanel';
+import TerminalPanels from './features/terminalTabs/terminal-panels';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import {
   cycleNextTab,
@@ -70,7 +70,7 @@ function App() {
           {!isTerminalTab && <Outlet />}
           {/* Need to keep these rendered but invisible */}
           <div className={cn('w-full h-full', !isTerminalTab && 'hidden')}>
-            <TerminalPanel />
+            <TerminalPanels />
           </div>
         </main>
       </div>
