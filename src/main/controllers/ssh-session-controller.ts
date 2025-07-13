@@ -5,24 +5,24 @@ import { SSHSession } from '../SSHSession';
 export class SSHSessionController extends IpcController {
   constructor(
     private readonly window: BrowserWindow,
-    private sshSession?: SSHSession
+    private sshSession: SSHSession
   ) {
-    super(`terminalSession-${sshSession?.sessionId}`);
+    super(`terminalSession-${sshSession.sessionId}`);
     this.addHandler('clientInput', (input: string) => this.handleClientInput(input));
     this.addHandler('resize', (cols: number, rows: number) => this.handleResize(cols, rows));
     this.addHandler('kill', () => this.handleKill());
   }
 
   handleClientInput(input: string) {
-    this.sshSession?.writeToPty(input);
+    this.sshSession.writeToPty(input);
   }
 
   handleResize(cols: number, rows: number) {
-    this.sshSession?.resize(cols, rows);
+    this.sshSession.resize(cols, rows);
   }
 
   handleKill() {
-    this.sshSession?.terminate();
+    this.sshSession.terminate();
   }
 
   sendInputToClient(input: string) {
