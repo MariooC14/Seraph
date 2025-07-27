@@ -6,14 +6,12 @@
 import { ClientTerminalSession } from './ClientTerminalSession';
 
 class TerminalSessionRegistry {
-  private sessions: Map<string, ClientTerminalSession> = new Map();
+  private sessions: Map<string, ClientTerminalSession | null> = new Map();
 
   async createLocalSession(shellPath: string) {
-    console.log('Creating new terminal with shell path:', shellPath);
     return await window.terminal
       .createLocalSession(shellPath)
       .then((sessionId: string) => {
-        console.log('New terminal sessionId:', sessionId);
         const session = new ClientTerminalSession(sessionId, 'local');
         this.sessions.set(sessionId, session);
         return session.sessionId;
@@ -24,19 +22,24 @@ class TerminalSessionRegistry {
       });
   }
 
+  // Creates an SSH session on backend. Does not create a terminal until the connection is established.
   async createSSHSession(hostId: string) {
-    console.log('Creating new SSH terminal session');
     return await window.terminal.createSSHSession(hostId).then(res => {
       if (res.success === true) {
-        const sessionId = res.data;
-        const session = new ClientTerminalSession(sessionId, 'ssh');
-        this.sessions.set(sessionId, session);
-        return sessionId;
+        return res.data;
       } else {
         console.error('Failed to create SSH terminal session:', res.error);
         throw new Error(res.error);
       }
     });
+  }
+
+  createPtyForSession(sessionId: string) {
+    if (this.sessions.has(sessionId)) {
+      throw new Error(`Terminal for session ${sessionId} already exists.`);
+    }
+    const terminalSession = new ClientTerminalSession(sessionId, 'ssh');
+    this.sessions.set(sessionId, terminalSession);
   }
 
   getSession(id: string) {

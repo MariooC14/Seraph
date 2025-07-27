@@ -23,27 +23,29 @@ export class SSHSession extends TerminalSession {
     private hostConfig: Config
   ) {
     super(terminalManager, sessionId);
-  }
-
-  public async init() {
-    log.info('[SSHSession] - Connecting with config:', this.hostConfig);
+    this.ssh = new NodeSSH();
     if (!this.hostConfig.port) {
       this.hostConfig.port = DEFAULT_SSH_PORT;
     }
+  }
 
+  init() {}
+
+  public async attemptConnection() {
     try {
-      this.ssh = await new NodeSSH().connect(this.hostConfig);
-      this.clientSSHChannel = await this.ssh.requestShell(DEFAULT_TTY_OPTS);
-      this.addPtyListeners();
+      await this.ssh.connect(this.hostConfig);
+      await this.setupPty();
+      return true;
     } catch (error) {
       if (error instanceof AggregateError) {
         log.error(`[SSHSession] - Failed to connect to SSH server: ${error.errors}`);
       }
-      throw new Error(error.errors[0]);
+      throw new Error(error.errors[0].message);
     }
   }
 
-  private addPtyListeners() {
+  async setupPty() {
+    this.clientSSHChannel = await this.ssh.requestShell(DEFAULT_TTY_OPTS);
     this.clientSSHChannel.on('data', (data: Buffer) => {
       this.controller.sendInputToClient(data.toString('utf8'));
     });

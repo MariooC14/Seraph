@@ -7,6 +7,7 @@ export type TerminalTab = {
   /** id is also sessionId */
   id: string;
   type: 'local' | 'ssh';
+  hostId?: string;
   name: string;
 };
 
@@ -97,10 +98,11 @@ export function createLocalTerminalTab(name: string, shellPath: string): AppThun
   };
 }
 
+// Requests backend to create an ssh session, it does not create a terminal until the connection is established.
 export function createSSHTerminalTab(name: string, hostId: string): AppThunk {
   return async dispatch => {
     const newSessionId = await terminalSessionRegistry.createSSHSession(hostId);
-    const tab: TerminalTab = { id: newSessionId, name, type: 'ssh' };
+    const tab: TerminalTab = { id: newSessionId, name, type: 'ssh', hostId };
     dispatch(addTab(tab));
     dispatch(focusTab(newSessionId));
   };

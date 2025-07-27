@@ -48,6 +48,10 @@ declare global {
       add: (host: Omit<HostConfig, 'id'>) => IPCPromise<HostConfig>;
       remove: (id: string) => IPCPromise<void>;
     };
+
+    sshSetup: {
+      connect: (sessionId: string) => IPCPromise<boolean>;
+    };
   }
 
   type Theme = 'system' | 'light' | 'dark';

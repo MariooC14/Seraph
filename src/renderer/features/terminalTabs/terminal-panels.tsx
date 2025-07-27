@@ -2,7 +2,6 @@ import { useParams } from 'react-router';
 import { cn } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { closeTab, selectTerminalTabs } from '@/features/terminalTabs/terminalTabsSlice';
-import { terminalSessionRegistry } from '@/features/terminalTabs/ClientTerminalSessionRegistry';
 import TerminalPanel from './terminal-panel';
 
 function TerminalPanels() {
@@ -21,8 +20,8 @@ function TerminalPanels() {
           key={tab.id}
           className={cn('p-4 h-full w-full bg-background', tab.id !== terminalId && 'hidden')}>
           <TerminalPanel
-            key={tab.id}
-            clientTerminalSession={terminalSessionRegistry.getSession(tab.id)}
+            sessionId={tab.id}
+            hostId={tab.hostId}
             onClose={handleClose}
             isVisible={tab.id === terminalId}
           />

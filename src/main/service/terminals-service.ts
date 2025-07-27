@@ -63,8 +63,7 @@ export class TerminalsService {
     const newSessionId = uuidv4();
     const newSSHSession = new SSHSession(this, newSessionId, hostConfig);
     const controller = new SSHSessionController(this._window, newSSHSession).startListening();
-    newSSHSession.setController(controller);
-    await newSSHSession.init();
+    newSSHSession.setController(controller).init();
     this.sessions.set(newSSHSession.sessionId, newSSHSession);
     return newSessionId;
   }

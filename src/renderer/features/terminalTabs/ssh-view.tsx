@@ -1,10 +1,31 @@
+import { terminalSessionRegistry } from './ClientTerminalSessionRegistry';
+import SSHConnectionDialog from './ssh-connection-view';
 import { TerminalPanelProps } from './terminal-panel';
 import TerminalView from './terminal-view';
+import { useState } from 'react';
 
 export function SSHView(props: TerminalPanelProps) {
-  if (props.clientTerminalSession) {
-    return <TerminalView {...props} />;
-  }
+  const clientTerminalSession = terminalSessionRegistry.getSession(props.sessionId);
+  const [connected, setConnected] = useState(false);
 
-  return <>SSH Connection View somehow</>;
+  const handleConnect = () => {
+    terminalSessionRegistry.createPtyForSession(props.sessionId);
+    setConnected(true);
+  };
+
+  return (
+    <div className="w-full h-full flex items-center justify-center">
+      {clientTerminalSession && (
+        <TerminalView {...props} clientTerminalSession={clientTerminalSession} />
+      )}
+
+      {!connected && (
+        <SSHConnectionDialog
+          sessionId={props.sessionId}
+          hostId={props.hostId}
+          onConnect={() => handleConnect()}
+        />
+      )}
+    </div>
+  );
 }
