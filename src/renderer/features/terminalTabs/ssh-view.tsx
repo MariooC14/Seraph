@@ -1,5 +1,5 @@
 import { terminalSessionRegistry } from './ClientTerminalSessionRegistry';
-import SSHConnectionDialog from './ssh-connection-view';
+import SSHConnectionDialog from './ssh-connection/ssh-connection-view';
 import { TerminalPanelProps } from './terminal-panel';
 import TerminalView from './terminal-view';
 import { useState } from 'react';
