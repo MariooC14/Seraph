@@ -13,7 +13,6 @@ contextBridge.exposeInMainWorld('terminal', {
     ipcRenderer.invoke(`terminalSession-${sessionId}:kill`, sessionId),
   onSessionTerminated: (sessionId: string, callback: (code: string) => void) =>
     ipcRenderer.on(`terminalSession-${sessionId}:exit`, (_event, code) => callback(code)),
-  killAllTerminals: () => ipcRenderer.invoke('terminal:killAll'),
   sendData: (sessionId: string, data: string) =>
     ipcRenderer.invoke(`terminalSession-${sessionId}:clientInput`, data),
   onData: (sessionId: string, callback: (newData: string) => void) =>
@@ -24,7 +23,7 @@ contextBridge.exposeInMainWorld('terminal', {
   getAvailableShells: () => ipcRenderer.invoke('terminal:getAvailableShells'),
   saveDefaultShell: (newShellPath: string) =>
     ipcRenderer.invoke('terminal:saveDefaultShell', newShellPath)
-});
+} satisfies (typeof window)['terminal']);
 
 contextBridge.exposeInMainWorld('app', {
   exit: () => ipcRenderer.invoke('app:exit'),
@@ -37,14 +36,14 @@ contextBridge.exposeInMainWorld('app', {
   onNativeThemeChanged: (callback: (theme: Theme) => void) =>
     ipcRenderer.on('app:nativeThemeChanged', (_event, value) => callback(value)),
   isMacOS: () => process.platform === 'darwin'
-});
+} satisfies (typeof window)['app']);
 
 contextBridge.exposeInMainWorld('hosts', {
   getAll: () => ipcRenderer.invoke('hosts:getAll'),
   get: (id: string) => ipcRenderer.invoke('hosts:getById', id),
   add: (host: Omit<HostConfig, 'id'>) => ipcRenderer.invoke('hosts:add', host),
   remove: (id: string) => ipcRenderer.invoke('hosts:remove', id)
-});
+} satisfies (typeof window)['hosts']);
 
 contextBridge.exposeInMainWorld('sshSetup', {
   connect: (sessionId: string) => ipcRenderer.invoke(`terminalSession-${sessionId}:connect`),
@@ -54,4 +53,4 @@ contextBridge.exposeInMainWorld('sshSetup', {
 contextBridge.exposeInMainWorld('network', {
   ping: (address: string, port: number = 22) =>
     ipcRenderer.invoke('network:ping', { address, port })
-});
+} satisfies (typeof window)['network']);

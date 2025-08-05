@@ -33,7 +33,7 @@ declare global {
     };
 
     app: {
-      exit(): () => void;
+      exit(): typeof ipcRenderer.invoke;
       maximize: () => void;
       unmaximize: () => void;
       minimize: () => void;
