@@ -28,18 +28,23 @@ class TerminalSessionRegistry {
       if (res.success === true) {
         return res.data;
       } else {
-        console.error('Failed to create SSH terminal session:', res.error);
-        throw new Error(res.error);
+        console.error('Failed to create SSH terminal session:', res.message);
+        throw new Error(res.message);
       }
     });
   }
 
-  createPtyForSession(sessionId: string) {
+  async requestPtyForSession(sessionId: string) {
     if (this.sessions.has(sessionId)) {
-      throw new Error(`Terminal for session ${sessionId} already exists.`);
+      return;
     }
-    const terminalSession = new ClientTerminalSession(sessionId, 'ssh');
-    this.sessions.set(sessionId, terminalSession);
+    try {
+      await window.sshSetup.requestPty(sessionId);
+      const terminalSession = new ClientTerminalSession(sessionId, 'ssh');
+      this.sessions.set(sessionId, terminalSession);
+    } catch (error) {
+      throw new Error(`Failed to request PTY for session ${sessionId}: ${error.message}`);
+    }
   }
 
   getSession(id: string) {

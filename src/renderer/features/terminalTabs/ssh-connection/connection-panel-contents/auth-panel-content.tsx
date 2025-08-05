@@ -4,27 +4,37 @@ import { useEffect, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 
-function AuthPanelContent({ hostConfig }: ConnectionPanelProps) {
+function AuthPanelContent({
+  hostConfig,
+  attemptConnect
+}: ConnectionPanelProps & { attemptConnect: () => Promise<boolean> }) {
   const { next } = useConnectionStepper();
   const [password, setPassword] = useState(hostConfig.password || '');
   const [connectState, setConnectState] = useState('initial');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (hostConfig.password) {
-      attemptConnect();
+      tryConnect();
     }
   }, []);
 
-  function attemptConnect() {
+  async function tryConnect() {
     setConnectState('pending');
-    setTimeout(() => {
+    const success = await attemptConnect();
+    if (success) {
       setConnectState('complete');
-    }, 1250);
+      next();
+    } else {
+      setConnectState('error');
+      setError('Failed to connect. Please check your credentials.');
+    }
   }
 
   return (
     <div>
-      {connectState === 'initial' && !hostConfig.password && (
+      {error && <div className="text-red-500 mt-4">{error}</div>}
+      {(connectState === 'initial' || connectState === 'error') && !hostConfig.password && (
         <>
           <Input
             placeholder="Password"
@@ -33,7 +43,7 @@ function AuthPanelContent({ hostConfig }: ConnectionPanelProps) {
             onChange={e => setPassword(e.target.value)}
           />
           <div className="w-full text-right mt-4">
-            <Button onClick={() => attemptConnect()}>Connect</Button>
+            <Button onClick={() => tryConnect()}>Connect</Button>
           </div>
         </>
       )}

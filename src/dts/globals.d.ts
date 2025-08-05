@@ -8,14 +8,15 @@ declare global {
     data: T;
   }
 
-  interface ErrorResponse extends BaseIPCResponse {
+  interface ErrorResponse<E = void> extends BaseIPCResponse {
     success: false;
-    error: string;
     code?: string;
+    message: string;
+    details?: E;
   }
 
-  type IPCResponse<T = void> = SuccessResponse<T> | ErrorResponse;
-  type IPCPromise<T = void> = Promise<IPCResponse<T>>;
+  type IPCResponse<T = void, E = void> = SuccessResponse<T> | ErrorResponse<E>;
+  type IPCPromise<T = void, E = void> = Promise<IPCResponse<T, E>>;
 
   interface Window {
     terminal: {
@@ -51,6 +52,11 @@ declare global {
 
     sshSetup: {
       connect: (sessionId: string) => IPCPromise<boolean>;
+      requestPty: (sessionId: string) => IPCPromise<void>;
+    };
+
+    network: {
+      ping: (address: string, port?: number) => IPCPromise<boolean, { messages: string[] }>;
     };
   }
 

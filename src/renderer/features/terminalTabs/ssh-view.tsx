@@ -8,9 +8,14 @@ export function SSHView(props: TerminalPanelProps) {
   const clientTerminalSession = terminalSessionRegistry.getSession(props.sessionId);
   const [connected, setConnected] = useState(false);
 
-  const handleConnect = () => {
-    terminalSessionRegistry.createPtyForSession(props.sessionId);
-    setConnected(true);
+  const handleConnect = async () => {
+    try {
+      await terminalSessionRegistry.requestPtyForSession(props.sessionId);
+      setConnected(true);
+    } catch (error) {
+      console.error('Failed to connect to SSH session:', error);
+      // Handle error appropriately, e.g., show a notification or alert
+    }
   };
 
   return (

@@ -47,5 +47,11 @@ contextBridge.exposeInMainWorld('hosts', {
 });
 
 contextBridge.exposeInMainWorld('sshSetup', {
-  connect: (sessionId: string) => ipcRenderer.invoke(`terminalSession-${sessionId}:connect`)
+  connect: (sessionId: string) => ipcRenderer.invoke(`terminalSession-${sessionId}:connect`),
+  requestPty: (sessionId: string) => ipcRenderer.invoke(`terminalSession-${sessionId}:getPty`)
+} satisfies (typeof window)['sshSetup']);
+
+contextBridge.exposeInMainWorld('network', {
+  ping: (address: string, port: number = 22) =>
+    ipcRenderer.invoke('network:ping', { address, port })
 });

@@ -14,6 +14,7 @@ export class SSHSessionController extends IpcController {
     this.addHandler('kill', () => this.handleKill());
     // connection related handlers
     this.addHandler('connect', () => this.connect());
+    this.addHandler('getPty', () => this.getPty());
   }
 
   handleClientInput(input: string) {
@@ -40,5 +41,10 @@ export class SSHSessionController extends IpcController {
   @IPCResponse<boolean>()
   connect() {
     return this.sshSession.attemptConnection();
+  }
+
+  @IPCResponse<void>()
+  getPty() {
+    return this.sshSession.getPty();
   }
 }

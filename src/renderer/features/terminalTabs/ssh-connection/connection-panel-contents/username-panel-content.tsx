@@ -27,7 +27,7 @@ function UserPanelContent({ hostConfig }: ConnectionPanelProps) {
           </TooltipTrigger>
           <TooltipContent>The username from your OS will be used instead.</TooltipContent>
         </Tooltip>
-        <Button disabled={!hostConfig.username} onClick={next}>
+        <Button disabled={!username} onClick={next}>
           Continue
         </Button>
       </div>

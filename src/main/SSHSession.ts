@@ -4,6 +4,7 @@ import log from 'electron-log/main';
 import { ClientChannel, PseudoTtyOptions } from 'ssh2';
 import { TerminalSession } from './TerminalSession';
 import { SSHSessionController } from './controllers/ssh-session-controller';
+import { IPCError } from './helpers';
 
 const DEFAULT_TTY_OPTS: PseudoTtyOptions = {
   cols: 80,
@@ -34,17 +35,29 @@ export class SSHSession extends TerminalSession {
   public async attemptConnection() {
     try {
       await this.ssh.connect(this.hostConfig);
-      await this.setupPty();
       return true;
     } catch (error) {
       if (error instanceof AggregateError) {
         log.error(`[SSHSession] - Failed to connect to SSH server: ${error.errors}`);
+        throw new IPCError(
+          'SSHConnectionError',
+          'Multiple errors occurred while connecting to SSH server',
+          { messages: error.errors.map(e => e.message) }
+        );
       }
-      throw new Error(error.errors[0].message);
+      throw new IPCError(
+        'SSHConnectionError',
+        `Failed to connect to SSH server: ${error.message}`,
+        { messages: [error.message] }
+      );
     }
   }
 
-  async setupPty() {
+  async getPty() {
+    if (this.clientSSHChannel && !this.clientSSHChannel?.closed) {
+      return; // PTY already set up
+    }
+
     this.clientSSHChannel = await this.ssh.requestShell(DEFAULT_TTY_OPTS);
     this.clientSSHChannel.on('data', (data: Buffer) => {
       this.controller.sendInputToClient(data.toString('utf8'));

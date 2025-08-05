@@ -8,6 +8,7 @@ import AuthPanelContent from './connection-panel-contents/auth-panel-content';
 import NetworkPanelContent from './connection-panel-contents/network-panel-content';
 import { ConnectionStepper } from './stepper-config';
 import { TypographyH3 } from '@/components/ui/TypographyH3';
+import SuccessPanelContent from './connection-panel-contents/success-panel-content';
 
 type SSHConnectionViewProps = {
   sessionId: string;
@@ -15,9 +16,14 @@ type SSHConnectionViewProps = {
   onConnect: () => void;
 };
 
-function SSHConnectionDialog({ hostId }: SSHConnectionViewProps) {
+function SSHConnectionDialog({ hostId, sessionId, onConnect }: SSHConnectionViewProps) {
   const hosts = useAppSelector(selectHosts);
   const [hostConfig] = useState(() => hosts.find(host => host.id === hostId));
+
+  const attemptConnect = async () => {
+    const res = await window.sshSetup.connect(sessionId);
+    return res.success;
+  };
 
   return (
     <Card>
@@ -46,15 +52,19 @@ function SSHConnectionDialog({ hostId }: SSHConnectionViewProps) {
                   ),
                   'step-network': step => (
                     <Panel {...step}>
-                      <NetworkPanelContent />
+                      <NetworkPanelContent hostConfig={hostConfig} />
                     </Panel>
                   ),
                   'step-auth': step => (
                     <Panel {...step}>
-                      <AuthPanelContent hostConfig={hostConfig} />
+                      <AuthPanelContent hostConfig={hostConfig} attemptConnect={attemptConnect} />
                     </Panel>
                   ),
-                  'step-success': step => <Panel {...step}></Panel>
+                  'step-success': step => (
+                    <Panel {...step}>
+                      <SuccessPanelContent onSuccess={onConnect} />
+                    </Panel>
+                  )
                 })}
               </div>
             </>
