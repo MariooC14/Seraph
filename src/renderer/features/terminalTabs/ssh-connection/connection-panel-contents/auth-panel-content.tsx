@@ -38,7 +38,7 @@ function AuthPanelContent({
   return (
     <div>
       {error && <div className="text-red-500 mt-4">{error}</div>}
-      {(connectState === 'initial' || connectState === 'error') && !hostConfig.password && (
+      {connectState !== 'pending' && !hostConfig.password && (
         <>
           <Input
             placeholder="Password"
@@ -52,14 +52,6 @@ function AuthPanelContent({
         </>
       )}
       {connectState === 'pending' && <Spinner size={32} />}
-      {connectState === 'complete' && (
-        <>
-          <div className="text-green-500 mt-4">Connected successfully!</div>
-          <div className="w-full text-right mt-4">
-            <Button onClick={next}>Next</Button>
-          </div>
-        </>
-      )}
     </div>
   );
 }
