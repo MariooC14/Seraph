@@ -65,9 +65,7 @@ export class SSHSession extends TerminalSession {
     this.clientSSHChannel.on('data', (data: Buffer) => {
       this.controller.sendInputToClient(data.toString('utf8'));
     });
-    this.clientSSHChannel.on('exit', code => {
-      this.controller.sendExitSignal(code);
-    });
+    this.clientSSHChannel.on('exit', code => this.terminate(code));
   }
 
   setUsername(username: string, save = false) {
@@ -88,8 +86,11 @@ export class SSHSession extends TerminalSession {
     this.clientSSHChannel?.write(input);
   }
 
-  public terminate() {
+  public terminate(code?: number) {
+    this.controller.stopListening();
+    this.controller.sendExitSignal(code ?? 0);
     this.clientSSHChannel?.close();
+    this.terminalsService.removeSession(this.sessionId);
   }
 
   // todo: Check if this is needed

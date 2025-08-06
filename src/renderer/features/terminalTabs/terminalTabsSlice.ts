@@ -33,7 +33,7 @@ export const terminalTabsSlice = createAppSlice({
       const tabToClose = state.tabs.find(tab => tab.id === sessionId);
       if (!tabToClose) return;
 
-      terminalSessionRegistry.terminateSession(sessionId);
+      terminalSessionRegistry.terminateSession(sessionId, tabToClose.type);
       state.tabs = state.tabs.filter(tab => tab.id !== sessionId);
       if (state.tabs.length > 0) {
         state.focusedTabIdx = state.tabs.length - 1;

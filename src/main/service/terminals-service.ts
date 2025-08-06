@@ -77,7 +77,8 @@ export class TerminalsService {
     this.sessions.clear();
   }
 
-  // Remove a session without terminating it - this can happen when a session is already closed
+  // Remove a session without terminating it
+  // This can happen when a session is already closed or a session doesn't have a pty (e.g. SSH session before connection)
   public removeSession(sessionId: string) {
     log.info(`[TerminalManager] - Removing session ${sessionId} from manager`);
     this.sessions.delete(sessionId);

@@ -51,14 +51,19 @@ class TerminalSessionRegistry {
     return this.sessions.get(id);
   }
 
-  terminateSession(sessionId: string) {
+  async terminateSession(sessionId: string, type: 'local' | 'ssh') {
     const session = this.sessions.get(sessionId);
-    if (session) {
-      session.terminate();
-      this.sessions.delete(sessionId);
-      return true;
+
+    // ssh session may be in the connection setup phase and does not have a pty yet
+    if (type === 'ssh' && !session) {
+      await window.sshSetup.cancelConnection(sessionId);
+      return;
     }
-    return false;
+
+    if (session && !session.terminated) {
+      await session.terminate();
+    }
+    this.sessions.delete(sessionId);
   }
 }
 

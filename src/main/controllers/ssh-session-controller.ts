@@ -21,6 +21,7 @@ export class SSHSessionController extends IpcController {
     this.addHandler('setPassword', (password: string, save?: boolean) =>
       this.setPassword(password, save)
     );
+    this.addHandler('cancelConnection', () => this.cancelConnection());
   }
 
   handleClientInput(input: string) {
@@ -62,5 +63,9 @@ export class SSHSessionController extends IpcController {
   @IPCResponse<void>()
   setPassword(password: string, save?: boolean) {
     return this.sshSession.setPassword(password, save);
+  }
+
+  cancelConnection() {
+    return this.sshSession.terminate();
   }
 }

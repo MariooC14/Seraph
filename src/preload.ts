@@ -52,7 +52,9 @@ contextBridge.exposeInMainWorld('sshSetup', {
   setUsername: (sessionId, username, save) =>
     ipcRenderer.invoke(`terminalSession-${sessionId}:setUsername`, username, save),
   setPassword: (sessionId, password, save) =>
-    ipcRenderer.invoke(`terminalSession-${sessionId}:setPassword`, password, save)
+    ipcRenderer.invoke(`terminalSession-${sessionId}:setPassword`, password, save),
+  cancelConnection: (sessionId: string) =>
+    ipcRenderer.invoke(`terminalSession-${sessionId}:cancelConnection`)
 } satisfies (typeof window)['sshSetup']);
 
 contextBridge.exposeInMainWorld('network', {

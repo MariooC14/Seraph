@@ -40,8 +40,8 @@ export class LocalTerminalSession extends TerminalSession {
       this.controller?.sendInputToClient(data);
     });
     this.terminal.onExit(code => {
-      this.terminalsService.removeSession(this.sessionId);
       this.controller?.sendExitSignal(code.exitCode);
+      this.terminalsService.removeSession(this.sessionId);
     });
   }
 

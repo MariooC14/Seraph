@@ -56,6 +56,7 @@ declare global {
       requestPty: (sessionId: string) => IPCPromise<void>;
       setUsername: (sessionId: string, username: string, save?: boolean) => IPCPromise<void>;
       setPassword: (sessionId: string, password: string, save?: boolean) => IPCPromise<void>;
+      cancelConnection: (sessionId: string) => IPCPromise<void>;
     };
 
     network: {

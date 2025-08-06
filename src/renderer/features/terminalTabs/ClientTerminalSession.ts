@@ -14,6 +14,7 @@ export class ClientTerminalSession {
   private terminal: Terminal;
   private fitAddon: FitAddon;
   private webLinksAddon: WebLinksAddon;
+  public _terminated: boolean = false;
 
   /** Creates a terminal session given an existing pty's session id */
   constructor(sessionId: string, terminalType: 'local' | 'ssh') {
@@ -70,9 +71,18 @@ export class ClientTerminalSession {
     }
   }
 
-  public terminate() {
-    window.terminal.terminateSession(this._sessionId);
+  public async terminate() {
+    await window.terminal.terminateSession(this._sessionId);
     this.terminal.dispose();
+  }
+
+  public get terminated() {
+    return this._terminated;
+  }
+
+  // Used to prevent double termination
+  public markAsTerminated() {
+    this._terminated = true;
   }
 
   public get terminalOptions() {

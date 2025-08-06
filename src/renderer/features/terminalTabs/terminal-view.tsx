@@ -22,6 +22,7 @@ function TerminalView({ clientTerminalSession: cts, onClose, isVisible }: Termin
 
     window.terminal.onSessionTerminated(cts.sessionId, code => {
       toast.info(`Terminal session ended with code ${code}`);
+      cts.markAsTerminated();
       dispatch(closeTab(cts.sessionId));
     });
 
