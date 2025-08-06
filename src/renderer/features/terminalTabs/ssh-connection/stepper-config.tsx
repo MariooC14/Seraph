@@ -10,6 +10,7 @@ type ConnectionStep = {
 
 export type ConnectionPanelProps = {
   hostConfig?: HostConfig;
+  sessionId?: string;
 };
 
 const allSteps = {

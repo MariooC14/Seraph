@@ -15,6 +15,12 @@ export class SSHSessionController extends IpcController {
     // connection related handlers
     this.addHandler('connect', () => this.connect());
     this.addHandler('getPty', () => this.getPty());
+    this.addHandler('setUsername', (username: string, save?: boolean) =>
+      this.setUsername(username, save)
+    );
+    this.addHandler('setPassword', (password: string, save?: boolean) =>
+      this.setPassword(password, save)
+    );
   }
 
   handleClientInput(input: string) {
@@ -46,5 +52,15 @@ export class SSHSessionController extends IpcController {
   @IPCResponse<void>()
   getPty() {
     return this.sshSession.getPty();
+  }
+
+  @IPCResponse<void>()
+  setUsername(username: string, save?: boolean) {
+    return this.sshSession.setUsername(username, save);
+  }
+
+  @IPCResponse<void>()
+  setPassword(password: string, save?: boolean) {
+    return this.sshSession.setPassword(password, save);
   }
 }

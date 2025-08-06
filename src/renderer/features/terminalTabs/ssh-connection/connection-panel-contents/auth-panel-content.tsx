@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 
 function AuthPanelContent({
   hostConfig,
+  sessionId,
   attemptConnect
 }: ConnectionPanelProps & { attemptConnect: () => Promise<boolean> }) {
   const { next } = useConnectionStepper();
@@ -21,6 +22,9 @@ function AuthPanelContent({
 
   async function tryConnect() {
     setConnectState('pending');
+    if (password) {
+      await window.sshSetup.setPassword(sessionId, password);
+    }
     const success = await attemptConnect();
     if (success) {
       setConnectState('complete');

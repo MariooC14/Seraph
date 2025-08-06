@@ -25,6 +25,8 @@ function SSHConnectionDialog({ hostId, sessionId, onConnect }: SSHConnectionView
     return res.success;
   };
 
+  const panelProps = { hostConfig, sessionId, attemptConnect };
+
   return (
     <Card>
       <CardHeader>
@@ -47,17 +49,17 @@ function SSHConnectionDialog({ hostId, sessionId, onConnect }: SSHConnectionView
                 {methods.switch({
                   'step-user': step => (
                     <Panel {...step}>
-                      <UsernamePanelContent hostConfig={hostConfig} />
+                      <UsernamePanelContent {...panelProps} />
                     </Panel>
                   ),
                   'step-network': step => (
                     <Panel {...step}>
-                      <NetworkPanelContent hostConfig={hostConfig} />
+                      <NetworkPanelContent {...panelProps} />
                     </Panel>
                   ),
                   'step-auth': step => (
                     <Panel {...step}>
-                      <AuthPanelContent hostConfig={hostConfig} attemptConnect={attemptConnect} />
+                      <AuthPanelContent {...panelProps} />
                     </Panel>
                   ),
                   'step-success': step => (

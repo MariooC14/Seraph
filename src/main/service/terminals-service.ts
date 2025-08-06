@@ -61,7 +61,8 @@ export class TerminalsService {
       throw new Error(`No host config found for id: ${hostId}`);
     }
     const newSessionId = uuidv4();
-    const newSSHSession = new SSHSession(this, newSessionId, hostConfig);
+    // Clone config to avoid modifying the original (e.g. username, password)
+    const newSSHSession = new SSHSession(this, newSessionId, { ...hostConfig });
     const controller = new SSHSessionController(this._window, newSSHSession).startListening();
     newSSHSession.setController(controller).init();
     this.sessions.set(newSSHSession.sessionId, newSSHSession);

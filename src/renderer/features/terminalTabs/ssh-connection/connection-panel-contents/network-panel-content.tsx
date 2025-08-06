@@ -15,6 +15,7 @@ function NetworkPanelContent({ hostConfig }: ConnectionPanelProps) {
     window.network.ping(hostConfig.host, hostConfig.port).then(res => {
       if (res.success === true) {
         setConnectState('complete');
+        setTimeout(next, 1000);
       } else {
         setConnectState('error');
         setErrors(res.details?.messages);
@@ -29,9 +30,7 @@ function NetworkPanelContent({ hostConfig }: ConnectionPanelProps) {
   return (
     <div>
       {connectState === 'pending' && <Spinner className="mt-4" size={32} />}
-      {connectState === 'complete' && (
-        <div className="text-green-500 mt-4">Connected successfully!</div>
-      )}
+      {connectState === 'complete' && <div className="text-green-500 mt-4">Host is reachable!</div>}
       {connectState === 'error' && (
         <>
           <TypographyP className="text-red-500 mt-2">Failed to reach host.</TypographyP>
@@ -51,7 +50,6 @@ function NetworkPanelContent({ hostConfig }: ConnectionPanelProps) {
       )}
       <div className="w-full text-right mt-4">
         {connectState === 'error' && <Button onClick={() => pingHost()}>Retry</Button>}
-        {connectState === 'complete' && <Button onClick={next}>Next</Button>}
       </div>
     </div>
   );

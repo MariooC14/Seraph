@@ -5,6 +5,8 @@ import { ClientChannel, PseudoTtyOptions } from 'ssh2';
 import { TerminalSession } from './TerminalSession';
 import { SSHSessionController } from './controllers/ssh-session-controller';
 import { IPCError } from './helpers';
+import { HostsService } from './service/hosts-service';
+import { HostConfig } from '@/dts/host-config';
 
 const DEFAULT_TTY_OPTS: PseudoTtyOptions = {
   cols: 80,
@@ -21,7 +23,7 @@ export class SSHSession extends TerminalSession {
   constructor(
     terminalManager: TerminalsService,
     sessionId: string,
-    private hostConfig: Config
+    private hostConfig: HostConfig
   ) {
     super(terminalManager, sessionId);
     this.ssh = new NodeSSH();
@@ -34,6 +36,7 @@ export class SSHSession extends TerminalSession {
 
   public async attemptConnection() {
     try {
+      // Uses the OS username if username is missing
       await this.ssh.connect(this.hostConfig);
       return true;
     } catch (error) {
@@ -65,6 +68,20 @@ export class SSHSession extends TerminalSession {
     this.clientSSHChannel.on('exit', code => {
       this.controller.sendExitSignal(code);
     });
+  }
+
+  setUsername(username: string, save = false) {
+    this.hostConfig.username = username;
+    if (save) {
+      HostsService.instance.updateHost(this.hostConfig.id, { username });
+    }
+  }
+
+  setPassword(password: string, save = false) {
+    this.hostConfig.password = password;
+    if (save) {
+      HostsService.instance.updateHost(this.hostConfig.id, { password });
+    }
   }
 
   public writeToPty(input: string) {

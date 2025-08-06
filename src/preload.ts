@@ -48,7 +48,11 @@ contextBridge.exposeInMainWorld('hosts', {
 
 contextBridge.exposeInMainWorld('sshSetup', {
   connect: (sessionId: string) => ipcRenderer.invoke(`terminalSession-${sessionId}:connect`),
-  requestPty: (sessionId: string) => ipcRenderer.invoke(`terminalSession-${sessionId}:getPty`)
+  requestPty: (sessionId: string) => ipcRenderer.invoke(`terminalSession-${sessionId}:getPty`),
+  setUsername: (sessionId, username, save) =>
+    ipcRenderer.invoke(`terminalSession-${sessionId}:setUsername`, username, save),
+  setPassword: (sessionId, password, save) =>
+    ipcRenderer.invoke(`terminalSession-${sessionId}:setPassword`, password, save)
 } satisfies (typeof window)['sshSetup']);
 
 contextBridge.exposeInMainWorld('network', {

@@ -54,6 +54,8 @@ declare global {
     sshSetup: {
       connect: (sessionId: string) => IPCPromise<boolean>;
       requestPty: (sessionId: string) => IPCPromise<void>;
+      setUsername: (sessionId: string, username: string, save?: boolean) => IPCPromise<void>;
+      setPassword: (sessionId: string, password: string, save?: boolean) => IPCPromise<void>;
     };
 
     network: {
