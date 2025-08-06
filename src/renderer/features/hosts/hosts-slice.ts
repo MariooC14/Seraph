@@ -29,6 +29,11 @@ const hostsSlice = createAppSlice({
     removeHost(state, action: PayloadAction<string>) {
       state.hosts = state.hosts.filter(host => host.id !== action.payload);
     },
+    updateHost(state, action: PayloadAction<HostConfig>) {
+      state.hosts = state.hosts.map(host =>
+        host.id === action.payload.id ? action.payload : host
+      );
+    },
     setFetching(state, action: PayloadAction<boolean>) {
       state.fetching = action.payload;
     }
@@ -46,9 +51,20 @@ export function getHosts(): AppThunk {
     if (hostsResponse.success === true) {
       dispatch(setHosts(hostsResponse.data));
     } else {
-      console.error('Failed to fetch host configs:', hostsResponse.error);
+      console.error('Failed to fetch host configs:', hostsResponse.message);
     }
     dispatch(setFetching(false));
+  };
+}
+
+export function updateHostConfig(host: HostConfig): AppThunk {
+  return async dispatch => {
+    const updateResponse = await window.hosts.update(host);
+    if (updateResponse.success === true) {
+      dispatch(updateHost(updateResponse.data));
+    } else {
+      console.error('Failed to update host config:', updateResponse.message);
+    }
   };
 }
 
@@ -58,7 +74,7 @@ export function addHostConfig(host: Omit<HostConfig, 'id'>): AppThunk {
     if (newHostResponse.success === true) {
       dispatch(addHost(newHostResponse.data));
     } else {
-      console.error('Failed to add host config:', newHostResponse.error);
+      console.error('Failed to add host config:', newHostResponse.message);
     }
   };
 }
@@ -69,11 +85,11 @@ export function removeHostConfig(hostId: string): AppThunk {
     if (removeResponse.success === true) {
       dispatch(removeHost(hostId));
     } else {
-      console.error('Failed to remove host config:', removeResponse.error);
+      console.error('Failed to remove host config:', removeResponse.message);
     }
   };
 }
 
-const { setHosts, addHost, removeHost, setFetching } = hostsSlice.actions;
+const { setHosts, addHost, removeHost, updateHost, setFetching } = hostsSlice.actions;
 export const { selectHosts, selectHostsFetching } = hostsSlice.selectors;
 export default hostsSlice.reducer;

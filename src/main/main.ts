@@ -8,8 +8,11 @@ import { HostsService } from './service/hosts-service';
 import { WindowController } from './controllers/window-controller';
 import { TerminalsController } from './controllers/terminals-controller';
 import { HostsController } from './controllers/hosts-controller';
+import { NetworkService } from './service/network-service';
+import { NetworkController } from './controllers/network-controller';
 
 let terminalsService: TerminalsService;
+let networkService: NetworkService;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -25,8 +28,10 @@ app.whenReady().then(() => {
   HostsService.init();
   StorageManager.init();
   WindowService.instance.createMainWindow();
+  networkService = new NetworkService();
   terminalsService = new TerminalsService();
 
+  new NetworkController(networkService).startListening();
   new HostsController(HostsService.instance).startListening();
   new TerminalsController(terminalsService).startListening();
   windowController.startListening();

@@ -8,14 +8,15 @@ declare global {
     data: T;
   }
 
-  interface ErrorResponse extends BaseIPCResponse {
+  interface ErrorResponse<E = void> extends BaseIPCResponse {
     success: false;
-    error: string;
     code?: string;
+    message: string;
+    details?: E;
   }
 
-  type IPCResponse<T = void> = SuccessResponse<T> | ErrorResponse;
-  type IPCPromise<T = void> = Promise<IPCResponse<T>>;
+  type IPCResponse<T = void, E = void> = SuccessResponse<T> | ErrorResponse<E>;
+  type IPCPromise<T = void, E = void> = Promise<IPCResponse<T, E>>;
 
   interface Window {
     terminal: {
@@ -32,7 +33,7 @@ declare global {
     };
 
     app: {
-      exit(): () => void;
+      exit(): typeof ipcRenderer.invoke;
       maximize: () => void;
       unmaximize: () => void;
       minimize: () => void;
@@ -47,6 +48,19 @@ declare global {
       get: (id: string) => IPCPromise<HostConfig | undefined>;
       add: (host: Omit<HostConfig, 'id'>) => IPCPromise<HostConfig>;
       remove: (id: string) => IPCPromise<void>;
+      update: (host: HostConfig) => IPCPromise<HostConfig>;
+    };
+
+    sshSetup: {
+      connect: (sessionId: string) => IPCPromise<boolean>;
+      requestPty: (sessionId: string) => IPCPromise<void>;
+      setUsername: (sessionId: string, username: string, save?: boolean) => IPCPromise<void>;
+      setPassword: (sessionId: string, password: string, save?: boolean) => IPCPromise<void>;
+      cancelConnection: (sessionId: string) => IPCPromise<void>;
+    };
+
+    network: {
+      ping: (address: string, port?: number) => IPCPromise<boolean, { messages: string[] }>;
     };
   }
 

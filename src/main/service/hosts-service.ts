@@ -1,6 +1,7 @@
 import { HostConfig } from '@/dts/host-config';
 import { StorageManager } from '../StorageManager';
 import { v4 as uuidv4 } from 'uuid';
+import { IPCError } from '../helpers';
 
 /**
  * This class manages host configurations for terminal sessions
@@ -58,6 +59,19 @@ export class HostsService {
   public removeHost(id: string): void {
     this.hostConfigs.delete(id);
     StorageManager.instance.saveHosts(this.getHosts());
+  }
+
+  public updateHost(id: string, updatedConfig: Omit<Partial<HostConfig>, 'id'>): HostConfig {
+    const existingHost = this.getHostById(id);
+    if (!existingHost) {
+      throw new IPCError(`Host with ID ${id} does not exist`, 'NOT_FOUND');
+    }
+
+    const updatedHostConfig: HostConfig = { ...existingHost, ...updatedConfig };
+
+    this.hostConfigs.set(id, updatedHostConfig);
+    StorageManager.instance.saveHosts(this.getHosts());
+    return updatedHostConfig;
   }
 
   private loadHostsFromStorage() {

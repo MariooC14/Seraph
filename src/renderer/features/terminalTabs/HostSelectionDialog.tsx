@@ -62,7 +62,7 @@ export default function HostSelectionDialog({ open, handleOpenChange }: HostSele
         <CommandGroup heading="Hosts">
           {hostConfigs.map(host => (
             <CommandItem key={host.id} onSelect={() => handleItemSelect(host)}>
-              {host.label}
+              {host.label || host.host}
             </CommandItem>
           ))}
         </CommandGroup>

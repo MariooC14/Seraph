@@ -13,7 +13,8 @@ import {
   getHosts,
   removeHostConfig,
   selectHosts,
-  selectHostsFetching
+  selectHostsFetching,
+  updateHostConfig
 } from '@/features/hosts/hosts-slice';
 import { type HostFormData } from '@/lib/host-validation';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -42,9 +43,7 @@ export default function HostsPage() {
   }
 
   async function handleUpdateHost(hostConfig: HostConfig) {
-    // TODO: Implement proper update method in the backend
-    dispatch(removeHostConfig(hostConfig.id));
-    dispatch(addHostConfig(hostConfig));
+    dispatch(updateHostConfig(hostConfig));
   }
 
   function handleDeleteHost(hostConfig: HostConfig) {

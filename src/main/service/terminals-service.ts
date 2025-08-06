@@ -61,10 +61,10 @@ export class TerminalsService {
       throw new Error(`No host config found for id: ${hostId}`);
     }
     const newSessionId = uuidv4();
-    const newSSHSession = new SSHSession(this, newSessionId, hostConfig);
+    // Clone config to avoid modifying the original (e.g. username, password)
+    const newSSHSession = new SSHSession(this, newSessionId, { ...hostConfig });
     const controller = new SSHSessionController(this._window, newSSHSession).startListening();
-    newSSHSession.setController(controller);
-    await newSSHSession.init();
+    newSSHSession.setController(controller).init();
     this.sessions.set(newSSHSession.sessionId, newSSHSession);
     return newSessionId;
   }
@@ -77,7 +77,8 @@ export class TerminalsService {
     this.sessions.clear();
   }
 
-  // Remove a session without terminating it - this can happen when a session is already closed
+  // Remove a session without terminating it
+  // This can happen when a session is already closed or a session doesn't have a pty (e.g. SSH session before connection)
   public removeSession(sessionId: string) {
     log.info(`[TerminalManager] - Removing session ${sessionId} from manager`);
     this.sessions.delete(sessionId);

@@ -80,11 +80,11 @@ async function getAvailableShellsForWindows() {
 
 // Decorator function that wraps the return value of a method into an IPCResponse
 // Similar in spirit to spring rest controllers but for IPC
-export function IPCResponse<T>() {
+export function IPCResponse<SuccessType, ErrorType = void>() {
   return function (_target: unknown, _propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function (...args: unknown[]): IPCPromise<T> {
+    descriptor.value = async function (...args: unknown[]): IPCPromise<SuccessType, ErrorType> {
       try {
         const result = await originalMethod.apply(this, args);
         return { success: true, data: result };
@@ -92,11 +92,27 @@ export function IPCResponse<T>() {
         log.error('IPC Response Error:', error);
         return {
           success: false,
-          error: error?.message || 'Unknown error'
+          code: error.code,
+          message: error.message,
+          details: error.details as ErrorType
         };
       }
     };
 
     return descriptor;
   };
+}
+
+// IPC cannot directly pass errors from main to renderer.
+// Our workaround is to create an error object that has a details field
+// and put your custom error messages there.
+export class IPCError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public details?: unknown
+  ) {
+    super(message);
+    this.name = 'IPCError';
+  }
 }

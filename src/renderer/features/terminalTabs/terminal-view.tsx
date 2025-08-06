@@ -12,11 +12,7 @@ type TerminalViewProps = {
   isVisible: boolean;
 };
 
-export default function TerminalView({
-  clientTerminalSession: cts,
-  onClose,
-  isVisible
-}: TerminalViewProps) {
+function TerminalView({ clientTerminalSession: cts, onClose, isVisible }: TerminalViewProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
 
@@ -26,6 +22,7 @@ export default function TerminalView({
 
     window.terminal.onSessionTerminated(cts.sessionId, code => {
       toast.info(`Terminal session ended with code ${code}`);
+      cts.markAsTerminated();
       dispatch(closeTab(cts.sessionId));
     });
 
@@ -69,3 +66,5 @@ export default function TerminalView({
     />
   );
 }
+
+export default TerminalView;

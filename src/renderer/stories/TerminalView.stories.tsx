@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import TerminalView from '@/features/terminalTabs/TerminalView';
+import TerminalView from '@/features/terminalTabs/terminal-view';
 import { ITerminalOptions } from '@xterm/xterm';
 import createSimpleMockTerminal from './mockTerminalEnvironment';
 import { defaultTerminalOptions } from '@/features/terminalTabs/terminalConfig';
@@ -66,7 +66,7 @@ type Story = StoryObj<TerminalViewPropsAndTerminalOptions>;
 export const Presets: Story = {
   render: args => {
     // Maintain terminal when changing props but create new when switching stories
-    const [terminal] = useState(new ClientTerminalSession('mock-session-id'));
+    const [terminal] = useState(new ClientTerminalSession('mock-session-id', 'local'));
     const { themeKey, ...rest } = args;
 
     terminal.terminalOptions.theme = themeOptions[themeKey || 'Default'];
