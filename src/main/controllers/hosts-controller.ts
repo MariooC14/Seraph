@@ -10,6 +10,7 @@ export class HostsController extends IpcController {
     this.addHandler('getById', (hostId: string) => this.getHostById(hostId));
     this.addHandler('add', (hostConfig: Omit<HostConfig, 'id'>) => this.addHost(hostConfig));
     this.addHandler('remove', (hostId: string) => this.removeHost(hostId));
+    this.addHandler('update', (host: HostConfig) => this.updateHost(host));
   }
 
   @IPCResponse<HostConfig[]>()
@@ -35,5 +36,10 @@ export class HostsController extends IpcController {
   removeHost(hostId: string) {
     this.hostsService.removeHost(hostId);
     return true;
+  }
+
+  @IPCResponse<HostConfig>()
+  updateHost(host: HostConfig) {
+    return this.hostsService.updateHost(host.id, host);
   }
 }

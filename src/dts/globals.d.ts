@@ -48,6 +48,7 @@ declare global {
       get: (id: string) => IPCPromise<HostConfig | undefined>;
       add: (host: Omit<HostConfig, 'id'>) => IPCPromise<HostConfig>;
       remove: (id: string) => IPCPromise<void>;
+      update: (host: HostConfig) => IPCPromise<HostConfig>;
     };
 
     sshSetup: {

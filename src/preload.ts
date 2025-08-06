@@ -42,7 +42,8 @@ contextBridge.exposeInMainWorld('hosts', {
   getAll: () => ipcRenderer.invoke('hosts:getAll'),
   get: (id: string) => ipcRenderer.invoke('hosts:getById', id),
   add: (host: Omit<HostConfig, 'id'>) => ipcRenderer.invoke('hosts:add', host),
-  remove: (id: string) => ipcRenderer.invoke('hosts:remove', id)
+  remove: (id: string) => ipcRenderer.invoke('hosts:remove', id),
+  update: (host: HostConfig) => ipcRenderer.invoke('hosts:update', host)
 } satisfies (typeof window)['hosts']);
 
 contextBridge.exposeInMainWorld('sshSetup', {
